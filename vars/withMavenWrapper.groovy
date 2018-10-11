@@ -3,8 +3,8 @@
 import hudson.model.*
 
 def call(Closure body=null) {
-	this.vars = [:]
-	call(vars, body)
+    this.vars = [:]
+    call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
@@ -18,7 +18,14 @@ def call(Map vars, Closure body=null) {
         //"-Djava.io.tmpdir=./target/tmp",
         ].join(" ")
 
-    if (env.DEBUG_RUN) {
+    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
+    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
+    def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
+    def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
+
+    if (DEBUG_RUN) {
          echo "debug added"
          MAVEN_OPTS_DEFAULT = ["${MAVEN_OPTS_DEFAULT}",
              "-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError",
@@ -27,15 +34,19 @@ def call(Map vars, Closure body=null) {
 
     def MAVEN_OPTS = vars.get("MAVEN_OPTS", "${MAVEN_OPTS_DEFAULT}")
 
-    echo "Maven OPTS have been specified: ${MAVEN_OPTS}"
+    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonardev")
+
+    echo "Maven OPTS have been specified: ${MAVEN_OPTS} - ${CLEAN_RUN}/${DRY_RUN}/${DEBUG_RUN} - ${SONAR_INSTANCE}"
 
     def goal = vars.get("goal", "install")
     def profile = vars.get("profile", "sonar")
-    def skipTests = vars.get("skipTests", false)
+    def skipTests = vars.get("skipTests", false).toBoolean()
+    def skipResults = vars.get("skipResults", false).toBoolean()
     def buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
-    def skipSonar = vars.get("skipSonar", false)
-    def skipPitest = vars.get("skipPitest", false)
+    def skipSonar = vars.get("skipSonar", false).toBoolean()
+    def skipPitest = vars.get("skipPitest", false).toBoolean()
     def buildCmdParameters = vars.get("buildCmdParameters", "")
+    def artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
 
     configFileProvider([configFile(fileId: 'fr-maven-default',  targetLocation: 'gsettings.xml', variable: 'SETTINGS_XML')]) {
         withMaven(
@@ -53,70 +64,65 @@ def call(Map vars, Closure body=null) {
                 artifactsPublisher(disabled: true)
             ]
         ) {
-            withSonarQubeEnv("${env.SONAR_INSTANCE}") {
+            withSonarQubeEnv("${SONAR_INSTANCE}") {
 
-                if (!env.RELEASE_VERSION) {
-                    echo 'No RELEASE_VERSION specified'
-                    env.RELEASE_VERSION = getReleasedVersion()
-                    //if (!env.RELEASE_VERSION) {
-                    //   error 'No RELEASE_VERSION found'
-                    //}
-                }
-                env.TARGET_TAG = getShortReleasedVersion()
-                echo "Maven RELEASE_VERSION: ${env.RELEASE_VERSION} - ${env.TARGET_TAG}"
+                if (!skipResults) {
 
-                manager.addShortText("${TARGET_TAG}")
+					if (!RELEASE_VERSION) {
+						echo 'No RELEASE_VERSION specified'
+						RELEASE_VERSION = getReleasedVersion()
+						//if (!RELEASE_VERSION) {
+						//   error 'No RELEASE_VERSION found'
+						//}
+					}
 
-                //sh 'echo SONAR_USER_HOME : ${SONAR_USER_HOME} && mkdir -p ${SONAR_USER_HOME}'
+                    TARGET_TAG = getShortReleasedVersion()
+                    echo "Maven RELEASE_VERSION: ${RELEASE_VERSION} - ${TARGET_TAG}"
 
-                if (env.RELEASE) {
-                  if (!env.RELEASE_VERSION) {
-                      env.RELEASE_VERSION = env.RELEASE_BASE
-                  } else {
-                      env.RELEASE_VERSION = env.RELEASE_VERSION
-                      substitutePomXmlVersion {
-                          newVersion = env.RELEASE_VERSION
+                    manager.addShortText("${TARGET_TAG}")
+
+                    //sh 'echo SONAR_USER_HOME : ${SONAR_USER_HOME} && mkdir -p ${SONAR_USER_HOME}'
+
+                    if (RELEASE) {
+                      if (!RELEASE_VERSION) {
+                          RELEASE_VERSION = RELEASE_BASE
+                      } else {
+                          RELEASE_VERSION = RELEASE_VERSION
+                          substitutePomXmlVersion {
+                              newVersion = RELEASE_VERSION
+                          }
                       }
-                  }
-                }
+                    }
+
+                } // skipResults
 
                 String MAVEN_GOALS = "-s ${SETTINGS_XML}"
 
-                if (env.CLEAN_RUN) {
+                if (CLEAN_RUN) {
                   MAVEN_GOALS += " -U clean"
                 }
 
-                if (!env.DRY_RUN) {
-                    MAVEN_GOALS += " ${goal}"
+                if (!DRY_RUN) {
+                    if (goal?.trim()) {
+                        MAVEN_GOALS += " ${goal}"
+                    }
                 } else {
                     MAVEN_GOALS += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true"
                 }
 
-                MAVEN_GOALS += " ${buildCmdParameters} -Dmaven.test.skip=${skipTests} -P ${profile}"
-
-                if (!skipPitest && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/))) {
-                    if (!env.DRY_RUN && !env.RELEASE) {
-                        echo "pitest added"
-                        MAVEN_GOALS += " -DwithHistory"
-                        MAVEN_GOALS += " org.pitest:pitest-maven:mutationCoverage"
-                    }
-                } // if DRY_RUN
-
-                if ( !skipSonar && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/))) {
-                    echo "sonar added"
-                    if (env.BRANCH_NAME ==~ /develop/) {
-                        MAVEN_GOALS += " -Dsonar.branch.name=develop"
-                    } else {
-                        MAVEN_GOALS += " -Dsonar.branch.name=${env.BRANCH_NAME}"
-                        MAVEN_GOALS += " -Dsonar.branch.target=develop"
-                    }
-                    MAVEN_GOALS += " sonar:sonar"
+                if (buildCmdParameters?.trim()) {
+                    MAVEN_GOALS += " ${buildCmdParameters}"
                 }
 
-                if ((env.BRANCH_NAME ==~ /release\/.*/) || (env.BRANCH_NAME ==~ /master\/.*/)) {
-                    echo "skip test added"
-                    MAVEN_GOALS += " -Dmaven.test.failure.ignore=true -Dmaven.test.failure.skip=true"
+                if (profile?.trim()) {
+                    MAVEN_GOALS += " -P${profile}"
                 }
+
+                MAVEN_GOALS += getMavenGoalsPitest(skipPitest: skipPitest)
+
+                MAVEN_GOALS += getMavenGoalsSonar(skipSonar: skipSonar)
+
+                MAVEN_GOALS += getMavenGoalsTest(skipTests: skipTests)
 
                 echo "Maven GOALS have been specified: ${MAVEN_GOALS}"
                 buildCmd += "${MAVEN_GOALS}"
@@ -124,13 +130,54 @@ def call(Map vars, Closure body=null) {
                 //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                     // Run the maven build
                     sh buildCmd
-                    if (env.DEBUG_RUN) {
+                    if (DEBUG_RUN) {
                         writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
                     }
-			        if (body) { body() }
+                    if (body) { body() }
                 //} // Xvfb
             } // withSonarQubeEnv
         } // withMaven
     } // configFileProvider
+
+    if (!skipResults) {
+        if (!DRY_RUN) {
+
+            stash includes: "${artifacts}", name: 'maven-artifacts'
+
+            stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
+
+            //dir('target') {stash name: 'app', includes: '*.war, *.jar'}
+            stash allowEmpty: true, includes: '**/target/*.war, **/target/*.jar', name: 'app'
+            stash includes: "**/target/classes/**", name: 'classes'
+        }
+
+        if ((!DRY_RUN && !RELEASE) && !skipTests) {
+            junit '**/target/surefire-reports/TEST-*.xml'
+        } // if DRY_RUN
+
+        step([
+             $class: "WarningsPublisher",
+             canComputeNew: false,
+             canResolveRelativePaths: false,
+             canRunOnFailed: true,
+             consoleParsers: [
+                 [
+                     parserName: 'Java Compiler (javac)'
+                 ],
+                 [
+                     parserName: 'Maven'
+                 ],
+                 [
+                     parserName: 'GNU Make + GNU C Compiler (gcc)', pattern: 'error_and_warnings.txt'
+                 ]
+             ],
+             //unstableTotalAll: '10',
+             //unstableTotalHigh: '0',
+             //failedTotalAll: '10',
+             //failedTotalHigh: '0',
+             usePreviousBuildAsReference: true,
+             useStableBuildAsReference: true
+             ])
+    } // skipResults
 
 }

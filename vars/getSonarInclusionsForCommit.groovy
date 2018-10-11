@@ -7,7 +7,7 @@ import groovy.json.JsonSlurper
  * returns project name from JOB_BASE_NAME
  *
  */
-def get_project_name(jobName, defaultProject="TEST") {
+def get_project_name(jobName, defaultProject="RISK") {
   def tokenized_job_name = jobName.split('/')
   if (tokenized_job_name.size() == 2) {
     return defaultProject  // e.g. CMR/develop, there is no good way to get Stash project name

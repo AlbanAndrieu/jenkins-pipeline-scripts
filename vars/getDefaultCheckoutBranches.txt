@@ -1,0 +1,10 @@
+<strong>getDefaultCheckoutBranches(isDefaultBranch: false) { ... }</strong>
+
+<p>
+Runs the branches which mut be used for the checkout:
+(It is needed in case of multi repo in workspace, because one is controlled by jenkins, the other shall not)
+<ul>
+<li>isDefaultBranch tell if checkout must be controlled by Jenkins</li>
+<li>env.GIT_BRANCH_NAME shall be specified (TODO, envrionement variables must be better managed in DSL)</li>
+</ul>
+</p>

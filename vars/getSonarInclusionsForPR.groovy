@@ -52,7 +52,7 @@ def call(body) {
   config.workspace            = config.get("workspace", env.WORKSPACE)
   config.jobName              = config.get("jobName", env.JOB_NAME)
 
-  config.project              = config.get("project", get_project_name(config.jobName, "TEST"))
+  config.project              = config.get("project", get_project_name(config.jobName, "TESTgea"))
   config.repository           = config.get("repository", get_repository_name(config.jobName))
 
   def authString

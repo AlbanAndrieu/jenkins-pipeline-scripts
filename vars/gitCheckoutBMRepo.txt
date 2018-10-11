@@ -1,0 +1,12 @@
+<strong>gitCheckoutBMRepo(vars: null, relativeTargetDir: "TODO") { ... }</strong>
+
+<p>
+Do a specific checkout for BM:
+(It is needed in case of multi repo in workspace, because one is controlled by jenkins, the other shall not)
+<ul>
+<li>vars give all the parameters which can be overriden</li>
+<li>isDefaultBranch tell if checkout must be controlled by Jenkins</li>
+<li>relativeTargetDir is the overriden path where to extract the repo</li>
+<li>body Closure is used to add some command behavior once the repo is extracted, such as specific GIT_COMMIT or GIT_REVISION</li>
+</ul>
+</p>

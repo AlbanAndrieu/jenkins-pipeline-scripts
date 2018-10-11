@@ -1,0 +1,13 @@
+<strong>gitCheckoutTESTRepo(vars: null, relativeTargetDir: "TODO") { ... }</strong>
+
+<p>
+Do a specific checkout for TEST:
+(It is needed in case of multi repo in workspace, because one is controlled by jenkins, the other shall not)
+<ul>
+<li>vars give all the parameters which can be overriden</li>
+<li>isDefaultBranch tell if checkout must be controlled by Jenkins</li>
+<li>relativeTargetDir is the overriden path where to extract the repo</li>
+<li>isScmEnabled is the overriden way to disable using default scm and use instead git with shell command (Goal is to workaround the dact that Jenkins is unable to extend the timeout)</li>
+<li>body Closure is used to add some command behavior once the repo is extracted, such as specific GIT_COMMIT or GIT_REVISION</li>
+</ul>
+</p>
