@@ -8,3 +8,6 @@ Runs the branches which mut be used for the checkout:
 <li>env.GIT_BRANCH_NAME shall be specified (TODO, envrionement variables must be better managed in DSL)</li>
 </ul>
 </p>
+<!--
+vim: ft=html
+-->

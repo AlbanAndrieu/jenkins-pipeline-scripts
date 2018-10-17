@@ -20,12 +20,10 @@ def call(Map vars, Closure body=null) {
 
     def excludeFolders = vars.get("excludeFolders", ", bm")
     def projectName = vars.get("projectName", ", TEST_Checkmarx")
-    def preset = vars.get("preset", '17') // Default 2014 //preset: '36', // Default checkmarx
+    def preset = vars.get("preset", '17')
 
-    // '7bc62ee5-b91d-4908-aea7-d12f982f70d0'
-    // '{AQAAABAAAAAQ4zdhkim0EaO0/PY/6/KdHzYOatEHaH/thBW+K7YJmL4=}'
-    def groupId = vars.get("groupId", '1d9286a6-fc4f-4d65-9010-045ca9032198')
-    def password = vars.get("password", '{AQAAABAAAAAQ1/XWT55MpaM5ha9F+rXg7L51B2fPfoy3Yg6KD7H7e4A=}')
+    def groupId = vars.get("groupId", '000')
+    def password = vars.get("password", '{AAA/BBB=}')
 
     if (!DRY_RUN && !RELEASE) {
 
@@ -51,6 +49,7 @@ def call(Map vars, Closure body=null) {
              endMillis = System.currentTimeMillis()
              if (endMillis - startMillis >= timeoutMillis) {
                echo "Approval timed out. Continuing with deployment."
+               didTimeout = true
              } else {
                userAborted = true
                echo "SYSTEM aborted, but looks like timeout period didn't complete. Aborting."
@@ -111,12 +110,12 @@ def call(Map vars, Closure body=null) {
                     osaLowThreshold: 1000,
                     osaMediumThreshold: 100,
                     useOwnServerCredentials: true,
-                    credentialsId: 'mgr.jenkins.checkmarx',
+                    credentialsId: 'nabla.checkmarx',
                     groupId: groupId,
                     password: password,
                     preset: preset,
                     projectName: projectName,
-                    serverUrl: 'https://par-checkmarx',
+                    serverUrl: 'https://nabla-checkmarx',
                     skipSCMTriggers: true,
                     sourceEncoding: '1',
                     username: '',

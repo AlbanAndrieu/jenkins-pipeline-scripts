@@ -130,9 +130,9 @@ def call(Map vars, Closure body=null) {
                 //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                     // Run the maven build
                     sh buildCmd
-                    if (DEBUG_RUN) {
-                        writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
-                    }
+                    //if (DEBUG_RUN) {
+                    //    writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
+                    //}
                     if (body) { body() }
                 //} // Xvfb
             } // withSonarQubeEnv
@@ -147,7 +147,7 @@ def call(Map vars, Closure body=null) {
             stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
 
             //dir('target') {stash name: 'app', includes: '*.war, *.jar'}
-            stash allowEmpty: true, includes: '**/target/*.war, **/target/*.jar', name: 'app'
+            stash allowEmpty: true, includes: "${artifacts}", name: 'app'
             stash includes: "**/target/classes/**", name: 'classes'
         }
 

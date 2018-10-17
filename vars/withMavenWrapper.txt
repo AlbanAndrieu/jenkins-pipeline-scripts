@@ -1,0 +1,21 @@
+<strong>withMavenWrapper(vars: null, goal: "install", ...) { ... }</strong>
+
+<p>
+Do a specific maven:
+<ul>
+<li>vars give all the parameters which can be overriden</li>
+<li>goal install allow to override default behavior</li>
+<li>profile sonar allow to override default behavior</li>
+<li>skipTests false allow to override default behavior</li>
+<li>skipResults false allow to override default behavior</li>
+<li>buildCmd, allow to override default behavior</li>
+<li>skipSonar false</li>
+<li>skipPitest false</li>
+<li>buildCmdParameters allow to override default behavior</li>
+<li>artifacts allow to override default behavior</li>
+<li>body Closure is used to add some command behavior once the repo is extracted, such as specific GIT_COMMIT or GIT_REVISION</li>
+</ul>
+</p>
+<!--
+vim: ft=html
+-->

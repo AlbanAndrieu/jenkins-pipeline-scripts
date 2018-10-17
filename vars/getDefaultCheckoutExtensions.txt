@@ -8,3 +8,6 @@ Runs the extensions which mut be used for the checkout:
 <li>relativeTargetDir is the overriden path where to extract the repo</li>
 </ul>
 </p>
+<!--
+vim: ft=html
+-->
