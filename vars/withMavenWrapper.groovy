@@ -42,7 +42,8 @@ def call(Map vars, Closure body=null) {
     def profile = vars.get("profile", "sonar")
     def skipTests = vars.get("skipTests", false).toBoolean()
     def skipResults = vars.get("skipResults", false).toBoolean()
-    def buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
+    //def buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
+    def buildCmd = vars.get("buildCmd", "-e")
     def skipSonar = vars.get("skipSonar", false).toBoolean()
     def skipPitest = vars.get("skipPitest", false).toBoolean()
     def buildCmdParameters = vars.get("buildCmdParameters", "")
@@ -52,7 +53,10 @@ def call(Map vars, Closure body=null) {
         withMaven(
             maven: 'maven-latest',
             jdk: 'java-latest',
-            globalMavenSettingsConfig: 'fr-maven-default',
+            mavenSettingsConfig: 'fr-maven-default',
+            //mavenSettingsFilePath: "${SETTINGS_XML}",
+            //globalMavenSettingsConfig: 'fr-maven-default',
+            //globalMavenSettingsFilePath: "${SETTINGS_XML}",
             mavenLocalRepo: './.repository',
             mavenOpts: "${MAVEN_OPTS}",
             options: [
@@ -129,7 +133,9 @@ def call(Map vars, Closure body=null) {
 
                 //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                     // Run the maven build
-                    sh buildCmd
+                    sh "export PATH=$MVN_CMD_DIR:/bin:$PATH && mvn ${buildCmd}"
+                    //sh "$MVN_CMD ${buildCmd}"
+                    //sh buildCmd
                     //if (DEBUG_RUN) {
                     //    writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
                     //}

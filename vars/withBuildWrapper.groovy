@@ -20,7 +20,7 @@ def call(Map vars, Closure body=null) {
     }
 
     def arch = vars.get("arch", "TEST")
-    def script = vars.get("script", "build.sh") 
+    def script = vars.get("script", "build.sh")
     def artifacts = vars.get("artifacts", ['*_VERSION.TXT',
                    '**/Executable/*.so',
                    '**/Executable/nabla',
