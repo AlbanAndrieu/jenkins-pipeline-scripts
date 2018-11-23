@@ -24,7 +24,7 @@ def call(Map vars, Closure body=null) {
 
     mavenGoals += " -Dmaven.test.skip=${skipTests}"
 
-    if ((env.BRANCH_NAME ==~ /release\/.*/) || (env.BRANCH_NAME ==~ /master\/.*/)) {
+    if (isReleaseBranch()) {
         echo "skip test added"
         mavenGoals += " -Dmaven.test.failure.ignore=true -Dmaven.test.failure.skip=true"
     }

@@ -1,7 +1,5 @@
 #!/usr/bin/groovy
-import com.cloudbees.groovy.cps.NonCPS
 
-//@NonCPS
 def call(Closure body=null) {
     this.vars = [:]
     call(vars, body)
@@ -41,10 +39,14 @@ def call(Map vars, Closure body=null) {
         }
 
         env.GIT_COMMIT = getCommitId()
-        echo "GIT_COMMIT: ${GIT_COMMIT} - ${GIT_COMMIT}"
+        if (DEBUG_RUN) {
+            echo "GIT_COMMIT: ${GIT_COMMIT} - ${GIT_COMMIT}"
+        }
 
         env.GIT_REVISION = getRevision()
-        echo "GIT_REVISION: ${GIT_REVISION} - ${GIT_REVISION}"
+        if (DEBUG_RUN) {
+            echo "GIT_REVISION: ${GIT_REVISION} - ${GIT_REVISION}"
+        }
 
         if (body) { body() }
 

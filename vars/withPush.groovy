@@ -1,15 +1,19 @@
 #!/usr/bin/groovy
 import hudson.model.*
 
-def withStageDeploy() {
+def withStageDeploy(Map vars) {
     stage("Deploy") {
         //when {
         //    expression { BRANCH_NAME ==~ /(release|master|develop)/ }
         //}
         //steps {
             script {
-                wrapInARC(isMavenEnabled: true) {
-                    withDeploy()
+                vars.put("isScmEnabled", false)
+                vars.put("isMavenEnabled", true)
+                wrapInTEST(vars) {
+                    withDeploy(vars) {
+                        unstash 'maven-artifacts'
+                    }
                 }
             } // script
         //} // steps
@@ -38,8 +42,16 @@ def withStageArchive(Map vars) {
         //}
         //steps {
             script {
+                vars.put("isScmEnabled", false)
                 wrapInTEST(vars) {
-		    withArchive(vars)
+            withArchive(vars) {
+
+                        unstash 'scons-artifacts-centos7'
+                        //unstash 'scons-artifacts-rhel7'
+                        //unstash 'scons-artifacts-osx'
+                        unstash 'app'
+
+                    }
                 } // wrapInTEST
             } // script
         //} // steps
@@ -60,8 +72,10 @@ def withStageTag(Map vars) {
         //}
         //steps {
             script {
+                vars.put("isScmEnabled", true)
+                vars.put("isCleaningEnabled", true)
                 wrapInTEST(vars) {
-		    withTag(vars)
+            withTag(vars)
                 } // wrapInTEST
             } // script
         //} // steps
@@ -92,16 +106,20 @@ def call(Map vars, Closure body=null) {
 
     def parallelTasks = [:]
 
-    parallelTasks['Deploy'] = {
-        withStageDeploy()
+    parallelTasks['Archive Artifacts'] = {
+        withStageArchive(vars.clone())
     }
 
-    parallelTasks['Archive Artifacts'] = {
-        withStageArchive(vars)
+    if (!DRY_RUN && isReleaseBranch()) {
+
+        parallelTasks['Deploy'] = {
+            withStageDeploy(vars.clone())
     }
 
     parallelTasks['Git Tag'] = {
-        withStageTag(vars)
+            withStageTag(vars.clone())
+        }
+
     }
 
     parallel parallelTasks

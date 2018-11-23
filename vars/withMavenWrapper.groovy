@@ -1,5 +1,4 @@
 #!/usr/bin/groovy
-//import com.cloudbees.groovy.cps.NonCPS
 import hudson.model.*
 
 def call(Closure body=null) {
@@ -18,7 +17,7 @@ def call(Map vars, Closure body=null) {
         //"-Djava.io.tmpdir=./target/tmp",
         ].join(" ")
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
+    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
     def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
     def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
@@ -129,7 +128,7 @@ def call(Map vars, Closure body=null) {
                 MAVEN_GOALS += getMavenGoalsTest(skipTests: skipTests)
 
                 echo "Maven GOALS have been specified: ${MAVEN_GOALS}"
-                buildCmd += "${MAVEN_GOALS}"
+                buildCmd += " ${MAVEN_GOALS}"
 
                 //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                     // Run the maven build

@@ -15,7 +15,11 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    if (!body) {
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
+    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+
+    if (DEBUG_RUN && !body) {
         echo 'No body specified'
     }
 

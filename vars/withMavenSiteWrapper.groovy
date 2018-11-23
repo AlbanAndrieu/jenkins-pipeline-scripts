@@ -1,5 +1,4 @@
 #!/usr/bin/groovy
-//import com.cloudbees.groovy.cps.NonCPS
 import hudson.model.*
 
 def call(Closure body=null) {
@@ -11,8 +10,8 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
-    //def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
     //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
     //def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
@@ -27,6 +26,8 @@ def call(Map vars, Closure body=null) {
     def skipPitest = vars.get("skipPitest", true).toBoolean()
     def buildCmdParameters = vars.get("buildCmdParameters", "")
     def artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
+
+    if (!DRY_RUN) {
 
     buildCmdParameters += "-Dskip.npm -Dskip.yarn -Dskip.bower -Dskip.grunt -Dmaven.exec.skip=true -Denforcer.skip=true -Dmaven.test.skip=true"
 
@@ -43,4 +44,5 @@ def call(Map vars, Closure body=null) {
 
     }
 
+    } // if DRY_RUN
 }

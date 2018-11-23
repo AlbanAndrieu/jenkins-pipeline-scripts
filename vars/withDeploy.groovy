@@ -14,11 +14,11 @@ def call(Map vars, Closure body=null) {
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
 
     if (!DRY_RUN) {
-        unstash 'maven-artifacts'
-
-        withMavenDeployWrapper(vars)
+        //unstash 'maven-artifacts'
 
         if (body) { body() }
+
+        withMavenDeployWrapper(vars)
 
     }
 

@@ -11,7 +11,7 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
     //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
@@ -27,7 +27,7 @@ def call(Map vars, Closure body=null) {
 
     if (!DRY_RUN && !RELEASE) {
 
-         def userInput = true
+         def userInput = false
          def didTimeout = false
          def userAborted = false
          def startMillis = System.currentTimeMillis()
@@ -48,14 +48,15 @@ def call(Map vars, Closure body=null) {
            } else {
              endMillis = System.currentTimeMillis()
              if (endMillis - startMillis >= timeoutMillis) {
-               echo "Approval timed out. Continuing with deployment."
+               echo "Approval timed out. Continuing."
                didTimeout = true
              } else {
                userAborted = true
                echo "SYSTEM aborted, but looks like timeout period didn't complete. Aborting."
              }
            }
-         } catch(err) { // timeout reached or input false
+         } catch(err) {
+             echo "timeout reached or input false"
              def user = err.getCauses()[0].getUser()
              if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
                  didTimeout = true
@@ -68,7 +69,8 @@ def call(Map vars, Closure body=null) {
          if (didTimeout) {
              echo "no input was received before timeout"
 
-             unstash 'sources'
+             //unstash 'sources'
+             if (body) { body() }
 
              step([
                  $class: 'CxScanBuilder',
@@ -124,11 +126,9 @@ def call(Map vars, Closure body=null) {
                     waitForResultsEnabled: true
                 ])
 
-                if (body) { body() }
-
         } else if (userInput == true) {
             // do something
-            echo "this was successful"
+            echo "skip requested"
         } else {
             // do something else
             echo "this was not successful"

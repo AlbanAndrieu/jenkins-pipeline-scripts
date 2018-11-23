@@ -1,4 +1,5 @@
+#!/usr/bin/groovy
 
 def call() {
-    BRANCH_NAME ==~ /develop/ || BRANCH_NAME ==~ /master/ ||  BRANCH_NAME ==~ /release\/.*/
+    env.BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/
 }

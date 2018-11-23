@@ -22,13 +22,11 @@ def call(Map vars, Closure body=null) {
     def arch = vars.get("arch", "TEST")
     def script = vars.get("script", "build.sh")
     def artifacts = vars.get("artifacts", ['*_VERSION.TXT',
-                   '**/Executable/*.so',
-                   '**/Executable/nabla',
                    '**/MD5SUMS.md5',
                    '**/Output/**/*.tar.gz'
                    ].join(', '))
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
+    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
     //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
     def SCONS_OPTS = vars.get("SCONS_OPTS", env.SCONS_OPTS ?: "")
@@ -50,13 +48,7 @@ def call(Map vars, Closure body=null) {
 
             //getEnvironementData(filePath: "./bm/step-2-0-0-build-env.sh", DEBUG_RUN: DEBUG_RUN)
 
-            shellcheckExitCode = sh(
-                script: "${script}",
-                returnStdout: true,
-                returnStatus: true
-            )
-
-            sh "echo ${shellcheckExitCode}"
+            sh "${script}"
 
             if (body) { body() }
 

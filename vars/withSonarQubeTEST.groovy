@@ -1,5 +1,4 @@
 #!/usr/bin/groovy
-//import com.cloudbees.groovy.cps.NonCPS
 import hudson.model.*
 
 def call(Closure body=null) {
@@ -7,11 +6,13 @@ def call(Closure body=null) {
 	call(vars, body)
 }
 
-def call(body) {
+def call(Map vars, Closure body=null) {
 
-    wrapInTEST() {
+    vars = vars ?: [:]
 
-        withSonarQubeWrapper(body)
+    wrapInTEST(vars) {
+
+        withSonarQubeWrapper(vars, body)
     }
 
 }

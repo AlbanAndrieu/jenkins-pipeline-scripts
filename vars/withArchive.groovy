@@ -9,14 +9,14 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
     //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
 
     if (!DRY_RUN) {
         unstash 'maven-artifacts'
-        unstash 'scons-artifacts-centos7'
-        unstash 'app'
+
+        if (body) { body() }
 
         def artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
 
@@ -46,7 +46,5 @@ def call(Map vars, Closure body=null) {
             unHealthy: ''
             ])
     } // if
-
-    if (body) { body() }
 
 }

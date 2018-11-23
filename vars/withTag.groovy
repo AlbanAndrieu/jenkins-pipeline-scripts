@@ -9,7 +9,7 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
     //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
@@ -17,10 +17,10 @@ def call(Map vars, Closure body=null) {
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     //gitChangelog from: [type: 'REF', value: 'refs/remotes/origin/develop'], ignoreCommitsWithoutIssue: true, returnType: 'STRING', to: [type: 'REF', value: 'refs/tags/LATEST_SUCCESSFULL']
-    TARGET_PROJECT = sh(returnStdout: true, script: "echo ${env.JOB_NAME} | cut -d'/' -f -1").trim()
+    TARGET_PROJECT = sh(returnStdout: true, script: "echo ${env.JOB_NAME} | cut -d'/' -f 2").trim().toUpperCase()
 
     setBuildName()
-    createVersionTextFile("Test ${env.BRANCH_NAME}","${TARGET_PROJECT}_VERSION.TXT")
+    createVersionTextFile("${TARGET_PROJECT} ${env.BRANCH_NAME}","${TARGET_PROJECT}_VERSION.TXT")
 
     if (!DRY_RUN && !RELEASE) {
 
@@ -29,7 +29,7 @@ def call(Map vars, Closure body=null) {
         //utils.manualPromotion()
 
         if (isReleaseBranch()) {
-            de TARGET_TAG = getSemVerReleasedVersion() ?: "LATEST"
+            def TARGET_TAG = getSemVerReleasedVersion() ?: "LATEST"
             gitTagLocal("${TARGET_TAG}_SUCCESSFULL")
             gitTagRemote("${TARGET_TAG}_SUCCESSFULL")
         }
