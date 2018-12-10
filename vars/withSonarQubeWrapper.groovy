@@ -22,7 +22,7 @@ def call(Map vars, Closure body=null) {
     def coverage = vars.get("coverage", "")
     def verbose = vars.get("verbose", false).toBoolean()
     def buildCmdParameters = vars.get("buildCmdParameters", "")
-    def skipMaven = vars.get("skipMaven", false).toBoolean()
+    def skipMaven = vars.get("skipMaven", true).toBoolean()
 
     script {
         if (!DRY_RUN && !RELEASE) {

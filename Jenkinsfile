@@ -47,6 +47,7 @@ pipeline {
           agent {
               docker {
                   image DOCKER_IMAGE
+                  alwaysPull true
                   reuseNode true
                   registryUrl DOCKER_REGISTRY_URL
                   registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
@@ -56,23 +57,18 @@ pipeline {
           }
           steps {
               script {
-                  //if (isReleaseBranch()) {
-
                   RESULT = sh(returnStdout: true, script: "./build.sh").trim()
 
                   echo "RESULT : ${RESULT}"
 
-                  branchName = branchName.replaceAll(/\\//, '%2F')
-
                   parallel "sample default maven project": {
-                                   build job: "github.com/AlbanAndrieu/nabla-servers-bower-sample/${branchName}",
+                                   build job: "github.com/AlbanAndrieu/nabla-servers-bower-sample/master",
                                    wait: true
                            },
                            "sample maven project": {
-                                   build job: "github.com/AlbanAndrieu/nabla-servers-bower/${branchName}",
+                                   build job: "github.com/AlbanAndrieu/nabla-servers-bower/master",
                                    wait: true
                            }
-                  //}
               }
           }
       } // stage setup

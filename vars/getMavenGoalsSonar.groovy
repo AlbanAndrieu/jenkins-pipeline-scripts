@@ -1,5 +1,4 @@
 #!/usr/bin/groovy
-//import com.cloudbees.groovy.cps.NonCPS
 import hudson.model.*
 
 def call(Closure body=null) {
@@ -17,11 +16,11 @@ def call(Map vars, Closure body=null) {
     def skipSonar = vars.get("skipSonar", true).toBoolean()
     def mavenGoals = vars.get("mavenGoals", "")
 
-    if ( !skipSonar && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/))) {
+    if ( !skipSonar ) {
         if (!DRY_RUN && !RELEASE) {
             echo "sonar added"
-            if (env.BRANCH_NAME ==~ /develop/) {
-                mavenGoals += " -Dsonar.branch.name=develop"
+            if ( env.BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
+                mavenGoals += " -Dsonar.branch.name=${env.BRANCH_NAME}"
             } else {
                 mavenGoals += " -Dsonar.branch.name=${env.BRANCH_NAME}"
                 mavenGoals += " -Dsonar.branch.target=develop"
