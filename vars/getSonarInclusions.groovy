@@ -1,4 +1,5 @@
-import groovy.json.JsonSlurper
+#!/usr/bin/groovy
+import hudson.model.*
 
 /**
  * get_project_name
@@ -7,7 +8,7 @@ import groovy.json.JsonSlurper
  * returns project name from JOB_BASE_NAME
  *
  */
-def get_project_name(jobName, defaultProject="RISK") {
+def get_project_name(jobName, defaultProject="NABLA") {
   def tokenized_job_name = jobName.split('/')
   if (tokenized_job_name.size() == 2) {
     return defaultProject  // e.g. CMR/develop, there is no good way to get Stash project name
@@ -26,9 +27,9 @@ def get_project_name(jobName, defaultProject="RISK") {
 def get_repository_name(jobName) {
   def tokenized_job_name = jobName.split('/')
   if (tokenized_job_name.size() == 2) {
-    return tokenized_job_name[0]  // e.g. CMR/develop
+    return tokenized_job_name[0]  // e.g. NABLA/develop
   } else {
-    return tokenized_job_name[1]  // e.g. RISK/generic_limits/develop
+    return tokenized_job_name[1]  // e.g. TMP/nabla/develop
   }
 }
 
@@ -53,7 +54,6 @@ List<String> diffCommitsForRev(Map<String,String> config) {
     diffRevisions
 }
 
-
 /**
  * diffCommitsForRev
  *
@@ -75,42 +75,84 @@ List<String> filesForRev(Map<String,String> config, String revision) {
     diffRevisions
 }
 
-def call(body) {
-    echo "[JPL] Executing `vars/getSonarInclusionsForCommit.groovy`"
+def call(Closure body=null) {
+    this.vars = [:]
+    call(vars, body)
+}
+
+def call(Map vars, Closure body=null) {
+
+    echo "[JPL] Executing `vars/getSonarInclusions.groovy`"
+
+    vars = vars ?: [:]
+
+    def sonarCmdParameters = vars.get("sonarCmdParameters", "")
+    def project = vars.get("project", "RISK")
+    def repository = vars.get("repository", "")
+
+    echo "[JPL] Repository: ${repository}"
+
+    if ( env.BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
+        echo "[JPL] isReleaseBranch, so no check for `vars/getSonarInclusions.groovy`"
+    } else {
+
+        def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${env.WORKSPACE}/${filename}" }.join(",")
+
+        if (body) { body() }
+
+        echo "[JPL] Sonar Sources: ${sonarInclusions}"
+
+	    if (sonarInclusions?.trim()) {
+	    	  sonarCmdParameters = " -Dsonar.inclusions=\"${sonarInclusions}\" "
+	    }
+
+    } // else
+
+    return sonarCmdParameters
+
+}
+
+def filesChanged(Map vars, Closure body=null) {
+
+    echo "[JPL] Executing `vars/getSonarInclusions.groovy` filesChanged"
+
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
     body.delegate = config
     body()
+
     echo "[JPL] Base CONFIG params set from JENKINSFILE are: ${config}"
+
+    vars = vars ?: [:]
 
     // Run configuration
     // If number of commits exceeds the Cap, file list will not be searched (to save time); the script will return ["*"]
-    config.commitCap            = config.get("commitCap", 50)
+    vars.commitCap            = vars.get("commitCap", 50)
     // If number of files changes exceeds the Cap, all files should be Sonar-scanned; the script will return ["*"]
-    config.fileCap              = config.get("fileCap", 50)
-    config.jenkinsCredentialsId = config.get("jenkinsCredentialsId", "jenkins-https")
-    config.baseUrl              = config.get("baseUrl", "https://github.com/")
-    config.jobName              = config.get("jobName", env.JOB_NAME)
-    config.project              = config.get("project", get_project_name(config.jobName, "TEST"))
-    config.repository           = config.get("repository", get_repository_name(config.jobName))
-    config.targetRevision       = config.get("targetRevision", "refs/heads/develop")
-    config.currentRevision      = config.get("currentRevision", env.GIT_COMMIT)
+    vars.fileCap              = vars.get("fileCap", 50)
+    vars.jenkinsCredentialsId = vars.get("jenkinsCredentialsId", "jenkins")
+    vars.baseUrl              = vars.get("baseUrl", "https://github.com/")
+    vars.jobName              = vars.get("jobName", env.JOB_NAME)
+    vars.project              = vars.get("project", get_project_name(vars.jobName, "NABLA"))
+    vars.repository           = vars.get("repository", get_repository_name(vars.jobName))
+    vars.targetRevision       = vars.get("targetRevision", "refs/heads/develop")
+    vars.currentRevision      = vars.get("currentRevision", env.GIT_COMMIT)
 
-    echo "[JPL] Full CONFIG after applying the fedault values is: ${config}"
+    echo "[JPL] Full CONFIG after applying the fedault values is: ${vars}"
 
     withCredentials([
         usernamePassword(
-        credentialsId: config.jenkinsCredentialsId,
+        credentialsId: vars.jenkinsCredentialsId,
         usernameVariable: 'stashLogin',
         passwordVariable: 'stashPass'
         )
     ]) {
-        config.basicAuth = "${stashLogin}:${stashPass}".getBytes().encodeBase64().toString()
+      vars.basicAuth = "${stashLogin}:${stashPass}".getBytes().encodeBase64().toString()
     }
 
-    List<String> diffRevisions = diffCommitsForRev(config)
-    if (diffRevisions.size() >= config.commitCap) {
-      echo "[JPL] Number of unique commits between the two revisions: ${diffRevisions.size()} exceeds the Cap: ${config.commitCap}; returning default value"
+    List<String> diffRevisions = diffCommitsForRev(vars)
+    if (diffRevisions.size() >= vars.commitCap) {
+      echo "[JPL] Number of unique commits between the two revisions: ${diffRevisions.size()} exceeds the Cap: ${vars.commitCap}; returning default value"
       return ["*"]
     }
 
@@ -118,14 +160,14 @@ def call(body) {
 
     List<String> filesChanged = []
     for (diffRevision in diffRevisions) {
-        filesChanged += filesForRev(config, diffRevision)
+        filesChanged += filesForRev(vars, diffRevision)
     }
     filesChanged = filesChanged.unique()
 
     echo "[JPL] Found following changed files source and target branch: ${filesChanged}"
 
-    if (filesChanged.size() >= config.fileCap) {
-      echo "[JPL] Number of files changes: ${filesChanged.size()} exceeds the Cap: ${config.fileCap}; returning default value"
+    if (filesChanged.size() >= vars.fileCap) {
+      echo "[JPL] Number of files changes: ${filesChanged.size()} exceeds the Cap: ${vars.fileCap}; returning default value"
       return ["*"]
     }
 

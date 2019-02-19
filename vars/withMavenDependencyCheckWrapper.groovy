@@ -8,13 +8,15 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/withMavenDependencyCheckWrapper.groovy`"
+
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-    //def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
+    //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     def goal = vars.get("goal", "org.owasp:dependency-check-maven:check")
@@ -29,22 +31,22 @@ def call(Map vars, Closure body=null) {
 
     if (!DRY_RUN) {
 
-    buildCmdParameters += "-Dskip.npm -Dskip.yarn -Dskip.bower -Dskip.grunt -Dmaven.exec.skip=true -Denforcer.skip=true -Dmaven.test.skip=true"
+        buildCmdParameters += "-Dskip.npm -Dskip.yarn -Dskip.bower -Dskip.grunt -Dmaven.exec.skip=true -Denforcer.skip=true -Dmaven.test.skip=true"
 
-    withMavenWrapper(goal: goal,
-	profile: profile,
-	skipTests: skipTests,
-	skipResults: skipResults,
-	skipSonar: skipSonar,
-	skipPitest: skipPitest,
-	buildCmdParameters: buildCmdParameters,
-	artifacts: artifacts) {
+        withMavenWrapper(goal: goal,
+        profile: profile,
+        skipTests: skipTests,
+        skipResults: skipResults,
+        skipSonar: skipSonar,
+        skipPitest: skipPitest,
+        buildCmdParameters: buildCmdParameters,
+        artifacts: artifacts) {
 
-	if (body) { body() }
+        if (body) { body() }
 
-    }
+        }
 
-    dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/dependency-check-report.xml ', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+        dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/dependency-check-report.xml ', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
 
     } // if DRY_RUN
 

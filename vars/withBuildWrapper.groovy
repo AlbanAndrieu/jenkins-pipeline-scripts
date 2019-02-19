@@ -13,6 +13,8 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/withBuildWrapper.groovy`"
+
     vars = vars ?: [:]
 
     if (!body) {
@@ -26,9 +28,9 @@ def call(Map vars, Closure body=null) {
                    '**/Output/**/*.tar.gz'
                    ].join(', '))
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false)
+    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     def SCONS_OPTS = vars.get("SCONS_OPTS", env.SCONS_OPTS ?: "")
 
     wrapInTEST(isScmEnabled: true) {
@@ -48,7 +50,19 @@ def call(Map vars, Closure body=null) {
 
             //getEnvironementData(filePath: "./bm/step-2-0-0-build-env.sh", DEBUG_RUN: DEBUG_RUN)
 
-            sh "${script}"
+            build = sh (
+              script: "${script} 2>&1 > scons-${ARCH}.log",
+              returnStatus: true
+            )
+	        
+            echo "BUILD RETURN CODE : ${build}"
+            if (build == 0) {
+                echo "TEST SUCCESS"
+                //currentBuild.result = 'SUCCESS'
+            } else {
+                echo "TEST FAILURE"
+                currentBuild.result = 'FAILURE'
+            }
 
             if (body) { body() }
 
@@ -57,36 +71,13 @@ def call(Map vars, Closure body=null) {
             throw e
         }
 
-        step([
-             $class: "WarningsPublisher",
-             canComputeNew: false,
-             canResolveRelativePaths: false,
-             canRunOnFailed: true,
-             consoleParsers: [
-                 [
-                     parserName: 'Java Compiler (javac)'
-                 ],
-                 [
-                     parserName: 'Maven'
-                 ],
-                 [
-                     parserName: 'GNU Make + GNU C Compiler (gcc)', pattern: 'error_and_warnings.txt'
-                 ],
-                 [
-                     parserName: 'Clang (LLVM based)', pattern: 'error_and_warnings_clang.txt'
-                 ]
-             ],
-             //unstableTotalAll: '10',
-             //unstableTotalHigh: '0',
-             //failedTotalAll: '10',
-             //failedTotalHigh: '0',
-             usePreviousBuildAsReference: true,
-             useStableBuildAsReference: true
-             ])
+        runHtmlPublishers(["WarningsPublisher"])
 
         stash includes: "${artifacts}", name: 'scons-artifacts-' + arch
-        stash allowEmpty: true, includes: "bw-outputs/*", name: 'bwoutputs-' + arch
+        stash allowEmpty: true, includes: "bw-outputs/build-wrapper-dump.json", name: 'bwoutputs-' + arch
 
-    } // wrapInARC
+    } // wrapInTEST
+
+    archiveArtifacts artifacts: "bw-outputs/build-wrapper.log", excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
 
 }

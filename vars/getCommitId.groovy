@@ -1,7 +1,6 @@
-#!/usr/bin/groovy
+#!/usr/bin/env groovy
 
 def call() {
-    println("***")
     try {
       println(env.GIT_COMMIT)
       if (!env.GIT_COMMIT) {

@@ -10,11 +10,11 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-    //def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
+    //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     def DOCKER_TEST_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: buildDockerTag("${env.BRANCH_NAME}", "${env.GIT_COMMIT}").toLowerCase())
@@ -28,6 +28,9 @@ def call(Map vars, Closure body=null) {
 
         try {
 
+            // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
+            withRegistryWrapper() {
+
             if (CLEAN_RUN) {
                 sh "${dockerFilePath}docker-compose-down.sh"
             }
@@ -38,8 +41,6 @@ def call(Map vars, Closure body=null) {
                 if (up == 0) {
                     echo "TEST SUCCESS"
                     //dockerCheckHealth("${DOCKER_TEST_CONTAINER}","healthy")
-
-                    currentBuild.result = 'SUCCESS'
                 } else if (up == 1) {
                     echo "TEST FAILURE"
                     currentBuild.result = 'FAILURE'
@@ -49,7 +50,9 @@ def call(Map vars, Closure body=null) {
                 }
             }
 
-			if (body) { body() }
+            if (body) { body() }
+
+            }  // withRegistryWrapper
 
         } catch(exc) {
             echo 'Error: There were errors in tests. '+exc.toString()

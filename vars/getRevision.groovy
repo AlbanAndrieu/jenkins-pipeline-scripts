@@ -1,7 +1,6 @@
 #!/usr/bin/groovy
 
 def call() {
-    println("***")
     try {
       println(env.GIT_REVISION)
       if (!env.GIT_REVISION) {

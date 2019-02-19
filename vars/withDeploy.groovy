@@ -7,11 +7,13 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/withDeploy.groovy`"
+
     vars = vars ?: [:]
 
     echo "Deploy maven artifacts to nexus"
 
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
 
     if (!DRY_RUN) {
         //unstash 'maven-artifacts'

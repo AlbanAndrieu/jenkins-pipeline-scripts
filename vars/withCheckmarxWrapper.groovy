@@ -9,13 +9,15 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/withCheckmarxWrapper.groovy`"
+
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-    def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
+    def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     def excludeFolders = vars.get("excludeFolders", ", bm")

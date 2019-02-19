@@ -11,7 +11,7 @@ def call(Map vars, Closure body=null) {
 
     script {
 
-        def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+        def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
         if (DEBUG_RUN) {
             sh 'env'
@@ -26,7 +26,7 @@ def call(Map vars, Closure body=null) {
 
         // TODO issue to get environement variable
         def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-        def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
+        def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
         def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
         if (DEBUG_RUN) {

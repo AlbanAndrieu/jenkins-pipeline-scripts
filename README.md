@@ -12,7 +12,13 @@ make sure you have installed the _GitHub Organization Folder_ in version 1.5 or 
 then start off with:
 
 ```groovy
-@Library('jenkins-pipeline-scripts@master') _
+@Library('nabla-pipeline-scripts@develop') _
+```
+
+OR (if jenkins is managing the version, the prefered way)
+
+```groovy
+@Library('nabla-pipeline-scripts') _
 ```
 
 See [Extending with Shared Libraries](https://jenkins.io/doc/book/pipeline/shared-libraries/) for more

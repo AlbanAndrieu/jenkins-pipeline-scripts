@@ -9,39 +9,44 @@ def call() {
 
   echo "abortPreviousRunningBuilds : ${pname} - ${bname} #${currentBuild.number}"
 
-  try {
-      hi.getItem(pname).getItem(env.JOB_BASE_NAME).getBuilds().each{ build ->
-          def exec = build.getExecutor()
+  if (! isReleaseBranch()) {
 
-          echo "  ${build.number} - ${exec}"
+      try {
+          milestone 1
+          hi.getItem(pname).getItem(env.JOB_BASE_NAME).getBuilds().each{ build ->
+              def exec = build.getExecutor()
 
-          if (null != exec) {
+              echo "  ${build.number} - ${exec}"
 
-            //print currentBuild.getBuiltOn().getNodeName()
-            //def build = currentBuild.build()
-            //print exec.getOwner().getNode().getNodeName()
+              if (null != exec) {
 
-            if (build.number < currentBuild.number && exec != null && build.isBuilding()) {
-              def user = getBuildUser().toString()
-              echo "Aborted by " + user
-            exec.interrupt(
-              Result.ABORTED,
-              new CauseOfInterruption.UserInterruption(
-                  "Aborted by ${user} - ${pname} - ${bname} #${currentBuild.number}"
-              )
-            )
-            println("${pname} - ${bname} / ${env.JOB_BASE_NAME} : Aborted previous running build #${build.number}")
-          } else {
-            println("${pname} - ${bname} / ${env.JOB_BASE_NAME} : Build is not running or is already built, not aborting #${build.number}")
-            }
+                //print currentBuild.getBuiltOn().getNodeName()
+                //def build = currentBuild.build()
+                //print exec.getOwner().getNode().getNodeName()
+
+                if (build.number < currentBuild.number && exec != null && build.isBuilding()) {
+                  def user = getBuildUser().toString()
+                  echo "Aborted by " + user
+                exec.interrupt(
+                  Result.ABORTED,
+                  new CauseOfInterruption.UserInterruption(
+                      "Aborted by ${user} - ${pname} - ${bname} #${currentBuild.number}"
+                  )
+                )
+                println("${pname} - ${bname} / ${env.JOB_BASE_NAME} : Aborted previous running build #${build.number}")
+              } else {
+                println("${pname} - ${bname} / ${env.JOB_BASE_NAME} : Build is not running or is already built, not aborting #${build.number}")
+                }
+              }
           }
+      } catch(NullPointerException e) {
+          // happens the first time if there is no branch at all
+          echo 'Error: There were errors in abortPreviousRunningBuilds. '+e.toString()
+      } finally {
+          // carry on as if nothing went wrong
       }
-  } catch(NullPointerException e) {
-      // happens the first time if there is no branch at all
-      echo 'Error: There were errors in abortPreviousRunningBuilds. '+e.toString()
-  } finally {
-      // carry on as if nothing went wrong
-  }
+
+  } // isReleaseBranch
 
 } // abortPreviousRunningBuilds
 

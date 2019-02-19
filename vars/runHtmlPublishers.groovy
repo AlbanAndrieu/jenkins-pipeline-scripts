@@ -99,11 +99,11 @@ def call(Map publishers) {
                 Map LogParserPublisherConfig = PublisherDefaults.LogParserPublisher << publisherConfig
                 step(LogParserPublisherConfig)
                 break
-            case "AnalysisPublisher":                
+            case "AnalysisPublisher":
                 Map AnalysisPublisherConfig = PublisherDefaults.AnalysisPublisher << publisherConfig
                 step(AnalysisPublisherConfig)
                 break
-            case "WarningsPublisher":                
+            case "WarningsPublisher":
                 Map WarningsPublisherConfig = PublisherDefaults.WarningsPublisher << publisherConfig
                 step(WarningsPublisherConfig)
                 break

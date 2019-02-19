@@ -8,6 +8,8 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/withMavenWrapper.groovy`"
+
     vars = vars ?: [:]
 
     String MAVEN_OPTS_DEFAULT = ["-Djava.awt.headless=true",
@@ -17,11 +19,11 @@ def call(Map vars, Closure body=null) {
         //"-Djava.io.tmpdir=./target/tmp",
         ].join(" ")
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-    def RELEASE = vars.get("RELEASE", env.RELEASE.toBoolean() ?: false)
+    def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     if (DEBUG_RUN) {
@@ -33,7 +35,7 @@ def call(Map vars, Closure body=null) {
 
     def MAVEN_OPTS = vars.get("MAVEN_OPTS", "${MAVEN_OPTS_DEFAULT}")
 
-    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonardev")
+    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar")
 
     echo "Maven OPTS have been specified: ${MAVEN_OPTS} - ${CLEAN_RUN}/${DRY_RUN}/${DEBUG_RUN} - ${SONAR_INSTANCE}"
 
@@ -52,9 +54,9 @@ def call(Map vars, Closure body=null) {
         withMaven(
             maven: 'maven-latest',
             jdk: 'java-latest',
-            mavenSettingsConfig: 'fr-maven-default',
+            mavenSettingsConfig: 'maven-default',
             //mavenSettingsFilePath: "${SETTINGS_XML}",
-            //globalMavenSettingsConfig: 'fr-maven-default',
+            //globalMavenSettingsConfig: 'maven-default',
             //globalMavenSettingsFilePath: "${SETTINGS_XML}",
             mavenLocalRepo: './.repository',
             mavenOpts: "${MAVEN_OPTS}",
@@ -71,13 +73,13 @@ def call(Map vars, Closure body=null) {
 
                 if (!skipResults) {
 
-					if (!RELEASE_VERSION) {
-						echo 'No RELEASE_VERSION specified'
-						RELEASE_VERSION = getReleasedVersion()
-						//if (!RELEASE_VERSION) {
-						//   error 'No RELEASE_VERSION found'
-						//}
-					}
+                    if (!RELEASE_VERSION) {
+                        echo 'No RELEASE_VERSION specified'
+                        RELEASE_VERSION = getReleasedVersion()
+                        //if (!RELEASE_VERSION) {
+                        //   error 'No RELEASE_VERSION found'
+                        //}
+                    }
 
                     TARGET_TAG = getShortReleasedVersion()
                     echo "Maven RELEASE_VERSION: ${RELEASE_VERSION} - ${TARGET_TAG}"
@@ -99,7 +101,7 @@ def call(Map vars, Closure body=null) {
 
                 } // skipResults
 
-                String MAVEN_GOALS = "-s ${SETTINGS_XML}"
+                String MAVEN_GOALS = "-s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
 
                 if (CLEAN_RUN) {
                   MAVEN_GOALS += " -U clean"

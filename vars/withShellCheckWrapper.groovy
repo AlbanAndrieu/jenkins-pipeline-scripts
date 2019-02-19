@@ -1,5 +1,4 @@
 #!/usr/bin/groovy
-//import com.cloudbees.groovy.cps.NonCPS
 import hudson.model.*
 
 def call(Closure body=null) {
@@ -13,13 +12,20 @@ def call(Map vars, Closure body=null) {
 
     def pattern = vars.get("pattern", "*.sh")
 
-	shellcheckExitCode = sh(
-		script: "shellcheck -f checkstyle ${pattern} > checkstyle.xml",
-		returnStdout: true,
-		returnStatus: true
-	)
-	//sh "echo ${shellcheckExitCode}"
+    shellcheckExitCode = sh(
+        script: "shellcheck -x -f checkstyle ${pattern} > checkstyle.xml",
+        returnStdout: true,
+        returnStatus: true
+    )
 
-	checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/checkstyle.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+    echo "SHELL CHECK RETURN CODE : ${shellcheckExitCode}"
+    if (shellcheckExitCode == 0) {
+        echo "TEST SUCCESS"
+    } else {
+        echo "TEST UNSTABLE"
+        //currentBuild.result = 'UNSTABLE'
+    }
+
+    checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/checkstyle.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
 
 }

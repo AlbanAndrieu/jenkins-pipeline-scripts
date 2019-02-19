@@ -7,14 +7,21 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/withArchive.groovy`"
+
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: false)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+
+    def skipMaven = vars.get("skipMaven", true).toBoolean()
 
     if (!DRY_RUN) {
-        unstash 'maven-artifacts'
+
+        if (!skipMaven) {
+           unstash 'maven-artifacts'
+        }
 
         if (body) { body() }
 
@@ -24,27 +31,6 @@ def call(Map vars, Closure body=null) {
 
         archiveArtifacts artifacts: "${artifacts}", excludes: null, fingerprint: true, onlyIfSuccessful: true
 
-        step([
-            $class: 'LogParserPublisher',
-            parsingRulesPath:
-            '/jenkins/deploy-log_parsing_rules',
-            failBuildOnError: false,
-            unstableOnWarning: false,
-            useProjectRule: false
-            ])
-
-        step([
-            $class: "AnalysisPublisher",
-            canComputeNew: false,
-            checkStyleActivated: false,
-            defaultEncoding: '',
-            dryActivated: false,
-            findBugsActivated: false,
-            healthy: '',
-            opentasksActivated: false,
-            pmdActivated: false,
-            unHealthy: ''
-            ])
     } // if
 
 }
