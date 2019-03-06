@@ -20,10 +20,11 @@ def call(Map vars, Closure body=null) {
             if (!DEBUG_RUN) {
                 cleanWs()
             } else {
-                 echo "Hi from wrapCleanWs"
+                echo "Hi from wrapCleanWs"
             }
-            if (!DRY_RUN && !DEBUG_RUN)
+            if (!DRY_RUN && !DEBUG_RUN) {
                 standardNotify { }
+            }
 
             if (body) { body() }
         } // script

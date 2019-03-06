@@ -41,4 +41,7 @@ fi
 #JENKINS_HOSTNAME=localhost
 #ssh -p $JENKINS_SSHD_PORT $JENKINS_HOSTNAME declarative-linter < Jenkinsfile
 
+#./mvnw install 
+#./gradlew build
+
 exit 0

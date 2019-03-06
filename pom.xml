@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <!-- @version $Revision: $ $Date: $ $Author: $ $State: $ -->
+    <!-- @formatter:off -->
+
+    <!--
+    <parent>
+        <artifactId>interview</artifactId>
+	<groupId>com.nabla.project.sample.interview</groupId>
+	<version>1.0.1-SNAPSHOT</version>
+    </parent>
+    -->
+
+    <groupId>com.nabla.project.sample</groupId>
+    <artifactId>jenkins-pipeline-scripts</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Jenkins pipeline scripts</name>
+    <description>Jenkins pipeline scripts POM</description>
+    <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
+
+    <scm>
+        <connection>scm:git:https://github.com/AlbanAndrieu/jenkins-pipeline-scripts.git</connection>
+        <developerConnection>scm:git:git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
+    </scm>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/issues</url>
+	</issueManagement>
+
+    <ciManagement>
+            <system>Jenkins</system>
+            <url>${JOB_URL}</url>
+            <notifiers>
+                    <notifier>
+                            <type>mail</type>
+                            <sendOnError>true</sendOnError>
+                            <sendOnFailure>true</sendOnFailure>
+                            <sendOnSuccess>false</sendOnSuccess>
+                            <sendOnWarning>false</sendOnWarning>
+                            <configuration>
+                                    <address>nabla@free.fr</address>
+                            </configuration>
+                    </notifier>
+            </notifiers>
+    </ciManagement>
+
+    <mailingLists>
+        <mailingList>
+        </mailingList>
+    </mailingLists>
+
+    <developers>
+            <developer>
+                    <id>albandri</id>
+                    <name>Alban Andrieu</name>
+                    <email>alban.andrieu@free.fr</email>
+                    <organization>finastra</organization>
+                    <roles>
+                            <role>Developer</role>
+                    </roles>
+                    <timezone>+1</timezone>
+            </developer>
+    </developers>
+
+
+
+    <prerequisites>
+        <maven>3.5.0</maven>
+    </prerequisites>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven.frontend.plugin.version>1.6</maven.frontend.plugin.version>
+        <maven.dependency.check.plugin.version>4.0.2</maven.dependency.check.plugin.version>
+        <maven.cargo.maven2.plugin.version>1.7.0</maven.cargo.maven2.plugin.version>
+        <maven.dependency.plugin.version>2.9</maven.dependency.plugin.version>
+        <maven.shade.plugin.version>3.2.1</maven.shade.plugin.version>
+        <maven.bundle.plugin.version>4.1.0</maven.bundle.plugin.version>
+        <org.umlgraph.umlgraph.version>5.6.6</org.umlgraph.umlgraph.version>
+        <maven.javadoc.plugin.version>2.10.3</maven.javadoc.plugin.version>
+        <maven.tomcat7.plugin.version>2.2</maven.tomcat7.plugin.version>
+        <maven.pitest.plugin.version>1.2.4</maven.pitest.plugin.version>
+        <maven.sonar.plugin.version>3.5.0.1254</maven.sonar.plugin.version>
+        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.pitest.plugin.version>1.4.3</maven.pitest.plugin.version>
+        <groovy.eclipse.compiler.version>2.9.2-01</groovy.eclipse.compiler.version>
+        <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
+        <maven.jetty.eclipse.plugin.version>${jetty9.version}</maven.jetty.eclipse.plugin.version>
+        <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
+        <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
+        <maven.resources.plugin.version>2.7</maven.resources.plugin.version>
+        <maven.nexus.staging.plugin.version>1.6.8</maven.nexus.staging.plugin.version>
+        <maven.clean.plugin.version>3.0.0</maven.clean.plugin.version>
+        <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
+        <maven.failsafe.plugin.version>${maven.surefire.plugin.version}</maven.failsafe.plugin.version>
+        <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
+        <maven.war.plugin.version>2.4</maven.war.plugin.version>
+        <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
+        <maven.lifecycle.mapping.version>1.0.0</maven.lifecycle.mapping.version>
+        <maven.project.info.reports.plugin.version>2.9</maven.project.info.reports.plugin.version>
+        <maven.jarsigner.plugin.version>3.0.0</maven.jarsigner.plugin.version>
+        <maven.git.commit.id.plugin.version>2.2.4</maven.git.commit.id.plugin.version>
+        <maven.dockerfile.plugin.version>1.4.4</maven.dockerfile.plugin.version>
+        <maven.fabric8.docker.plugin.version>0.26.1</maven.fabric8.docker.plugin.version>
+        <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
+        <maven.jenkinsfile.plugin.version>1.0.0</maven.jenkinsfile.plugin.version>
+        <maven.jenkins.pipeline.unit.plugin.version>1.1</maven.jenkins.pipeline.unit.plugin.version>
+
+        <sun.jsf.version>2.2.7</sun.jsf.version>
+        <asm.ow2.version>5.0.2</asm.ow2.version>
+        <logback.version>1.0.13</logback.version>
+      
+        <javaagent></javaagent>
+        <jacoco.version>0.8.2</jacoco.version>
+        <!--<jacoco.version>0.7.7.201606060606</jacoco.version> Incompatible version 1007 in Sonar-->
+        <!--<jacoco.version>0.7.6-SNAPSHOT</jacoco.version>-->
+        <maven.jacoco.plugin.version>${jacoco.version}</maven.jacoco.plugin.version>
+        <jacoco.agent.version>${jacoco.version}</jacoco.agent.version>
+        <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=destfile=${sonar.jacoco.itReportPath}</jacoco.agent>-->
+        <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=output=tcpserver</jacoco.agent>-->
+        <jacoco.agent></jacoco.agent>
+        <cobertura.maven.plugin.version>2.7</cobertura.maven.plugin.version>
+        <maven.codenarc.plugin.version>0.22-1</maven.codenarc.plugin.version>
+        <jdk.version>1.8.0</jdk.version>
+        <jdk.level>1.8</jdk.level>
+        <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
+        <sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>
+        <cobertura.format>xml</cobertura.format>
+        <asm.ow2.version>5.0.3</asm.ow2.version>
+        <jmockit.version>1.19</jmockit.version>
+        <junit.version>4.12</junit.version>
+        <hamcrest.all.version>1.3</hamcrest.all.version>
+        <groovy.version>2.5.6</groovy.version>
+        <ivy.version>2.4.0</ivy.version>        
+        <groovy.cps.version>1.12</groovy.cps.version>
+        <guava.version>18.0</guava.version>
+        <jersey.version>2.22</jersey.version>
+        <jersey.bom.version>${jersey.version}</jersey.bom.version>
+        <slf4j.version>1.6.6</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
+        <jsr305.version>2.0.1</jsr305.version>
+        <jmockit.version>1.19</jmockit.version>
+        <http.builder.version>0.6</http.builder.version>
+        <javax.servlet.api.version>3.0.1</javax.servlet.api.version>
+        <doxia.core.version>1.8</doxia.core.version>
+        <doxia.version>1.8.1</doxia.version>
+        <commons.io.version>2.5</commons.io.version>
+        <commons.math3.version>3.2</commons.math3.version>
+        <org.assertj.version>3.4.1</org.assertj.version>
+        <jenkins.version>2.85</jenkins.version>
+        <jenkins.core.version>${jenkins.version}</jenkins.core.version>
+        <workflow.step.api.version>2.1</workflow.step.api.version>
+
+        <sonar.host.url>https://sonardev.misys.global.ad/</sonar.host.url>
+        <sonar.login>c71b002ba25ba981183379e2ae9baa272a8eb79a</sonar.login>
+        <sonar.links.ci>${env.BUILD_URL}</sonar.links.ci>
+        <sonar.cpd.cross_project>true</sonar.cpd.cross_project>
+        <sonar.pitest.mode>reuseReport</sonar.pitest.mode>
+        <sonar.groovy.jacoco.reportMissing.force.zero>true</sonar.groovy.jacoco.reportMissing.force.zero>
+        <sonar.pdf.username>admin</sonar.pdf.username>
+        <sonar.pdf.password>admin</sonar.pdf.password>
+        <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+        <maven.exec.skip>false</maven.exec.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.lesfurets</groupId>
+            <artifactId>jenkins-pipeline-unit</artifactId>
+            <version>${maven.jenkins.pipeline.unit.plugin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.cloudbees</groupId>
+            <artifactId>groovy-cps</artifactId>
+            <version>${groovy.cps.version}</version>
+        </dependency>       
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>    
+        
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>${commons.math3.version}</version>            
+        </dependency>    
+                
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${org.assertj.version}</version>
+        </dependency>   
+					
+		<dependency>
+			<groupId>org.jenkins-ci.main</groupId>
+			<artifactId>jenkins-core</artifactId>
+			<version>${jenkins.core.version}</version>
+			<scope>provided</scope>
+		</dependency>
+ 					
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-step-api</artifactId>
+			<version>${workflow.step.api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+						
+		<dependency>
+		    <groupId>org.apache.ivy</groupId>
+		    <artifactId>ivy</artifactId>
+		    <version>${ivy.version}</version>
+		    <!--<scope>test</scope>-->
+		</dependency>
+						
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <exclusions>
+                <!-- circular dependency -->
+                <exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>${jsr305.version}</version>
+            <optional>true</optional>
+            <!-- needed only for annotations -->
+        </dependency>
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+        <dependency>
+             <groupId>org.hamcrest</groupId>
+             <artifactId>hamcrest-all</artifactId>
+             <version>${hamcrest.all.version}</version>
+             <scope>test</scope>
+        </dependency>
+        -->
+        <!-- jmockit musr be after junit in the classpath -->
+        <dependency>
+            <groupId>org.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <version>${jmockit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>${maven.lifecycle.mapping.version}</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.owasp</groupId>
+                                        <artifactId>dependency-check-maven</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>check</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.jacoco</groupId>
+                                        <artifactId>jacoco-maven-plugin</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>prepare-agent</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.felix</groupId>
+                                        <artifactId>maven-bundle-plugin</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>manifest</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${maven.dependency.check.plugin.version}</version>
+                    <configuration>
+                        <format>XML</format>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipRuntimeScope>true</skipRuntimeScope>
+                        <skipSystemScope>true</skipSystemScope>
+                        <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                        <centralAnalyzerEnabled>false</centralAnalyzerEnabled>
+                        <nexusAnalyzerEnabled>false</nexusAnalyzerEnabled>
+                        <nexusUrl>https://alm-artifacts.misys.global.ad/nexus/</nexusUrl>
+                        <cveUrl12Modified>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-Modified.xml.gz</cveUrl12Modified>
+                        <cveUrl20Modified>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-2.0-Modified.xml.gz</cveUrl20Modified>
+                        <cveUrl12Base>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-%d.xml</cveUrl12Base>
+                        <cveUrl20Base>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-2.0-%d.xml</cveUrl20Base>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>${maven.project.info.reports.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven.site.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.doxia</groupId>
+                            <artifactId>doxia-core</artifactId>
+                            <version>${doxia.core.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.maven.doxia</groupId>
+                            <artifactId>doxia-site-renderer</artifactId>
+                            <version>${doxia.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${maven.jacoco.plugin.version}</version>
+                    <configuration>
+                        <!-- includes>
+                            <include>com.test.project.**</include>
+                        </includes -->
+                        <dumpOnExit>true</dumpOnExit>
+                        <append>true</append>
+                        <output>file</output>
+                        <!--classDumpDir>${project.build.directory}/jacoco-instrumented</classDumpDir-->
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <!-- say to maven to use groovy-eclipse-compiler in order to compile groovy files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>${groovy.eclipse.compiler.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-batch</artifactId>
+                        <version>${groovy.eclipse.batch.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <source>${jdk.level}</source>
+                    <target>${jdk.level}</target>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven.build.helper.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/groovy</source>
+                                <!--<source>vars</source>-->
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/groovy</source>
+                                <source>src/test/resources/callstacks</source>
+                                <source>src/test/resources/libs/jenkins-pipeline-scripts@feature/src</source>
+                                <source>src/test/resources/libs/jenkins-pipeline-scripts@feature/vars</source>
+                                <!--
+                                <source>src/test/resources/libs/jenkins-pipeline-scripts@master/resources</source>
+                                <source>src/test/resources/libs/jenkins-pipeline-scripts@master/src</source>
+                                <source>src/test/resources/libs/jenkins-pipeline-scripts@master/vars</source>
+                                -->
+                                <source>src/test/jenkins/job</source>
+                                <source>src/test/jenkins/lib</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <skipTests>${maven.test.ut.skip}</skipTests>
+                    <!-- Enable or disable Stop maven -->
+                    <testFailureIgnore>${maven.test.failure.skip}</testFailureIgnore>
+                    <includes>
+                        <include>**/*_UT*,**/*Test*</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*_IT*</exclude>
+                    </excludes>
+                    <environmentVariables>
+                        <!-- define a default KREDITNETHOME env variable for unit test to work -->
+                        <KREDITNETHOME>${kreditnet-home}</KREDITNETHOME>
+                    </environmentVariables>
+                    <!--TODO must be used to detect test that are failing randomly due to wrong code for instance
+                    <runOrder>random</runOrder>-->
+                    <runOrder>filesystem</runOrder>
+                    <!--<forkMode>always</forkMode>-->
+                    <!-- DEPRECATED since version 2.14 -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${maven.pitest.plugin.version}</version>
+            </plugin>
+            <!-- mvn jenkinsfile:validate -->
+            <plugin>
+                <groupId>com.andyserver.maven.plugins</groupId>
+                <artifactId>jenkinsfile-maven-plugin</artifactId>
+                <version>${maven.jenkinsfile.plugin.version}</version>
+                <configuration>
+                    <server>${env.JENKINS_URL}</server>
+                    <username>${env.JENKINS_USER}</username>
+                    <password>${env.JENKINS_USER_TOKEN}</password>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>jacoco</id>
+            <activation>
+                <property>
+                    <name>!profile.activation</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven.surefire.plugin.version}</version>
+                        <inherited>true</inherited>
+                        <configuration>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <!--<argLine>${jacoco.agent.ut.arg} -Xms64m -Xmx256m -XX:MaxPermSize=256m -Djava.awt.headless=true -XX:-UseSplitVerifier -XX:ReservedCodeCacheSize=128m</argLine>-->
+                            <argLine>${jacoco.agent.ut.arg} -Xms64m -Xmx256m -Djava.awt.headless=true -XX:ReservedCodeCacheSize=128m -Dfile.encoding=UTF-8</argLine>
+                            <skipTests>${maven.test.ut.skip}</skipTests>
+                            <!-- Enable or disable Stop maven -->
+                            <testFailureIgnore>${maven.test.failure.skip}</testFailureIgnore>
+                            <!--TODO must be used to detect test that are failing randomly due to wrong code for instance
+                            <runOrder>random</runOrder>-->
+                            <runOrder>filesystem</runOrder>
+                            <!--<forkMode>always</forkMode>-->
+                            <!-- DEPRECATED since version 2.14 -->
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                            <excludes>
+                                <exclude>**/*_IT*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven.failsafe.plugin.version}</version>
+                        <configuration>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <skipTests>${maven.test.skip}</skipTests>
+                            <skipITs>${maven.test.it.skip}</skipITs>
+                            <!--<argLine>${jacoco.agent.it.arg} -Xmx1024m -XX:MaxPermSize=256m</argLine>-->
+                            <argLine>${jacoco.agent.it.arg} -Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                            <!-- Let's put failsafe reports with surefire to have access to tests failures/success reports in sonar -->
+                            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                            <!--TODO must be used to detect test that are failing randomly due to wrong code for instance
+                            <runOrder>random</runOrder>-->
+                            <runOrder>filesystem</runOrder>
+                            <!--<forkMode>always</forkMode>-->
+                            <!-- DEPRECATED since version 2.14 -->
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${maven.jacoco.plugin.version}</version>
+                        <executions>
+                            <!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
+                            <execution>
+                                <id>prepare-ut-agent</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${sonar.jacoco.reportPaths}</destFile>
+                                    <propertyName>jacoco.agent.ut.arg</propertyName>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                            <!-- Prepares a variable, jacoco.agent.it.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
+                            <execution>
+                                <id>prepare-it-agent</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${sonar.jacoco.itReportPaths}</destFile>
+                                    <propertyName>jacoco.agent.it.arg</propertyName>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- The destination file for the code coverage report has to be set to the same value
+                           in the parent pom and in each module pom. Then JaCoCo will add up information in
+                           the same report, so that, it will give the cross-module code coverage. -->
+                            <destFile>${sonar.jacoco.itReportPaths}</destFile>
+                            <excludes>
+                                <exclude>jsp/**/*.class</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <!-- Jacoco output file for ITs -->
+                <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
+                <!-- Jacoco output file for UTs -->
+                <jacoco.out.ut.file>jacoco.exec</jacoco.out.ut.file>
+                <!-- Tells Sonar to use jacoco for coverage results -->
+                <!-- Don't let Sonar execute tests. We will ask it to Maven -->
+                <!--<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>-->
+                <!-- The system property jacoco.outputDir needs to be override on the command line
+                with an absolute path if you want to merge results from all modules.
+                Example in a Jenkisn build where ${WORKSPACE} is defined and your project in the root directory of the workspace :
+                mvn clean install -Prun-its,coverage -Djacoco.outputDir=${WORKSPACE}/target
+                Note that unfortunately using the following does not work because of
+
+                http://jira.codehaus.org/browse/SONAR-3427:
+
+                <jacoco.outputDir>${session.executionRootDirectory}/target/</jacoco.outputDir>
+                -->
+                <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+                <sonar.groovy.jacoco.reportMissing.force.zero>true</sonar.groovy.jacoco.reportMissing.force.zero>
+                <!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
+                <sonar.jacoco.itReportPaths>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPaths>
+                <!--<sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>-->
+                <!-- Tells Sonar where the Jacoco coverage result file is located for Unit Tests -->
+                <sonar.jacoco.reportPaths>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPaths>
+                <sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
+                <!-- ************************ -->
+                <!-- Sonar/Reporting settings -->
+                <!-- ************************ -->
+                <!-- Sonar/Jacoco integration. Note that these properties need to be defined outside the "coverage" profile
+                because we want to be to able to execute mvn sonar:sonar without passing a profile -->
+                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                <!--<jacoco.skip>true</jacoco.skip>-->
+                <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>org.jacoco.core</artifactId>
+                    <version>${jacoco.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>       
+        <profile>
+            <id>logback</id>
+            <dependencies>
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>${logback.version}</version>
+                    <scope>runtime</scope>
+                    <exclusions>
+                        <!-- circular dependency -->
+                        <exclusion>
+                            <artifactId>slf4j-api</artifactId>
+                            <groupId>org.slf4j</groupId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-core</artifactId>
+                    <version>${logback.version}</version>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>log4j</id>
+            <activation>
+                <property>
+                    <name>!profile.activation</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>${slf4j.version}</version>
+                    <scope>runtime</scope>
+                    <exclusions>
+                        <!-- circular dependency -->
+                        <exclusion>
+                            <artifactId>slf4j-api</artifactId>
+                            <groupId>org.slf4j</groupId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                    <version>${log4j.version}</version>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <!-- if ./exclusions.txt is present, use that as the exclusion list. Useful when skipping tests. -->
+            <id>exclusions</id>
+            <activation>
+                <file>
+                    <exists>exclusions.txt</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludesFile>exclusions.txt</excludesFile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- if ./inclusions.txt is present, use that as the inclusion list. Useful when skipping tests. -->
+            <id>inclusions</id>
+            <activation>
+                <file>
+                    <exists>inclusions.txt</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includesFile>inclusions.txt</includesFile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>homemade-release</id>
+            <name>Homemade release</name>
+            <url>http://alm-artifacts.misys.global.ad/nexus/content/repositories/homemade-release</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>homemade-snapshot</id>
+            <name>Homemade snapshot</name>
+            <url>http://alm-artifacts.misys.global.ad/nexus/content/repositories/homemade-snapshot</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>

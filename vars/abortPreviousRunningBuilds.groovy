@@ -1,4 +1,5 @@
 #!/usr/bin/groovy
+import jenkins.model.CauseOfInterruption
 import com.cloudbees.groovy.cps.NonCPS
 
 @NonCPS
@@ -29,7 +30,7 @@ def call() {
                   echo "Aborted by " + user
                 exec.interrupt(
                   Result.ABORTED,
-                  new CauseOfInterruption.UserInterruption(
+                  new jenkins.model.CauseOfInterruption.UserInterruption(
                       "Aborted by ${user} - ${pname} - ${bname} #${currentBuild.number}"
                   )
                 )
