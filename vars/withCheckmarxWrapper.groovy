@@ -71,7 +71,6 @@ def call(Map vars, Closure body=null) {
          if (didTimeout) {
              echo "no input was received before timeout"
 
-             //unstash 'sources'
              if (body) { body() }
 
              step([

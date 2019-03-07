@@ -26,49 +26,55 @@ def call(Map vars, Closure body=null) {
 
     script {
 
-        try {
+        tee('docker-compose.log') {
 
-            // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-            withRegistryWrapper() {
-
-            if (CLEAN_RUN) {
-                sh "${dockerFilePath}docker-compose-down.sh"
-            }
-
-            if (!DRY_RUN) {
-                def up = sh script: "${dockerFilePath}docker-compose-up.sh", returnStatus: true
-                echo "UP RETURN CODE : ${up}"
-                if (up == 0) {
-                    echo "TEST SUCCESS"
-                    //dockerCheckHealth("${DOCKER_TEST_CONTAINER}","healthy")
-                } else if (up == 1) {
-                    echo "TEST FAILURE"
-                    currentBuild.result = 'FAILURE'
-                } else {
-                    echo "TEST UNSTABLE"
-                    currentBuild.result = 'UNSTABLE'
-                }
-            }
-
-            if (body) { body() }
-
-            }  // withRegistryWrapper
-
-        } catch(exc) {
-            echo 'Error: There were errors in tests. '+exc.toString()
-            error 'There are errors in tests'
-            currentBuild.result = 'FAILURE'
-        } finally {
             try {
-                sh "docker-compose -f ${dockerFilePath}docker-compose.yml ${DOCKER_COMPOSE_OPTIONS} ps -q"
-            }
-            catch(exc) {
-                echo 'Warn: There was a problem taking down the docker-compose network. '+exc.toString()
-                //currentBuild.result = 'ABORTED'
+		    
+                // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
+                withRegistryWrapper() {
+		    
+                    if (CLEAN_RUN) {
+                        sh "${dockerFilePath}docker-compose-down.sh"
+                    }
+                    
+                    sh "docker images"
+                    sh "docker volume ls"                    
+		    
+                    if (!DRY_RUN) {
+                        def up = sh script: "${dockerFilePath}docker-compose-up.sh", returnStatus: true
+                        echo "UP RETURN CODE : ${up}"
+                        if (up == 0) {
+                            echo "TEST SUCCESS"
+                            //dockerCheckHealth("${DOCKER_TEST_CONTAINER}","healthy")
+                        } else if (up == 1) {
+                            echo "TEST FAILURE"
+                            currentBuild.result = 'FAILURE'
+                        } else {
+                            echo "TEST UNSTABLE"
+                            currentBuild.result = 'UNSTABLE'
+                        }
+                    }
+		    
+                    if (body) { body() }
+		    
+                }  // withRegistryWrapper
+		    
+            } catch(exc) {
+                echo 'Error: There were errors in tests. '+exc.toString()
+                error 'There are errors in tests'
+                currentBuild.result = 'FAILURE'
             } finally {
-                sh "${dockerFilePath}docker-compose-down.sh"
-            }
-        }
+                try {
+                    sh "docker-compose -f ${dockerFilePath}docker-compose.yml ${DOCKER_COMPOSE_OPTIONS} ps -q"
+                }
+                catch(exc) {
+                    echo 'Warn: There was a problem taking down the docker-compose. '+exc.toString()
+                } finally {
+                    sh "${dockerFilePath}docker-compose-down.sh"
+                }
+            } // finally
+        
+        } // tee
 
     } // script
 

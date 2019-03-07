@@ -16,9 +16,9 @@ def call(Map vars, Closure body=null) {
 
     call(roleName)
 
-	if (body) {
-		body()
-	}
+    if (body) {
+        body()
+    }
 
 }
 
@@ -34,13 +34,12 @@ def call(String roleName) {
        echo "BUILD RETURN CODE : ${build}"
        if (build == 0) {
          echo "TEST SUCCESS"
-         //currentBuild.result = 'SUCCESS'
        } else {
          echo "TEST UNSTABLE"
          currentBuild.result = 'UNSTABLE'
        }
 
-       junit "**/ara-" + roleName + ".xml"
+       junit testResults: "**/ara-" + roleName + ".xml", healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [[$class: 'ClaimTestDataPublisher']]
 
        archiveArtifacts artifacts: "molecule-" + roleName + ".log", onlyIfSuccessful: false, allowEmptyArchive: true
 

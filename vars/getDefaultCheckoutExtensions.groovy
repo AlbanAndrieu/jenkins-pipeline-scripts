@@ -1,6 +1,6 @@
 #!/usr/bin/groovy
 
-def call(isDefaultBranch = false, relativeTargetDir = "", timeout = 20, isCleaningEnabled = false) {
+def call(isDefaultBranch = false, relativeTargetDir = "", timeout = 20, isCleaningEnabled = true) {
 
     def DEFAULT_EXTENTIONS = [
             //[$class: 'LocalBranch', localBranch: "**"],

@@ -3,7 +3,7 @@ import java.*
 import java.lang.*
 import hudson.*
 import hudson.model.*
-import jenkins.model.Jenkins
+import jenkins.model.*
 import com.cloudbees.groovy.cps.NonCPS
 
 def call(Closure body=null) {
@@ -23,9 +23,10 @@ def call(Map vars, Closure body=null) {
         echo 'No body specified'
     }
 
-    def relativeTargetDir = vars.get("relativeTargetDir", "test")
-    def isDefaultBranch = vars.get("isDefaultBranch", true).toBoolean()
-    def isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
+    vars.relativeTargetDir = vars.get("relativeTargetDir", "test")
+    vars.isDefaultBranch = vars.get("isDefaultBranch", true).toBoolean()
+    vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
+    vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
 
     // TODO
     //def GIT_BRANCH_NAME = vars.get("GIT_BRANCH_NAME", "develop")
@@ -34,7 +35,7 @@ def call(Map vars, Closure body=null) {
 
         checkout scm
 
-        //gitCheckoutTESTRepo(relativeTargetDir: relativeTargetDir, isDefaultBranch: isDefaultBranch, isScmEnabled: isScmEnabled) {
+        //gitCheckoutTESTRepo(vars) {
         //
         //   dir ("test") {
         //
