@@ -42,6 +42,8 @@ fi
 #ssh -p $JENKINS_SSHD_PORT $JENKINS_HOSTNAME declarative-linter < Jenkinsfile
 
 #./mvnw install 
+
+#./gradlew wrapper --gradle-version=5.2.1 --distribution-type=bin
 #./gradlew build
 
 exit 0
