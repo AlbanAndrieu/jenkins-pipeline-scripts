@@ -1,6 +1,5 @@
 #!/usr/bin/groovy
 import java.*
-import java.lang.*
 import hudson.*
 import hudson.model.*
 import jenkins.model.*
@@ -67,6 +66,7 @@ def call(Map vars, Closure body=null) {
                     echo "BUILD SUCCESS"
                 } else {
                     echo "BUILD FAILURE"
+                    error 'There are errors in build'
                     currentBuild.result = 'FAILURE'
                 }
 

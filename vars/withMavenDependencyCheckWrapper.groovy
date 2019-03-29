@@ -19,30 +19,23 @@ def call(Map vars, Closure body=null) {
     //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    def goal = vars.get("goal", "org.owasp:dependency-check-maven:check")
-    def profile = vars.get("profile", "sonar")
-    def skipTests = vars.get("skipTests", true).toBoolean()
-    def skipResults = vars.get("skipResults", true).toBoolean()
-    //def buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
-    def skipSonar = vars.get("skipSonar", true).toBoolean()
-    def skipPitest = vars.get("skipPitest", true).toBoolean()
-    def buildCmdParameters = vars.get("buildCmdParameters", "")
-    def artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
+    vars.goal = vars.get("goal", "org.owasp:dependency-check-maven:check")
+    vars.profile = vars.get("profile", "sonar")
+    vars.skipTests = vars.get("skipTests", true).toBoolean()
+    vars.skipResults = vars.get("skipResults", true).toBoolean()
+    //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
+    vars.skipSonar = vars.get("skipSonar", true).toBoolean()
+    vars.skipPitest = vars.get("skipPitest", true).toBoolean()
+    vars.buildCmdParameters = vars.get("buildCmdParameters", "")
+    vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
 
     if (!DRY_RUN) {
 
         buildCmdParameters += "-Dskip.npm -Dskip.yarn -Dskip.bower -Dskip.grunt -Dmaven.exec.skip=true -Denforcer.skip=true -Dmaven.test.skip=true"
 
-        withMavenWrapper(goal: goal,
-        profile: profile,
-        skipTests: skipTests,
-        skipResults: skipResults,
-        skipSonar: skipSonar,
-        skipPitest: skipPitest,
-        buildCmdParameters: buildCmdParameters,
-        artifacts: artifacts) {
+        withMavenWrapper(vars) {
 
-        if (body) { body() }
+            if (body) { body() }
 
         }
 

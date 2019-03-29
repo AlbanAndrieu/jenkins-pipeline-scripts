@@ -13,7 +13,7 @@ def DOCKER_IMAGE="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOC
 def DOCKER_OPTS_ROOT = [
     '-v /etc/passwd:/etc/passwd:ro',
     '-v /etc/group:/etc/group:ro',
-    '--entrypoint=\'\'',    
+    '--entrypoint=\'\'',
 ].join(" ")
 
 def DOCKER_OPTS_BASIC = [
@@ -21,14 +21,13 @@ def DOCKER_OPTS_BASIC = [
     '-v /usr/local/sonar-build-wrapper:/usr/local/sonar-build-wrapper',
     '-v /workspace/slave/tools/:/workspace/slave/tools/',
     '-v /jenkins:/home/jenkins',
-    DOCKER_OPTS_ROOT,   
+    DOCKER_OPTS_ROOT,
 ].join(" ")
 
 def DOCKER_OPTS_COMPOSE = [
     DOCKER_OPTS_BASIC,
     '-v /var/run/docker.sock:/var/run/docker.sock',
 ].join(" ")
-
 
 def branchName = env.BRANCH_NAME
 
@@ -42,7 +41,7 @@ pipeline {
     booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")
     string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
     string(defaultValue: "", name: "RELEASE_VERSION", description: "Release version for artifacts")
-  }  
+  }
   environment {
     DRY_RUN = "${params.DRY_RUN}".toBoolean()
     CLEAN_RUN = "${params.CLEAN_RUN}".toBoolean()
@@ -51,10 +50,10 @@ pipeline {
     RELEASE = "${params.RELEASE}".toBoolean()
     RELEASE_BASE = "${params.RELEASE_BASE}"
     RELEASE_VERSION = "${params.RELEASE_VERSION}"
-  }    
+  }
   options {
     disableConcurrentBuilds()
-    skipStagesAfterUnstable()
+    //skipStagesAfterUnstable()
     parallelsAlwaysFailFast()
     ansiColor('xterm')
     timeout(time: 180, unit: 'MINUTES')
@@ -78,9 +77,15 @@ pipeline {
       }
       steps {
         script {
-          properties(createPropertyList())
+          def myenv = load "src/test/jenkins/lib/myenv.groovy"
+          properties(myenv.getPropertyList())
+
+          //myenv.defineEnvironment()
+
+          myenv.printEnvironment()
+
           setBuildName()
-          RESULT = sh(returnStdout: true, script: "./build.sh").trim()
+          RESULT = sh(returnStdout: true, script: './clean.sh').trim()
 
           echo "RESULT : ${RESULT}"
 
@@ -98,7 +103,7 @@ pipeline {
           args DOCKER_OPTS_COMPOSE
           label 'docker-compose'
         }
-      }    
+      }
       steps {
         script {
 
@@ -108,7 +113,7 @@ pipeline {
 
           //profile: "sonar,run-integration-test"
 
-          sh "ls -lrtan /home/jenkins/ || true"
+          sh "echo TEST : $branchName"
           //buildCmdParameters: "-Dserver=jetty9x -Dmaven.repo.local=./.repository"
 
           withMavenWrapper(goal: "install",
@@ -130,7 +135,7 @@ pipeline {
 
         } // script
       } // steps
-    } // stage Maven    
+    } // stage Maven
     stage('SonarQube analysis') {
       agent {
         docker {
@@ -152,17 +157,48 @@ pipeline {
 
           }
 
-          parallel "sample default maven project": {
-            build job: "github.com/AlbanAndrieu/nabla-servers-bower-sample/master",
-            wait: true
-          },
-          "sample maven project": {
-            build job: "github.com/AlbanAndrieu/nabla-servers-bower/master",
-            wait: true
+          try {
+            parallel "sample default maven project": {
+              def e2e = build job: "github.com/AlbanAndrieu/nabla-servers-bower-sample/master", propagate: false, wait: true
+              result = e2e.result
+              if (result.equals("SUCCESS")) {
+                echo "E2E SUCCESS"
+              } else {
+                 echo "E2E UNSTABLE"
+                 error 'FAIL E2E'
+                 currentBuild.result = 'UNSTABLE'
+                 sh "exit 1" // this fails the stage
+              }
+
+            } // parallel
+          } catch (e) {
+             currentBuild.result = 'FAILURE'
+             result = "FAIL" // make sure other exceptions are recorded as failure too
           }
         }
       } // steps
     } // stage SonarQube analysis
+    stage('\u2795 Quality - Security') {
+        agent {
+            docker {
+                image DOCKER_IMAGE
+                reuseNode true
+                registryUrl DOCKER_REGISTRY_URL
+                registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
+                args DOCKER_OPTS_COMPOSE
+                label 'docker-inside'
+            }
+        }
+        steps {
+            script {
+                stage('\u2795 Quality - Security - Checkmarx') {
+                    script {
+                        withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx', preset: '17', groupId: '1d9286a6-fc4f-4d65-9010-045ca9032198')
+                     }    // script                                                                                                                       }
+                }
+            } // script
+        } // steps
+    } // stage Security
   } // stages
   post {
     always {

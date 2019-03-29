@@ -15,23 +15,23 @@ def call(Map vars, Closure body=null) {
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
 
-    def skipSonar = vars.get("skipSonar", true).toBoolean()
-    def mavenGoals = vars.get("mavenGoals", "")
+    vars.skipSonar = vars.get("skipSonar", true).toBoolean()
+    vars.mavenGoals = vars.get("mavenGoals", "")
 
-    if ( !skipSonar ) {
+    if ( !vars.skipSonar ) {
         if (!DRY_RUN && !RELEASE) {
             echo "sonar added"
             if ( env.BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
-                mavenGoals += " -Dsonar.branch.name=${env.BRANCH_NAME}"
+                vars.mavenGoals += " -Dsonar.branch.name=${env.BRANCH_NAME}"
             } else {
-                mavenGoals += " -Dsonar.branch.name=${env.BRANCH_NAME}"
-                mavenGoals += " -Dsonar.branch.target=develop"
+                vars.mavenGoals += " -Dsonar.branch.name=${env.BRANCH_NAME}"
+                vars.mavenGoals += " -Dsonar.branch.target=develop"
             }
-            mavenGoals += " sonar:sonar"
+            vars.mavenGoals += " sonar:sonar"
         }
     }
 
     if (body) { body() }
 
-    return mavenGoals
+    return vars.mavenGoals
 }

@@ -8,6 +8,8 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/wrapCleanWs.groovy`"
+	
+    vars.isEmailEnabled = vars.get("isEmailEnabled", true).toBoolean()
 
     node('docker-inside') {
 
@@ -22,7 +24,7 @@ def call(Map vars, Closure body=null) {
             } else {
                 echo "Hi from wrapCleanWs"
             }
-            if (!DRY_RUN && !DEBUG_RUN) {
+            if (!DRY_RUN && !DEBUG_RUN && vars.isEmailEnabled) {
                 standardNotify { }
             }
 

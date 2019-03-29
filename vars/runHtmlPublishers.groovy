@@ -1,3 +1,7 @@
+#!/usr/bin/groovy
+
+import hudson.model.*
+import com.cloudbees.groovy.cps.NonCPS
 // Method to run all common Jenkins HTML Publishers (Maven, Java, C++, ALMTest) in single tasks
 
 // Each Publisher task should be be described as map of {name, config}, where
@@ -84,12 +88,14 @@ def call() {
 }
 
 // Shortcut for creating publishers from a list
+@NonCPS
 def call(List<String> publishers) {
     Map defaultPublishers = [:]
     publishers.each() { defaultPublishers[it] = [:] }
     call(defaultPublishers)
 }
 
+@NonCPS
 def call(Map publishers) {
 
     publishers.each { publisherName, publisherConfig ->

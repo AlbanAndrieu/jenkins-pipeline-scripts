@@ -1,0 +1,6 @@
+#!/usr/bin/groovy
+
+def map = [
+        key: "value",
+]
+return map

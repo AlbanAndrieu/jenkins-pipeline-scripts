@@ -1,5 +1,7 @@
 #!/usr/bin/groovy
+
 import hudson.model.*
+import com.cloudbees.groovy.cps.NonCPS
 
 def call(Closure body=null) {
     this.vars = [:]
@@ -22,6 +24,7 @@ def call(Map vars, Closure body=null) {
 
 }
 
+@NonCPS
 def call(String roleName) {
 
     if (roleName != null && roleName.trim() != "" ) {
@@ -31,11 +34,12 @@ def call(String roleName) {
          returnStatus: true
        )
 
-       echo "BUILD RETURN CODE : ${build}"
+       echo "ARA RETURN CODE : ${build}"
        if (build == 0) {
-         echo "TEST SUCCESS"
+         echo "ARA SUCCESS"
        } else {
-         echo "TEST UNSTABLE"
+         echo "ARA UNSTABLE"
+         error 'There are errors in ara'
          currentBuild.result = 'UNSTABLE'
        }
 

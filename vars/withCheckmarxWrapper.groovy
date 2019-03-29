@@ -1,5 +1,4 @@
 #!/usr/bin/groovy
-//import com.cloudbees.groovy.cps.NonCPS
 import hudson.model.*
 
 def call(Closure body=null) {
@@ -20,12 +19,16 @@ def call(Map vars, Closure body=null) {
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    def excludeFolders = vars.get("excludeFolders", ", bm")
-    def projectName = vars.get("projectName", ", TEST_Checkmarx")
-    def preset = vars.get("preset", '17')
+    vars.excludeFolders = vars.get("excludeFolders", ", bm")
+    vars.projectName = vars.get("projectName", ", TEST_Checkmarx")
+    vars.preset = vars.get("preset", '17')
 
-    def groupId = vars.get("groupId", '000')
-    def password = vars.get("password", '{AAA/BBB=}')
+    vars.groupId = vars.get("groupId", '000')
+    vars.password = vars.get("password", '{AAA/BBB=}')
+    vars.generatePdfReport = vars.get("generatePdfReport", false).toBoolean()
+    vars.lowThreshold = vars.get("lowThreshold", 1000).toBoolean()
+    vars.mediumThreshold = vars.get("mediumThreshold", 100).toBoolean()
+    vars.highThreshold = vars.get("highThreshold", 50).toBoolean()
 
     if (!DRY_RUN && !RELEASE) {
 
@@ -77,7 +80,7 @@ def call(Map vars, Closure body=null) {
                  $class: 'CxScanBuilder',
                  avoidDuplicateProjectScans: true,
                  comment: '',
-                 excludeFolders: '.repository, target, .node_cache, .tmp, .node_tmp, .git, .grunt, .bower, .mvnw, bower_components, node_modules, npm, node, lib, libs, docs, hooks, help, test, Sample, vendors, dist, build, site, fonts, images, coverage, .mvn, ansible' + excludeFolders,
+                 excludeFolders: '.repository, target, .node_cache, .tmp, .node_tmp, .git, .grunt, .bower, .mvnw, bower_components, node_modules, npm, node, lib, libs, docs, hooks, help, test, Sample, vendors, dist, build, site, fonts, images, coverage, .mvn, ansible' + vars.excludeFolders,
                  excludeOpenSourceFolders: '',
                  exclusionsSetting: 'job',
                  failBuildOnNewResults: true,
@@ -101,23 +104,23 @@ def call(Map vars, Closure body=null) {
 ''',
                     fullScanCycle: 10,
                     fullScansScheduled: false,
-                    generatePdfReport: true,
-                    highThreshold: 50,
+                    generatePdfReport: false,
                     includeOpenSourceFolders: '',
                     incremental: true,
-                    lowThreshold: 1000,
-                    mediumThreshold: 100,
+                    lowThreshold: vars.lowThreshold,
+                    mediumThreshold: vars.mediumThreshold,
+                    highThreshold: vars.highThreshold,
                     osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz',
-                    osaHighThreshold: 10,
                     osaInstallBeforeScan: false,
                     osaLowThreshold: 1000,
                     osaMediumThreshold: 100,
+                    osaHighThreshold: 10,
                     useOwnServerCredentials: true,
                     credentialsId: 'nabla.checkmarx',
-                    groupId: groupId,
-                    password: password,
-                    preset: preset,
-                    projectName: projectName,
+                    groupId: vars.groupId,
+                    password: vars.password,
+                    preset: vars.preset,
+                    projectName: vars.projectName,
                     serverUrl: 'https://nabla-checkmarx',
                     skipSCMTriggers: true,
                     sourceEncoding: '1',
@@ -126,7 +129,7 @@ def call(Map vars, Closure body=null) {
                     vulnerabilityThresholdResult: 'FAILURE',
                     waitForResultsEnabled: true
                 ])
-
+        
         } else if (userInput == true) {
             // do something
             echo "skip requested"
