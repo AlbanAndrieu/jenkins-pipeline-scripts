@@ -23,3 +23,16 @@ OR (if jenkins is managing the version, the prefered way)
 
 See [Extending with Shared Libraries](https://jenkins.io/doc/book/pipeline/shared-libraries/) for more
 information on Jenkins pipeline extensions.
+
+See also [Best Practices For Pipeline Code](https://jenkins.io/blog/2017/02/01/pipeline-scalability-best-practice/)
+
+Run test
+
+```
+./mvnw -Dtest=TestSharedLibrary test
+```
+
+TODO
+========================
+
+See [Extending environment variables with Shared Libraries](https://devops.datenkollektiv.de/programatically-add-environment-variables-to-a-jenkins-instance.html) 

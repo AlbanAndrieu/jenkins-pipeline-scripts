@@ -26,9 +26,9 @@ def call(Map vars, Closure body=null) {
     vars.groupId = vars.get("groupId", '000')
     vars.password = vars.get("password", '{AAA/BBB=}')
     vars.generatePdfReport = vars.get("generatePdfReport", false).toBoolean()
-    vars.lowThreshold = vars.get("lowThreshold", 1000).toBoolean()
-    vars.mediumThreshold = vars.get("mediumThreshold", 100).toBoolean()
-    vars.highThreshold = vars.get("highThreshold", 50).toBoolean()
+    vars.lowThreshold = vars.get("lowThreshold", 1000)
+    vars.mediumThreshold = vars.get("mediumThreshold", 100)
+    vars.highThreshold = vars.get("highThreshold", 50)
 
     if (!DRY_RUN && !RELEASE) {
 

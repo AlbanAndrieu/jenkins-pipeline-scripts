@@ -33,14 +33,7 @@ def call(Map vars, Closure body=null) {
 
         vars.buildCmdParameters += "-Dskip.npm -Dskip.yarn -Dskip.bower -Dskip.grunt -Dmaven.exec.skip=true -Denforcer.skip=true -Dmaven.test.skip=true"
 
-        withMavenWrapper(goal: goal,
-            profile: profile,
-            skipTests: skipTests,
-            skipResults: skipResults,
-            skipSonar: skipSonar,
-            skipPitest: skipPitest,
-            buildCmdParameters: buildCmdParameters,
-            artifacts: artifacts) {
+        withMavenWrapper(vars) {
 
             if (body) { body() }
 

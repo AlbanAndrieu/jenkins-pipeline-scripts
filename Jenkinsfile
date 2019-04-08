@@ -72,9 +72,6 @@ pipeline {
           label 'docker-compose'
         }
       }
-      environment {
-        JENKINS_URL = "http://localhost/jenkins/"
-      }
       steps {
         script {
           def myenv = load "src/test/jenkins/lib/myenv.groovy"
@@ -120,7 +117,8 @@ pipeline {
               profile: "jacoco",
               skipSonar: true,
               skipPitest: true,
-              buildCmdParameters: "-Dserver=jetty9x",
+              skipArtifacts: true,
+              buildCmdParameters: "-Dserver=jetty9x -Dsonar.findbugs.allowuncompiledcode=true",
               artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip") {
 
                 //sh 'chown -R jenkins:docker .[^.]* *'
@@ -153,7 +151,11 @@ pipeline {
       }
       steps {
         script {
-          withSonarQubeWrapper(verbose: true, skipMaven: true, project: "NABLA", repository: "jenkins-pipeline-scripts") {
+          withSonarQubeWrapper(verbose: true, 
+              skipMaven: true, 
+              buildCmdParameters: "-Dsonar.findbugs.allowuncompiledcode=true",
+              project: "NABLA", 
+              repository: "jenkins-pipeline-scripts") {
 
           }
 

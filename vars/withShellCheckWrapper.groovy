@@ -18,13 +18,13 @@ def call(Map vars, Closure body=null) {
     tee("shellcheck.log") {
 
         shellcheckExitCode = sh(
-            script: "shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${pattern} > checkstyle.xml",
+            script: "shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} > checkstyle.xml",
             returnStdout: true,
             returnStatus: true
         )
 	    
-        echo "SHELL CHECK RETURN CODE : ${shellcheckExitCode}"
-        if (shellcheckExitCode == 0) {
+        echo "SHELL CHECK RETURN CODE : ${vars.shellcheckExitCode}"
+        if (vars.shellcheckExitCode == 0) {
             echo "SHELL CHECK SUCCESS"
         //} else {
         //    echo "SHELL CHECK UNSTABLE"

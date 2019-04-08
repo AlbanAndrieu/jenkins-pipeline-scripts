@@ -1,6 +1,5 @@
 #!/usr/bin/groovy
 import java.*
-import java.lang.*
 import hudson.*
 import hudson.model.*
 import jenkins.model.Jenkins
