@@ -12,33 +12,54 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def excludes = vars.get("excludes", "**/*Debug*.tar.gz")
-    def remoteDirectory = vars.get("remoteDirectory", "ARC/lastSuccessfulBuild/${INSTALLER_PATH}")
-    def sourceFiles = vars.get("sourceFiles", "**/Latest-*.tar.gz,**/TEST-*.tar.gz")
+    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
-	sshPublisher continueOnError: true,
-		publishers: [
-			sshPublisherDesc(
-				configName: 'ssh-server-1',
-				transfers: [
-					sshTransfer(cleanRemote: false,
-					excludes: excludes,
-					execCommand: '',
-					execTimeout: 120000,
-					flatten: true,
-					makeEmptyDirs: false,
-					noDefaultExcludes: false,
-					patternSeparator: '[, ]+',
-					remoteDirectory: remoteDirectory,
-					remoteDirectorySDF: false,
-					removePrefix: '',
-					sourceFiles: sourceFiles)
-				],
-			usePromotionTimestamp: false,
-			useWorkspaceInPromotion: false,
-			verbose: true)
-		]
+    vars.excludes = vars.get("excludes", "**/*Debug*.tar.gz")
+    vars.remoteDirectory = vars.get("remoteDirectory", "TEST/LatestBuildsUntested/latest")
+    vars.alwaysPublishFromMaster = vars.get("alwaysPublishFromMaster", false).toBoolean()
+    vars.continueOnError = vars.get("continueOnError", true).toBoolean()
+    vars.cleanRemote = vars.get("cleanRemote", true).toBoolean()
+    vars.flatten = vars.get("flatten", true).toBoolean()    
+    vars.sourceFiles = vars.get("sourceFiles", "**/Latest-*.tar.gz,**/TEST-*.tar.gz")
 
-    if (body) { body() }
+    if ( isReleaseBranch() ) {
+        if (DEBUG_RUN) {
+            echo 'Publish artifacts'
+        }
+        
+        if (body) { body() }
+        
+        try {        
+            sshPublisher alwaysPublishFromMaster: vars.alwaysPublishFromMaster, continueOnError: vars.continueOnError,
+                publishers: [
+                    sshPublisherDesc(
+                        configName: 'albandri',
+                        transfers: [
+                            sshTransfer(cleanRemote: vars.cleanRemote,
+                                excludes: vars.excludes,
+                                execCommand: '',
+                                execTimeout: 120000,
+                                flatten: vars.flatten,
+                                makeEmptyDirs: false,
+                                noDefaultExcludes: false,
+                                patternSeparator: '[, ]+',
+                                remoteDirectory: vars.remoteDirectory,
+                                remoteDirectorySDF: false,
+                                removePrefix: '',
+                                sourceFiles: vars.sourceFiles)
+                        ],
+                    usePromotionTimestamp: false,
+                    useWorkspaceInPromotion: false,
+                    verbose: true)
+                ]
+        }
+        catch(exc) {
+            echo 'Error: There were errors running sshPublisher. '+exc.toString()
+        }
+        
+        return true
+    } else {
+        return false
+    }
 
 }

@@ -11,7 +11,7 @@ def call(Map vars, Closure body=null) {
 	
     vars.isEmailEnabled = vars.get("isEmailEnabled", true).toBoolean()
 
-    node('docker-inside') {
+    node('docker-compose') {
 
         script {
 

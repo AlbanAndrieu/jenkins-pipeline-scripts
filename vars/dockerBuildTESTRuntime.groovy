@@ -20,7 +20,7 @@ def call(Map vars, Closure body=null) {
     def skipPush = vars.get("skipPush", true).toBoolean()
     def skipMaven = vars.get("skipMaven", true).toBoolean()
 
-    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry-tmp.misys.global.ad")
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi")
     def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
     def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins")
     def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "nabla")
@@ -47,9 +47,10 @@ def call(Map vars, Closure body=null) {
                                  ].join(" ")
         }
         //DOCKER_BUILD_ARGS = [ "${DOCKER_BUILD_ARGS}"].join(" ")
-
+        
+        docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
         // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-        withRegistryWrapper(DOCKER_REGISTRY: DOCKER_REGISTRY) {
+        //withRegistryWrapper(DOCKER_REGISTRY: DOCKER_REGISTRY) {
         
 	        sh 'docker images'
 	        

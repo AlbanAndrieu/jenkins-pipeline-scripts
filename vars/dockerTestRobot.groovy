@@ -26,49 +26,59 @@ def call(Map vars, Closure body=null) {
     def DOCKER_ROBOT_RUNTIME_NAME = vars.get("DOCKER_ROBOT_RUNTIME_NAME", env.DOCKER_ROBOT_RUNTIME_NAME ?: "robot")
     def DOCKER_ROBOT_RUNTIME_IMG = vars.get("DOCKER_ROBOT_RUNTIME_IMG", env.DOCKER_ROBOT_RUNTIME_IMG ?: "${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_ROBOT_RUNTIME_NAME}:${DOCKER_ROBOT_RUNTIME_TAG}")
 
-    def DOCKER_TEST_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: buildDockerTag("${env.BRANCH_NAME}", "${env.GIT_COMMIT}").toLowerCase())
-    //def DOCKER_TEST_LINK = vars.get("DOCKER_TEST_LINK", env.DOCKER_TEST_LINK ?: "test:test")
-    def DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "-d --force-recreate robot")
-    def DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${env.DOCKER_TEST_TAG}")
-    def ADDITIONAL_ROBOT_OPTS = vars.get("ADDITIONAL_ROBOT_OPTS", env.ADDITIONAL_ROBOT_OPTS ?: "-s PipelineTests.TEST")
-    def ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "/tmp/robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}")
+    vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp")
+    vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG)
+    vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_robot_1")
+    vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "--force-recreate --exit-code-from robot robot")
+    vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}")
 
-    def dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
+    vars.ADDITIONAL_ROBOT_OPTS = vars.get("ADDITIONAL_ROBOT_OPTS", env.ADDITIONAL_ROBOT_OPTS ?: "-s PipelineTests.TEST -e disabled")
+    vars.ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "./robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}")
+
+    vars.dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
+    //vars.allowEmptyResults = vars.get("allowEmptyResults", env.allowEmptyResults ?: false).toBoolean()
+    vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
+
+    vars.isFailReturnCode = vars.get("isFailReturnCode", env.isFailReturnCode ?: 255)
+    vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", env.isUnstableReturnCode ?: 250)
 
     script {
 
         if (!DRY_RUN && !RELEASE && BRANCH_NAME ==~ /develop|PR-.*|feature\/.*|bugfix\/.*/ ) {
 
-            dockerComposeTest(DOCKER_TEST_TAG: DOCKER_TEST_TAG,
-                DOCKER_TEST_CONTAINER: "${DOCKER_TEST_TAG}_test_1",
-                DOCKER_COMPOSE_UP_OPTIONS: "-d --force-recreate robot",
-                dockerFilePath: dockerFilePath) {
+            try {
 
-                // --memory 1024m --cpus="1.5"
-                //docker.image("${DOCKER_ROBOT_RUNTIME_IMG}").withRun("-e \"ADDITIONAL_ROBOT_OPTS=${ADDITIONAL_ROBOT_OPTS}\"").inside("--link ${DOCKER_TEST_LINK}--network ${DOCKER_TEST_TAG}_default -v ${ROBOT_RESULTS_PATH}:/tmp/:rw") {c ->
-                //    sh "docker logs ${c.id}"
-                //    //sh "python --version"
-                //}
+                lock(resource: "lock_ROBOT_${env.NODE_NAME}", inversePrecedence: true) {
 
-            }
+                    //timeout(180) {
 
-            step(
-              [
-                $class               : 'RobotPublisher',
-                outputPath           : "${ROBOT_RESULTS_PATH}",
-                outputFileName       : "output.xml",
-                reportFileName       : 'report.html',
-                logFileName          : 'log.html',
-                disableArchiveOutput : false,
-                passThreshold        : 100.0,
-                unstableThreshold    : 80.0,
-                otherFiles           : "*.png,*.jpg",
-              ]
-            )
+                        if (CLEAN_RUN) {
+                            sh "rm -Rf result"
+                        }
 
-        }
+                        dockerComposeTest(vars) {
 
-        if (body) { body() }
+                            sh "docker cp robot:${vars.ROBOT_RESULTS_PATH} result || true"
+
+                            runHtmlPublishers(["RobotPublisher": [outputPath: "result"]])
+
+                            //junit testResults: 'result/results/output.xml', healthScaleFactor: 2.0, allowEmptyResults: vars.allowEmptyResults, keepLongStdio: true
+
+                            if (body) { body() }
+
+                        } // dockerComposeTest
+
+                    //} // timeout
+
+                } // lock
+
+            } catch(exc) {
+                error 'There are errors in dockerTestRobot'
+            } finally {
+                archiveArtifacts artifacts: "${vars.ROBOT_RESULTS_PATH}/**/*.log, *.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+            } // finally
+
+        }  // DRY_RUN
 
     } // script
 

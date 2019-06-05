@@ -10,7 +10,7 @@ def call(def DOCKER_TAG, def commit = "", def dbms = "") {
     } else if (env.BRANCH_NAME ==~ /develop/ ) {
         DOCKER_TAG = "latest"
     } else if (env.BRANCH_NAME ==~ /master.*/ ) {
-        DOCKER_TAG = ${branchSafeName}
+        DOCKER_TAG = "${branchSafeName}"
     } else if (env.BRANCH_NAME ==~ /release\/.+/ ) {
         DOCKER_TAG = "${branchSafeName}-${env.BUILD_ID}"
     }

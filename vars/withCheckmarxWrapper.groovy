@@ -29,6 +29,25 @@ def call(Map vars, Closure body=null) {
     vars.lowThreshold = vars.get("lowThreshold", 1000)
     vars.mediumThreshold = vars.get("mediumThreshold", 100)
     vars.highThreshold = vars.get("highThreshold", 50)
+    vars.avoidDuplicateProjectScans = vars.get("avoidDuplicateProjectScans", false).toBoolean()
+    vars.incremental = vars.get("incremental", true).toBoolean()
+
+    //if (!vars.skipPitest && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/))) {
+    if ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/)) {
+        echo "Force incremental mode"
+        vars.incremental = true
+        echo "Force Default 2017 - light preset mode"
+        vars.preset = '100013'
+    }
+    if (env.BRANCH_NAME == 'master') {
+        echo "Disable incremental mode"
+        vars.incremental = false
+    }
+
+    if ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME == 'master') || (env.BRANCH_NAME ==~ /release\/.*/)) {
+        echo "Avoid duplicate project scans"
+        vars.avoidDuplicateProjectScans = true
+    }
 
     if (!DRY_RUN && !RELEASE) {
 
@@ -78,7 +97,7 @@ def call(Map vars, Closure body=null) {
 
              step([
                  $class: 'CxScanBuilder',
-                 avoidDuplicateProjectScans: true,
+                 avoidDuplicateProjectScans: vars.avoidDuplicateProjectScans,
                  comment: '',
                  excludeFolders: '.repository, target, .node_cache, .tmp, .node_tmp, .git, .grunt, .bower, .mvnw, bower_components, node_modules, npm, node, lib, libs, docs, hooks, help, test, Sample, vendors, dist, build, site, fonts, images, coverage, .mvn, ansible' + vars.excludeFolders,
                  excludeOpenSourceFolders: '',
@@ -104,9 +123,9 @@ def call(Map vars, Closure body=null) {
 ''',
                     fullScanCycle: 10,
                     fullScansScheduled: false,
-                    generatePdfReport: false,
+                    generatePdfReport: vars.generatePdfReport,
                     includeOpenSourceFolders: '',
-                    incremental: true,
+                    incremental: vars.incremental,
                     lowThreshold: vars.lowThreshold,
                     mediumThreshold: vars.mediumThreshold,
                     highThreshold: vars.highThreshold,
@@ -129,7 +148,7 @@ def call(Map vars, Closure body=null) {
                     vulnerabilityThresholdResult: 'FAILURE',
                     waitForResultsEnabled: true
                 ])
-        
+
         } else if (userInput == true) {
             // do something
             echo "skip requested"

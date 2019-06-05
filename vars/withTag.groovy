@@ -32,8 +32,27 @@ def call(Map vars, Closure body=null) {
 
         if (isReleaseBranch()) {
             def TARGET_TAG = getSemVerReleasedVersion() ?: "LATEST"
-            gitTagLocal("${TARGET_TAG}_SUCCESSFULL")
-            gitTagRemote("${TARGET_TAG}_SUCCESSFULL")
+            
+            def tagName="${TARGET_TAG}_SUCCESSFULL"
+            def message="Jenkins"
+            def remote="origin"
+
+            try {
+                sh """
+                    git config --global user.email "jenkins@nabla.mobi";
+                    git config --global user.name "jenkins";
+                    git tag -l | xargs git tag -d # remove all local tags;
+                    git push --delete ${remote} ${tagName} || echo "Could not delete remote tag: does not exist or no access rights" || true;
+                    git tag --delete ${tagName} || echo "Could not delete local tag: does not exist or no access rights" || true; # remove local tag
+                    git fetch --tags --prune > /dev/null 2>&1 || true;
+                    git tag -a ${tagName} -m '${message}'; # create new tag
+                    git push ${remote} ${tagName} --force || echo "Could not push tag: invalid name or no access rights";            
+                """
+            } catch(exc) {
+                echo 'Warning: There were errors while tagging. '+exc.toString()
+                sh "git config --global --list && ls -lrta /home/jenkins/.gitconfig"
+            }    
+
         }
     } // if DRY_RUN
 

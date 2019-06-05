@@ -29,6 +29,7 @@ def call(Map vars, Closure body=null) {
 
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
+    vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false)
@@ -38,7 +39,7 @@ def call(Map vars, Closure body=null) {
     wrapInTEST(isScmEnabled: vars.isScmEnabled, isCleaningEnabled: vars.isCleaningEnabled) {
         try {
 
-            tee("scons-${ARCH}.log") {
+            tee("scons-${arch}.log") {
 
                 if (!DRY_RUN) {
                     unstash 'maven-artifacts'
@@ -56,6 +57,8 @@ def call(Map vars, Closure body=null) {
                     //getEnvironementData(filePath: "./bm/step-2-0-0-build-env.sh", DEBUG_RUN: DEBUG_RUN)
                 }
 
+                if (body) { body() }
+                
                 build = sh (
                   script: "${script}",
                   returnStatus: true
@@ -70,8 +73,6 @@ def call(Map vars, Closure body=null) {
                     currentBuild.result = 'FAILURE'
                 }
 
-                if (body) { body() }
-
             } // tee
 
         } catch (e) {
@@ -83,7 +84,7 @@ def call(Map vars, Closure body=null) {
             stash includes: "${artifacts}", name: 'scons-artifacts-' + arch
             stash allowEmpty: true, includes: "bw-outputs/build-wrapper-dump.json", name: 'bwoutputs-' + arch
 
-            archiveArtifacts artifacts: "bw-outputs/build-wrapper.log, *.log", excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
+            archiveArtifacts artifacts: "bw-outputs/build-wrapper.log, *.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
         }
 
     } // wrapInTEST

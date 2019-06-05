@@ -28,6 +28,9 @@ def call(Map vars, Closure body=null) {
 
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
+    def MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "mgr-settings-nexus") // fr-maven-default
+    def MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2") // maven-latest
+    def JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8") // java-latest
 
     if (DEBUG_RUN) {
          echo "debug added"
@@ -52,9 +55,12 @@ def call(Map vars, Closure body=null) {
     vars.skipPitest = vars.get("skipPitest", false).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "")
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
+    vars.skipArtifacts = vars.get("skipArtifacts", false).toBoolean()
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
-
-    tee("maven.log") {
+    vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
+    
+    try {
+        tee("maven.log") {
 
         configFileProvider([configFile(fileId: 'fr-maven-default',  targetLocation: 'gsettings.xml', variable: 'SETTINGS_XML')]) {
             withMaven(
@@ -202,5 +208,32 @@ def call(Map vars, Closure body=null) {
         } // skipResults
 
     } // tee
+    } catch (e) {
+        step([$class: 'ClaimPublisher'])
+        throw e
+    } finally {
+        //step([
+        //     $class: "WarningsPublisher",
+        //     canComputeNew: false,
+        //     canResolveRelativePaths: false,
+        //     canRunOnFailed: true,
+         //    consoleParsers: [
+         //        [
+         //            parserName: 'Java Compiler (javac)'
+         //        ],
+         //        [
+         //            parserName: 'Maven'
+         //        ]
+         //    ],
+         //    usePreviousBuildAsReference: true,
+         //    useStableBuildAsReference: true
+         //    ])
 
+        stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
+
+        stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
+
+        //maven.log
+        archiveArtifacts artifacts: "*.log, **/ZKM_log.txt, **/ChangeLog.txt", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+    }
 }

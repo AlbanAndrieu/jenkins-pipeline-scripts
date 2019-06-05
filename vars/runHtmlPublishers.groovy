@@ -31,6 +31,7 @@ class PublisherDefaults {
         useProjectRule: false
     ]
 
+    // Below Publisher has been deprecated and must be removed
     static Map AnalysisPublisher = [
         $class: "AnalysisPublisher",
         canComputeNew: false,
@@ -44,6 +45,7 @@ class PublisherDefaults {
         unHealthy: ''
     ]
 
+    // Below Publisher has been deprecated and must be removed
     static Map WarningsPublisher = [
         $class: "WarningsPublisher",
         canComputeNew: false,
@@ -76,6 +78,19 @@ class PublisherDefaults {
         reportName: 'AlmondeTest Report',
         reportTitles: 'ALMTEST index'
     ]
+
+    static Map RobotPublisher = [
+        $class: 'RobotPublisher',
+        outputPath: "/home/frrobot/results",
+        outputFileName: "output.xml",
+        reportFileName: 'report.html',
+        logFileName: 'log.html',
+        disableArchiveOutput: false,
+        passThreshold: 100.0,
+        unstableThreshold: 80.0,
+        otherFiles: "*.png,*.jpg",
+    ]
+
 }
 
 // Shortcut for creating default publishers (with no flags)
@@ -105,17 +120,21 @@ def call(Map publishers) {
                 Map LogParserPublisherConfig = PublisherDefaults.LogParserPublisher << publisherConfig
                 step(LogParserPublisherConfig)
                 break
-            case "AnalysisPublisher":
-                Map AnalysisPublisherConfig = PublisherDefaults.AnalysisPublisher << publisherConfig
-                step(AnalysisPublisherConfig)
-                break
-            case "WarningsPublisher":
-                Map WarningsPublisherConfig = PublisherDefaults.WarningsPublisher << publisherConfig
-                step(WarningsPublisherConfig)
-                break
+            //case "AnalysisPublisher":
+            //    Map AnalysisPublisherConfig = PublisherDefaults.AnalysisPublisher << publisherConfig
+            //    step(AnalysisPublisherConfig)
+            //    break
+            //case "WarningsPublisher":
+            //    Map WarningsPublisherConfig = PublisherDefaults.WarningsPublisher << publisherConfig
+            //    step(WarningsPublisherConfig)
+            //    break
             case "ALMTestPublisher":
                 Map ALMTestPublisherConfig = PublisherDefaults.ALMTestPublisher << publisherConfig
                 publishHTML(ALMTestPublisherConfig)
+                break
+            case "RobotPublisher":
+                Map RobotPublisherConfig = PublisherDefaults.RobotPublisher << publisherConfig
+                step(RobotPublisherConfig)
                 break
             default:
                 echo "[JPL] Unknown results Publisher"

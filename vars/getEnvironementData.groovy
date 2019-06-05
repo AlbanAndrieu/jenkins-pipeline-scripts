@@ -14,12 +14,12 @@ def call(Map vars, Closure body=null) {
     }
 
     def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    def filePath = vars.get("filePath", "step-2-0-0-build-env.sh")
+    vars.filePath = vars.get("filePath", "step-2-0-0-build-env.sh")
 
     if (DEBUG_RUN) {
-        sh "set -xv && ${filePath}"
+        sh "set -xv && ${vars.filePath}"
     } else {
-        sh "${filePath}"
+        sh "${vars.filePath}"
     }
 
     load "./jenkins-env.groovy"

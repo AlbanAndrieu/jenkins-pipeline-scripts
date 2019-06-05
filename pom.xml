@@ -8,8 +8,8 @@
     <!--
     <parent>
         <artifactId>interview</artifactId>
-	<groupId>com.nabla.project.sample.interview</groupId>
-	<version>1.0.1-SNAPSHOT</version>
+    <groupId>com.nabla.project.sample.interview</groupId>
+    <version>1.0.1-SNAPSHOT</version>
     </parent>
     -->
 
@@ -28,26 +28,26 @@
         <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
     </scm>
 
-	<issueManagement>
-		<system>GitHub Issues</system>
-		<url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/issues</url>
-	</issueManagement>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/issues</url>
+    </issueManagement>
 
     <ciManagement>
-            <system>Jenkins</system>
-            <url>${JOB_URL}</url>
-            <notifiers>
-                    <notifier>
-                            <type>mail</type>
-                            <sendOnError>true</sendOnError>
-                            <sendOnFailure>true</sendOnFailure>
-                            <sendOnSuccess>false</sendOnSuccess>
-                            <sendOnWarning>false</sendOnWarning>
-                            <configuration>
-                                    <address>nabla@free.fr</address>
-                            </configuration>
-                    </notifier>
-            </notifiers>
+		<system>Jenkins</system>
+		<url>${JOB_URL}</url>
+		<notifiers>
+			<notifier>
+				<type>mail</type>
+				<sendOnError>true</sendOnError>
+				<sendOnFailure>true</sendOnFailure>
+				<sendOnSuccess>false</sendOnSuccess>
+				<sendOnWarning>false</sendOnWarning>
+				<configuration>
+						<address>nabla@free.fr</address>
+				</configuration>
+			</notifier>
+		</notifiers>
     </ciManagement>
 
     <mailingLists>
@@ -56,16 +56,16 @@
     </mailingLists>
 
     <developers>
-            <developer>
-                    <id>albandri</id>
-                    <name>Alban Andrieu</name>
-                    <email>alban.andrieu@free.fr</email>
-                    <organization>finastra</organization>
-                    <roles>
-                            <role>Developer</role>
-                    </roles>
-                    <timezone>+1</timezone>
-            </developer>
+        <developer>
+            <id>albandri</id>
+            <name>Alban Andrieu</name>
+            <email>alban.andrieu@free.fr</email>
+            <organization>finastra</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
 
@@ -117,7 +117,7 @@
         <jdk.level>1.8</jdk.level>
 
         <!--<sun.jsf.version>2.2.7</sun.jsf.version>-->
-      
+
         <javaagent></javaagent>
         <jacoco.version>0.8.2</jacoco.version>
         <!--<jacoco.version>0.7.7.201606060606</jacoco.version> Incompatible version 1007 in Sonar-->
@@ -151,7 +151,7 @@
         <commons.io.version>2.5</commons.io.version>
         <commons.math3.version>3.2</commons.math3.version>
         <org.assertj.version>3.4.1</org.assertj.version>
-        
+
         <jenkins.version>2.102</jenkins.version>
         <jenkins.core.version>${jenkins.version}</jenkins.core.version>
         <jenkins.workflow.step.api.version>2.10</jenkins.workflow.step.api.version>
@@ -230,18 +230,18 @@
             <version>${jenkins.workflow.step.api.version}</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.jenkins-ci.plugins.workflow</groupId>
-			<artifactId>workflow-cps</artifactId>
-			<version>${jenkins.workflow.cps.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jenkins-ci</groupId>
-			<artifactId>symbol-annotation</artifactId>
-			<version>${jenkins.symbol.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>${jenkins.workflow.cps.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci</groupId>
+            <artifactId>symbol-annotation</artifactId>
+            <version>${jenkins.symbol.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.ivy</groupId>
@@ -476,7 +476,7 @@
                                 <source>src/test/resources/libs/jenkins-pipeline-scripts@master/resources</source>
                                 <source>src/test/resources/libs/jenkins-pipeline-scripts@master/src</source>
                                 <source>src/test/resources/libs/jenkins-pipeline-scripts@master/vars</source>
-                                
+
                                 <!--<source>src/test/resources</source>-->
                                 <source>src/test/jenkins/job</source>
                                 <source>src/test/jenkins/lib</source>
@@ -765,22 +765,5 @@
             </build>
         </profile>
     </profiles>
-
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>true</uniqueVersion>
-            <id>homemade-release</id>
-            <name>Homemade release</name>
-            <url>http://alm-artifacts.misys.global.ad/nexus/content/repositories/homemade-release</url>
-            <layout>default</layout>
-        </repository>
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>homemade-snapshot</id>
-            <name>Homemade snapshot</name>
-            <url>http://alm-artifacts.misys.global.ad/nexus/content/repositories/homemade-snapshot</url>
-            <layout>default</layout>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>

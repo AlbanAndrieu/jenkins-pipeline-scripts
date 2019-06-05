@@ -156,12 +156,27 @@ pipeline {
               buildCmdParameters: "-Dsonar.findbugs.allowuncompiledcode=true",
               project: "NABLA", 
               repository: "jenkins-pipeline-scripts") {
-
           }
-
+        }
+      } // steps
+    } // stage SonarQube analysis
+    stage('E2E tests') {
+      agent {
+        docker {
+          image DOCKER_IMAGE
+          alwaysPull true
+          reuseNode true
+          registryUrl DOCKER_REGISTRY_URL
+          registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
+          args DOCKER_OPTS_COMPOSE
+          label 'docker-compose'
+        }
+      }
+      steps {
+        script {
           try {
             parallel "sample default maven project": {
-              def e2e = build job: "github.com/AlbanAndrieu/nabla-servers-bower-sample/master", propagate: false, wait: true
+              def e2e = build job: 'github.com/AlbanAndrieu/nabla-servers-bower-sample/master', propagate: false, wait: true
               result = e2e.result
               if (result.equals("SUCCESS")) {
                 echo "E2E SUCCESS"
@@ -169,7 +184,7 @@ pipeline {
                  echo "E2E UNSTABLE"
                  error 'FAIL E2E'
                  currentBuild.result = 'UNSTABLE'
-                 sh "exit 1" // this fails the stage
+                 //sh "exit 1" // this fails the stage
               }
 
             } // parallel
@@ -195,7 +210,12 @@ pipeline {
             script {
                 stage('\u2795 Quality - Security - Checkmarx') {
                     script {
-                        withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx', preset: '17', groupId: '1d9286a6-fc4f-4d65-9010-045ca9032198')
+                        withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx', 
+                            preset: '1',
+                            groupId: '1234',
+                            lowThreshold: 10,
+                            mediumThreshold: 0,
+                            highThreshold: 0)
                      }    // script                                                                                                                       }
                 }
             } // script
