@@ -20,7 +20,7 @@ def call(Map vars, Closure body=null) {
 
     if (!DRY_RUN) {
 
-        if (!skipMaven) {
+        if (!vars.skipMaven) {
            unstash 'maven-artifacts'
         }
 

@@ -63,7 +63,6 @@ def call(String shell) {
 					junit testResults: 'target/ansible-lint.xml', healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [
 						[$class: 'ClaimTestDataPublisher']
 					]
-					archiveArtifacts artifacts: "overview.html, target/ansible-lint*", onlyIfSuccessful: false, allowEmptyArchive: true
 				} // configFileProvider
 
 			} // tee
@@ -71,6 +70,9 @@ def call(String shell) {
 			currentBuild.result = 'FAILURE'
 			build = "FAIL" // make sure other exceptions are recorded as failure too
 			throw e			
+		} finally {
+		    archiveArtifacts artifacts: "overview.html, target/ansible-lint*, ansible-cmdb.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}
+		
 	} // if
 }

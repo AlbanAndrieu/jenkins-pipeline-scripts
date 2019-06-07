@@ -22,18 +22,18 @@ def call(Map vars, Closure body=null) {
     def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins")
     def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "fusion-risk")
 
-    def DOCKER_ALMTEST_RUNTIME_TAG = vars.get("DOCKER_ALMTEST_RUNTIME_TAG", env.DOCKER_ALMTEST_RUNTIME_TAG ?: "latest")
-    def DOCKER_ALMTEST_RUNTIME_NAME = vars.get("DOCKER_ALMTEST_RUNTIME_NAME", env.DOCKER_ALMTEST_RUNTIME_NAME ?: "arc-almtest-centos7")
-    def DOCKER_ALMTEST_RUNTIME_IMG = vars.get("DOCKER_ALMTEST_RUNTIME_IMG", env.DOCKER_ALMTEST_RUNTIME_IMG ?: "${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_ALMTEST_RUNTIME_NAME}:${DOCKER_ALMTEST_RUNTIME_TAG}")
+    vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp")
+    vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG)
+    vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_test_1")
+    vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "--exit-code-from frarcalmtest frarcalmtest")
+    vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}")
 
-    def DOCKER_TEST_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: buildDockerTag("${env.BRANCH_NAME}", "${env.GIT_COMMIT}").toLowerCase())
-    //def DOCKER_TEST_LINK = vars.get("DOCKER_TEST_LINK", env.DOCKER_TEST_LINK ?: "${DOCKER_TEST_TAG}_frarc_1:frarc")
-    def DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "--exit-code-from frarcalmtest frarcalmtest")
-    def DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${env.DOCKER_TEST_TAG}")
-    def ADDITIONAL_ALMTEST_OPTS = vars.get("ADDITIONAL_ALMTEST_OPTS", env.ADDITIONAL_ALMTEST_OPTS ?: "-Config ./ALMTestConfig.plist -EnvironmentId ${DOCKER_TEST_TAG} -ResultJUnitPublish YES")
-    def ALMTEST_RESULTS_PATH = vars.get("ALMTEST_RESULTS_PATH", env.ALMTEST_RESULTS_PATH ?: "./almtest-${env.GIT_COMMIT}-${env.BUILD_NUMBER}")
+    vars.ADDITIONAL_ALMTEST_OPTS = vars.get("ADDITIONAL_ALMTEST_OPTS", env.ADDITIONAL_ALMTEST_OPTS ?: "-Config ./ALMTestConfig.plist -EnvironmentId ${vars.DOCKER_TEST_TAG} -ResultJUnitPublish YES")
+    vars.ALMTEST_RESULTS_PATH = vars.get("ALMTEST_RESULTS_PATH", env.ALMTEST_RESULTS_PATH ?: "./almtest-${env.GIT_COMMIT}-${env.BUILD_NUMBER}")
 
-    def dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
+    vars.dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
+    vars.allowEmptyResults = vars.get("allowEmptyResults", env.allowEmptyResults ?: false).toBoolean()
+    vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
 
     script {
 
@@ -47,20 +47,15 @@ def call(Map vars, Closure body=null) {
 
                         if (CLEAN_RUN) {
                             sh "rm -Rf result"
-                            // Almonde/result/latestResult
                         }
 
-                        dockerComposeTest(DOCKER_REGISTRY: DOCKER_REGISTRY,
-                            DOCKER_TEST_TAG: DOCKER_TEST_TAG,
-                            DOCKER_TEST_CONTAINER: "${DOCKER_TEST_TAG}_frarc_1",
-                            DOCKER_COMPOSE_UP_OPTIONS: DOCKER_COMPOSE_UP_OPTIONS,
-                            dockerFilePath: dockerFilePath) {
+                        dockerComposeTest(vars) {
 
-                            sh "docker cp frarcalmtest:${ALMTEST_RESULTS_PATH} result || true"
+                            sh "docker cp frarcalmtest:${vars.ALMTEST_RESULTS_PATH} result || true"
 
                             runHtmlPublishers(["ALMTestPublisher": [reportDir: "result/latestResult/"]])
 
-                            junit testResults: 'result/latestResult/junit.xml', healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [[$class: 'ClaimTestDataPublisher']]
+                            junit testResults: 'result/latestResult/junit.xml', healthScaleFactor: 2.0, allowEmptyResults: vars.allowEmptyResults, keepLongStdio: true
 
                             if (body) { body() }
 
@@ -73,10 +68,10 @@ def call(Map vars, Closure body=null) {
             } catch(exc) {
                 error 'There are errors in dockerTestALMTEST'
             } finally {
-                archiveArtifacts artifacts: "${ALMTEST_RESULTS_PATH}/**/*.log, *.log, Build/logs/*.log", excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.ALMTEST_RESULTS_PATH}/**/*.log, *.log, Build/logs/*.log, Output/**/MGR-ARC-*.stdout.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
             } // finally
 
-        }
+        }  // DRY_RUN
 
     } // script
 

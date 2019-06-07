@@ -56,6 +56,7 @@ def call(String shell, String targetDirectory) {
 						reportName: 'Sphinx Docs',
 						reportTitles: "Sphinx Docs Index"
 					])
+					
 					if (isReleaseBranch()) {
 						// Initially, we will want to publish only one version,
 						// i.e. the latest one from develop branch.
@@ -70,10 +71,13 @@ def call(String shell, String targetDirectory) {
 				} // dir docs
 
 			} // tee
+						
 		} catch (e) {
 			currentBuild.result = 'FAILURE'
 			build = "FAIL" // make sure other exceptions are recorded as failure too
 			throw e
+		} finally {
+		    archiveArtifacts artifacts: "sphinx.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}
 	} // if 
 

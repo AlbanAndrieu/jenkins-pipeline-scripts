@@ -58,156 +58,133 @@ def call(Map vars, Closure body=null) {
     vars.skipArtifacts = vars.get("skipArtifacts", false).toBoolean()
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
-    
+
     try {
         tee("maven.log") {
 
-        configFileProvider([configFile(fileId: 'fr-maven-default',  targetLocation: 'gsettings.xml', variable: 'SETTINGS_XML')]) {
-            withMaven(
-                maven: 'maven-latest',
-                jdk: 'java-latest',
-                mavenSettingsConfig: 'maven-default',
-                //mavenSettingsFilePath: "${SETTINGS_XML}",
-                //globalMavenSettingsConfig: 'maven-default',
-                //globalMavenSettingsFilePath: "${SETTINGS_XML}",
-                mavenLocalRepo: './.repository',
-                mavenOpts: "${MAVEN_OPTS}",
-                options: [
-                    pipelineGraphPublisher(
-                        ignoreUpstreamTriggers: !isReleaseBranch(),
-                        skipDownstreamTriggers: !isReleaseBranch(),
-                        lifecycleThreshold: 'deploy'
-                    ),
-                    artifactsPublisher(disabled: true)
-                ]
-            ) {
-                withSonarQubeEnv("${SONAR_INSTANCE}") {
+            configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: 'gsettings.xml', variable: 'SETTINGS_XML')]) {
+                withMaven(
+                    maven: "${MAVEN_VERSION}",
+                    jdk: "${JDK_VERSION}",
+                    mavenSettingsConfig: "${MAVEN_SETTINGS_CONFIG}",
+                    mavenLocalRepo: './.repository',
+                    mavenOpts: "${MAVEN_OPTS}",
+                    options: [
+                        pipelineGraphPublisher(
+                            ignoreUpstreamTriggers: !isReleaseBranch(),
+                            skipDownstreamTriggers: !isReleaseBranch(),
+                            lifecycleThreshold: 'deploy'
+                        ),
+                        artifactsPublisher(disabled: true)
+                    ]
+                ) {
+                    withSonarQubeEnv("${SONAR_INSTANCE}") {
 
-                    if (!vars.skipResults) {
+                        if (!vars.skipResults) {
 
-                        if (!RELEASE_VERSION) {
-                            echo 'No RELEASE_VERSION specified'
-                            RELEASE_VERSION = getReleasedVersion()
-                            //if (!RELEASE_VERSION) {
-                            //   error 'No RELEASE_VERSION found'
-                            //}
-                        }
-
-                        TARGET_TAG = getShortReleasedVersion()
-                        echo "Maven RELEASE_VERSION: ${RELEASE_VERSION} - ${TARGET_TAG}"
-
-                        manager.addShortText("${TARGET_TAG}")
-	    
-                        //sh 'echo SONAR_USER_HOME : ${SONAR_USER_HOME} && mkdir -p ${SONAR_USER_HOME}'
-	    
-                        if (RELEASE) {
-                          if (!RELEASE_VERSION) {
-                              RELEASE_VERSION = RELEASE_BASE
-                          } else {
-                              RELEASE_VERSION = RELEASE_VERSION
-                              substitutePomXmlVersion {
-                                  newVersion = RELEASE_VERSION
-                              }
-                          }
-                        }
-
-                    } // skipResults
-
-                    String MAVEN_GOALS = "-s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
-
-                    if (CLEAN_RUN) {
-                      MAVEN_GOALS += " -U clean"
-                    }
-
-                    if (!DRY_RUN) {
-                        if (vars.goal?.trim()) {
-                            MAVEN_GOALS += " ${vars.goal}"
-                        }
-                    } else {
-                        MAVEN_GOALS += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true"
-                    }
-
-                    if (vars.buildCmdParameters?.trim()) {
-                        MAVEN_GOALS += " ${vars.buildCmdParameters}"
-                    }
-                    
-                    MAVEN_GOALS += getMavenGoalsProfile(vars)
-
-                    MAVEN_GOALS += getMavenGoalsPitest(vars)
-
-                    MAVEN_GOALS += getMavenGoalsSonar(vars)
-
-                    MAVEN_GOALS += getMavenGoalsTest(vars)
-
-                    echo "Maven GOALS have been specified: ${MAVEN_GOALS}"
-                    vars.buildCmd += " ${MAVEN_GOALS}"
-
-                    //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
-                        // Run the maven build
-                        build = sh (
-                                script: "export PATH=$MVN_CMD_DIR:/bin:$PATH && mvn ${vars.buildCmd}",
-                                returnStatus: true
-                                )
-                        //if (DEBUG_RUN) {
-                        //    writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
-                        //}
-                        echo "BUILD RETURN CODE : ${build}"
-                        if (build == 0) {
-                            echo "MAVEN SUCCESS"
-                        } else {
-                            echo "MAVEN FAILURE"
-                            if (!vars.skipFailure) {
-                                error 'There are errors in maven'
-                                currentBuild.result = 'FAILURE'
+                            if (!RELEASE_VERSION) {
+                                echo 'No RELEASE_VERSION specified'
+                                RELEASE_VERSION = getReleasedVersion()
+                                //if (!RELEASE_VERSION) {
+                                //   error 'No RELEASE_VERSION found'
+                                //}
                             }
+
+                            TARGET_TAG = getShortReleasedVersion()
+                            echo "Maven RELEASE_VERSION: ${RELEASE_VERSION} - ${TARGET_TAG}"
+
+                            manager.addShortText("${TARGET_TAG}")
+
+                            if (RELEASE) {
+                              if (!RELEASE_VERSION) {
+                                  RELEASE_VERSION = RELEASE_BASE
+                              } else {
+                                  RELEASE_VERSION = RELEASE_VERSION
+                                  substitutePomXmlVersion {
+                                      newVersion = RELEASE_VERSION
+                                  }
+                              }
+                            }
+
+                        } // skipResults
+
+                        String MAVEN_GOALS = "-s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
+
+                        if (CLEAN_RUN) {
+                          MAVEN_GOALS += " -U clean"
                         }
-                        if (body) { body() }
-                    //} // Xvfb
-                } // withSonarQubeEnv
-            } // withMaven
-        } // configFileProvider
 
-        if (!vars.skipResults) {
-            if (!DRY_RUN) {
+                        if (!DRY_RUN) {
+                            if (vars.goal?.trim()) {
+                                MAVEN_GOALS += " ${vars.goal}"
+                            }
+                        } else {
+                            MAVEN_GOALS += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true"
+                        }
 
-                stash includes: "${vars.artifacts}", name: 'maven-artifacts'
+                        if (vars.buildCmdParameters?.trim()) {
+                            MAVEN_GOALS += " ${vars.buildCmdParameters}"
+                        }
 
-                stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
+                        MAVEN_GOALS += getMavenGoalsProfile(vars)
 
-                stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
-                stash includes: "**/target/classes/**", name: 'classes'
-            }
+                        MAVEN_GOALS += getMavenGoalsPitest(vars)
 
-            if ((!DRY_RUN && !RELEASE) && !vars.skipTests) {
-                junit '**/target/surefire-reports/TEST-*.xml'
-            } // if DRY_RUN
+                        MAVEN_GOALS += getMavenGoalsSonar(vars)
 
-            step([
-                 $class: "WarningsPublisher",
-                 canComputeNew: false,
-                 canResolveRelativePaths: false,
-                 canRunOnFailed: true,
-                 consoleParsers: [
-                     [
-                         parserName: 'Java Compiler (javac)'
-                     ],
-                     [
-                         parserName: 'Maven'
-                     ],
-                     [
-                         parserName: 'GNU Make + GNU C Compiler (gcc)', pattern: 'error_and_warnings.txt'
-                     ]
-                 ],
-                 //unstableTotalAll: '10',
-                 //unstableTotalHigh: '0',
-                 //failedTotalAll: '10',
-                 //failedTotalHigh: '0',
-                 usePreviousBuildAsReference: true,
-                 useStableBuildAsReference: true
-                 ])
-        } // skipResults
+                        MAVEN_GOALS += getMavenGoalsTest(vars)
 
-    } // tee
+                        MAVEN_GOALS += getMavenGoalsZkm(vars)
+
+                        MAVEN_GOALS += getMavenGoalsSigning(vars)
+
+                        MAVEN_GOALS += getMavenGoalsDocker(vars)
+
+                        echo "Maven GOALS have been specified: ${MAVEN_GOALS}"
+                        vars.buildCmd += " ${MAVEN_GOALS}"
+
+                        //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
+                            // Run the maven build
+                            build = sh (
+                                    script: "export PATH=$MVN_CMD_DIR:/bin:$PATH && mvn ${vars.buildCmd}",
+                                    returnStatus: true
+                                    )
+                            //if (DEBUG_RUN) {
+                            //    writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
+                            //}
+                            echo "BUILD RETURN CODE : ${build}"
+                            if (build == 0) {
+                                echo "MAVEN SUCCESS"
+                            } else {
+                                echo "MAVEN FAILURE"
+                                if (!vars.skipFailure) {
+                                    error 'There are errors in maven'
+                                    currentBuild.result = 'FAILURE'
+                                }
+                            }
+                            if (body) { body() }
+                        //} // Xvfb
+                    } // withSonarQubeEnv
+                } // withMaven
+            } // configFileProvider
+
+            if (!vars.skipResults) {
+                if (!DRY_RUN) {
+
+                    if (!vars.skipArtifacts) {
+                        stash includes: "${vars.artifacts}", name: 'maven-artifacts'
+                    }
+
+                    stash includes: "**/target/classes/**", name: 'classes'
+                }
+
+                if ((!DRY_RUN && !RELEASE) && !vars.skipTests) {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                } // if DRY_RUN
+
+            } // skipResults
+
+        } // tee
     } catch (e) {
         step([$class: 'ClaimPublisher'])
         throw e
