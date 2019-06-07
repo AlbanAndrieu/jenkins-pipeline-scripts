@@ -34,7 +34,7 @@ def call(Map vars, Closure body=null) {
 
     script {
 
-        wrapInARC(isScmEnabled: vars.isScmEnabled) {
+        wrapInTEST(isScmEnabled: vars.isScmEnabled) {
 
             //sh(returnStdout: true, script: "echo ${DOCKER_BUILD_IMG} | cut -d'/' -f -1").trim()
             DOCKER_BUILD_ARGS = [""].join(" ")
@@ -60,7 +60,7 @@ def call(Map vars, Closure body=null) {
 
             //dockerFingerprintFrom dockerfile: "${dockerFilePath}Dockerfile", image: "${DOCKER_BUILD_IMG}"
 
-        }  // wrapInARC
+        }  // wrapInTEST
 
     } // script
 

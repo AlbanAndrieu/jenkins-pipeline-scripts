@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 @Library('jenkins-pipeline-scripts') _
+import com.test.jenkins.*
 
 def DOCKER_REGISTRY="hub.docker.com"
 def DOCKER_ORGANISATION="nabla"

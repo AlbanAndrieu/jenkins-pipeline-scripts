@@ -41,7 +41,9 @@ fi
 #JENKINS_HOSTNAME=localhost
 #ssh -p $JENKINS_SSHD_PORT $JENKINS_HOSTNAME declarative-linter < Jenkinsfile
 
-./mvnw clean install -Dpipeline.stack.write=true
+./mvnw clean install
+
+echo -e "${green} ./mvnw clean install -Dpipeline.stack.write=true ${NC}"
 
 #./gradlew wrapper --gradle-version=5.2.1 --distribution-type=bin
 #./gradlew build
@@ -51,7 +53,7 @@ git fetch -t                  # fetch remote tags
 
 #git tag --delete v1.0.0
 #git push --delete origin v1.0.0
-echo -e "git tag 1.1.0"
-echo -e "git push origin --tags"
+echo -e "${green} git tag 1.1.0 ${NC}"
+echo -e "${green} git push origin --tags ${NC}"
 
 exit 0

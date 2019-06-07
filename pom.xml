@@ -191,6 +191,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
+            <type>pom</type>
         </dependency>
 
         <dependency>
@@ -679,7 +680,7 @@
                 <dependency>
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
-                    <version>${logback.version}</version>
+                    <version>${logback.version}</version> <!--$NO-MVN-MAN-VER$-->
                     <scope>runtime</scope>
                     <exclusions>
                         <!-- circular dependency -->
@@ -708,7 +709,7 @@
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>${slf4j.version}</version>
+                    <version>${slf4j.version}</version> <!--$NO-MVN-MAN-VER$-->
                     <scope>runtime</scope>
                     <exclusions>
                         <!-- circular dependency -->

@@ -7,6 +7,9 @@ will receive few updates going forward.*
 This repository contains helper functions and classes to be used with the Jenkins Pipeline Plugin.
 This repository is used on http://home.nabla.mobi:8381/jenkins/ and other Jenkins instances managed by Nabla.
 
+Below feature have been removed on purpose
+ * [tee](https://jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#-tee-%20tee%20output%20to%20file)
+
 To use this library from your `Jenkinsfile`,
 make sure you have installed the _GitHub Organization Folder_ in version 1.5 or later,
 then start off with:
@@ -32,7 +35,6 @@ Run test
 ./mvnw -Dtest=TestSharedLibrary test
 ```
 
-TODO
 ========================
 
 See [Extending environment variables with Shared Libraries](https://devops.datenkollektiv.de/programatically-add-environment-variables-to-a-jenkins-instance.html) 
