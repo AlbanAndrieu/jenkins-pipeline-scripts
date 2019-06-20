@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <!-- @version $Revision: $ $Date: $ $Author: $ $State: $ -->
@@ -24,8 +26,8 @@
     <scm>
         <connection>scm:git:https://github.com/AlbanAndrieu/jenkins-pipeline-scripts.git</connection>
         <developerConnection>scm:git:git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git</developerConnection>
-        <tag>HEAD</tag>
         <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
@@ -34,20 +36,20 @@
     </issueManagement>
 
     <ciManagement>
-		<system>Jenkins</system>
-		<url>${JOB_URL}</url>
-		<notifiers>
-			<notifier>
-				<type>mail</type>
-				<sendOnError>true</sendOnError>
-				<sendOnFailure>true</sendOnFailure>
-				<sendOnSuccess>false</sendOnSuccess>
-				<sendOnWarning>false</sendOnWarning>
-				<configuration>
-						<address>nabla@free.fr</address>
-				</configuration>
-			</notifier>
-		</notifiers>
+        <system>Jenkins</system>
+        <url>${JOB_URL}</url>
+        <notifiers>
+            <notifier>
+                <type>mail</type>
+                <sendOnError>true</sendOnError>
+                <sendOnFailure>true</sendOnFailure>
+                <sendOnSuccess>false</sendOnSuccess>
+                <sendOnWarning>false</sendOnWarning>
+                <configuration>
+                        <address>nabla@free.fr</address>
+                </configuration>
+            </notifier>
+        </notifiers>
     </ciManagement>
 
     <mailingLists>
@@ -67,8 +69,6 @@
             <timezone>+1</timezone>
         </developer>
     </developers>
-
-
 
     <prerequisites>
         <maven>3.5.0</maven>
@@ -175,10 +175,10 @@
     <dependencies>
 
         <dependency>
-           <groupId>javax.servlet</groupId>
-           <artifactId>javax.servlet-api</artifactId>
-           <version>${javax.servlet.api.version}</version>
-           <scope>provided</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet.api.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

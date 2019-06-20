@@ -12,6 +12,9 @@ import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
 import com.cloudbees.groovy.cps.NonCPS
 
+@GrabResolver(name='jenkins', root='https://repo.jenkins-ci.org/public/')
+@Grab(group='org.jenkins-ci.main', module='jenkins-core', version='2.9')
+
 //@CompileStatic
 class GlobalEnvironmentVariables implements Serializable {
 

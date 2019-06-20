@@ -18,7 +18,8 @@ before_cache:
 
 script:
 #  ./gradlew verify -x sign
-  ./gradlew build -x sign
+#  ./gradlew build -x sign
+  ./gradlew build --stacktrace
 cache:
   directories:
   - $HOME/.gradle/caches/
