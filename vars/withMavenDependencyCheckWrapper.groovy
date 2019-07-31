@@ -20,14 +20,17 @@ def call(Map vars, Closure body=null) {
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     vars.goal = vars.get("goal", "org.owasp:dependency-check-maven:check")
-    vars.profile = vars.get("profile", "sonar")
+    vars.profile = vars.get("profile", "sonar").trim()
     vars.skipTests = vars.get("skipTests", true).toBoolean()
     vars.skipResults = vars.get("skipResults", true).toBoolean()
     //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
     vars.skipSonar = vars.get("skipSonar", true).toBoolean()
     vars.skipPitest = vars.get("skipPitest", true).toBoolean()
-    vars.buildCmdParameters = vars.get("buildCmdParameters", "")
+    vars.skipDocker = vars.get("skipDocker", true).toBoolean()
+    vars.skipArtifacts = vars.get("skipArtifacts", true).toBoolean()
+    vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
+    vars.mavenOutputFile = vars.get("mavenOutputFile", "depcheck.log").trim()
 
     if (!DRY_RUN) {
 
@@ -35,11 +38,13 @@ def call(Map vars, Closure body=null) {
 
         withMavenWrapper(vars) {
 
+            stash allowEmpty: true, includes: "**/dependency-check-report.xml", name: 'depcheck'
+
             if (body) { body() }
 
         }
 
-        dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/dependency-check-report.xml ', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+        dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/dependency-check-report.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
 
     } // if DRY_RUN
 

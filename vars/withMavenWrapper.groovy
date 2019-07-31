@@ -29,6 +29,7 @@ def call(Map vars, Closure body=null) {
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
     def MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "mgr-settings-nexus") // fr-maven-default
+    def MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "mgr-settings-security-nexus")
     def MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2") // maven-latest
     def JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8") // java-latest
 
@@ -46,23 +47,26 @@ def call(Map vars, Closure body=null) {
     echo "Maven OPTS have been specified: ${MAVEN_OPTS} - ${CLEAN_RUN}/${DRY_RUN}/${DEBUG_RUN} - ${SONAR_INSTANCE}"
 
     vars.goal = vars.get("goal", "install")
-    vars.profile = vars.get("profile", "sonar")
+    vars.profile = vars.get("profile", "sonar").trim()
     vars.skipTests = vars.get("skipTests", false).toBoolean()
     vars.skipResults = vars.get("skipResults", false).toBoolean()
     //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
-    vars.buildCmd = vars.get("buildCmd", "-e")
+    vars.buildCmd = vars.get("buildCmd", "-e").trim()
     vars.skipSonar = vars.get("skipSonar", false).toBoolean()
     vars.skipPitest = vars.get("skipPitest", false).toBoolean()
-    vars.buildCmdParameters = vars.get("buildCmdParameters", "")
+    vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
     vars.skipArtifacts = vars.get("skipArtifacts", false).toBoolean()
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
+    vars.mavenGoals = vars.get("mavenGoals", "").trim()
+    vars.mavenOutputFile = vars.get("mavenOutputFile", "maven.log").trim()
 
     try {
-        tee("maven.log") {
+        tee("${vars.mavenOutputFile}") {
 
-            configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: 'gsettings.xml', variable: 'SETTINGS_XML')]) {
+            configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: '/jenkins/.m2/settings.xml', variable: 'SETTINGS_XML'),
+                configFile(fileId: "${MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: '/jenkins/.m2/settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY_CONFIG')]) {
                 withMaven(
                     maven: "${MAVEN_VERSION}",
                     jdk: "${JDK_VERSION}",
@@ -108,40 +112,43 @@ def call(Map vars, Closure body=null) {
 
                         } // skipResults
 
-                        String MAVEN_GOALS = "-s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
+                        vars.mavenGoals += "-s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
 
                         if (CLEAN_RUN) {
-                          MAVEN_GOALS += " -U clean"
+                          vars.mavenGoals += " -U clean"
                         }
 
                         if (!DRY_RUN) {
                             if (vars.goal?.trim()) {
-                                MAVEN_GOALS += " ${vars.goal}"
+                                vars.mavenGoals += " ${vars.goal}"
                             }
                         } else {
-                            MAVEN_GOALS += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true"
+                            vars.mavenGoals += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true"
                         }
 
                         if (vars.buildCmdParameters?.trim()) {
-                            MAVEN_GOALS += " ${vars.buildCmdParameters}"
+                            vars.mavenGoals += " ${vars.buildCmdParameters}"
                         }
 
-                        MAVEN_GOALS += getMavenGoalsProfile(vars)
+                        vars.mavenGoals += getMavenGoalsProfile(vars)
 
-                        MAVEN_GOALS += getMavenGoalsPitest(vars)
+                        vars.mavenGoals = getMavenGoalsPitest(vars)
 
-                        MAVEN_GOALS += getMavenGoalsSonar(vars)
+                        vars.mavenGoals = getMavenGoalsSonar(vars)
 
-                        MAVEN_GOALS += getMavenGoalsTest(vars)
+                        vars.mavenGoals = getMavenGoalsTest(vars)
 
-                        MAVEN_GOALS += getMavenGoalsZkm(vars)
+                        //vars.mavenGoals = getMavenGoalsZkm(vars)
 
-                        MAVEN_GOALS += getMavenGoalsSigning(vars)
+                        vars.mavenGoals = getMavenGoalsSigning(vars)
 
-                        MAVEN_GOALS += getMavenGoalsDocker(vars)
+                        vars.mavenGoals = getMavenGoalsDocker(vars)
 
-                        echo "Maven GOALS have been specified: ${MAVEN_GOALS}"
-                        vars.buildCmd += " ${MAVEN_GOALS}"
+                        echo "Maven GOALS have been specified: ${vars.mavenGoals}"
+                        vars.buildCmd += " ${vars.mavenGoals}"
+
+                        // TODO Remove it when tee will be back
+                        //vars.buildCmd += " 2>&1 > ${vars.mavenOutputFile} "
 
                         //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                             // Run the maven build
@@ -206,11 +213,12 @@ def call(Map vars, Closure body=null) {
          //    useStableBuildAsReference: true
          //    ])
 
-        stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
+        if (!vars.skipResults) {
+            stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
 
-        stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
+            stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
+        }
 
-        //maven.log
-        archiveArtifacts artifacts: "*.log, **/ZKM_log.txt, **/ChangeLog.txt", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+        archiveArtifacts artifacts: "*.log, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     }
 }

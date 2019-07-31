@@ -25,16 +25,16 @@ def call(Map vars, Closure body=null) {
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
 
     vars.propertiesPath = vars.get("propertiesPath", "sonar-project.properties")
-    vars.bwoutputs = vars.get("bwoutputs", "")
-    vars.coverage = vars.get("coverage", "")
+    vars.bwoutputs = vars.get("bwoutputs", "").trim()
+    vars.coverage = vars.get("coverage", "").trim()
     vars.verbose = vars.get("verbose", false).toBoolean()
-    vars.buildCmdParameters = vars.get("buildCmdParameters", "")
+    vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
     vars.project = vars.get("project", "NABLA")
-    vars.repository = vars.get("repository", "")
+    vars.repository = vars.get("repository", "").trim()
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
     vars.skipUnstable = vars.get("skipUnstable", false).toBoolean()
     vars.skipInclusion = vars.get("skipInclusion", false).toBoolean()
-    vars.targetBranch = vars.get("targetBranch", "develop")
+    vars.targetBranch = vars.get("targetBranch", "develop").trim()
     def scannerHome = tool name: "${SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     vars.sonarExecutable = vars.get("sonarExecutable", "${scannerHome}/bin/sonar-scanner")
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
@@ -94,6 +94,11 @@ def call(Map vars, Closure body=null) {
                         }
                     }
                 }
+
+                // TODO Remove it when tee will be back
+                //vars.buildCmdParameters += " 2>&1 > sonar.log "
+
+                echo "Sonar GOALS have been specified: ${vars.buildCmdParameters}"
 
                 withSonarQubeEnv("${SONAR_INSTANCE}") {
                     if (body) {

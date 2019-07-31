@@ -18,7 +18,7 @@ def call(Map vars, Closure body=null) {
     tee("shellcheck.log") {
 
         shellcheckExitCode = sh(
-            script: "shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} > checkstyle.xml",
+            script: "shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml",
             returnStdout: true,
             returnStatus: true
         )

@@ -18,28 +18,8 @@ def call(Map vars, Closure body=null) {
     vars.skipSigning = vars.get("skipSigning", true).toBoolean()
     vars.mavenGoals = vars.get("mavenGoals", "")
     
-    try {
-
-        if (!vars.skipSigning && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /release.*/))) {
-            if (!DRY_RUN && !RELEASE) {
-                echo "signing added"
-                // string(credentialsId: 'jenkins-arc-keystore', variable: 'KEYSTORE'),
-                withCredentials([
-                    [$class: 'StringBinding', credentialsId: 'jenkins-arc-keystore', variable: 'KEYSTORE'],
-                    [$class: 'StringBinding', credentialsId: 'jenkins-arc-storepass', variable: 'STOREPASS']
-                ]) {
-                    echo " KEYSTORE : ${KEYSTORE} STOREPASS : ${STOREPASS}"
-                    vars.mavenGoals += " -Djarsigner.skip=false -Djarsigner.keystore=${KEYSTORE} -Djarsigner.storepass=${STOREPASS}"
-                }
-            } // if DRY_RUN
-        } else {
-            vars.mavenGoals += " -Djarsigner.skip=true "
-        }
-
-	} catch(exc) {
-        echo 'Error: There were errors to retreive credentials. '+exc.toString() // but we do not fail the whole build because of that
-    }
-		
+    vars.mavenGoals += " -Djarsigner.skip=" + vars.skipSigning + " "
+	
     if (body) { body() }
 
     return vars.mavenGoals

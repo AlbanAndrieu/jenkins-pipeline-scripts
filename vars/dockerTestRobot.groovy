@@ -57,8 +57,18 @@ def call(Map vars, Closure body=null) {
                         }
 
                         dockerComposeTest(vars) {
-
-                            sh "docker cp robot:${vars.ROBOT_RESULTS_PATH} result || true"
+                        
+                            def containerId = getContainerId(vars)
+                            
+                            if (containerId?.trim()) {
+                                sh """
+                                    docker cp ${containerId}:${vars.ROBOT_RESULTS_PATH} result || true
+                                """
+                            } else {
+                                sh """
+                                    docker cp robot:${vars.ROBOT_RESULTS_PATH} result || true # OLD way when container name is hard coded in docker-compose. To be removed after full migration
+                                """                            
+                            }
 
                             runHtmlPublishers(["RobotPublisher": [outputPath: "result"]])
 
@@ -75,7 +85,7 @@ def call(Map vars, Closure body=null) {
             } catch(exc) {
                 error 'There are errors in dockerTestRobot'
             } finally {
-                archiveArtifacts artifacts: "${vars.ROBOT_RESULTS_PATH}/**/*.log, *.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.ROBOT_RESULTS_PATH}/**/*.log, *.log, result/**/*", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
             } // finally
 
         }  // DRY_RUN

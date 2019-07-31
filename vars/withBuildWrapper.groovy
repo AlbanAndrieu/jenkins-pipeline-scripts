@@ -41,7 +41,9 @@ def call(Map vars, Closure body=null) {
 
             tee("scons-${arch}.log") {
 
+                echo "DRY_RUN : ${DRY_RUN}"
                 if (!DRY_RUN) {
+                    echo "Unstash"
                     unstash 'maven-artifacts'
                     unstash 'app'
                 }

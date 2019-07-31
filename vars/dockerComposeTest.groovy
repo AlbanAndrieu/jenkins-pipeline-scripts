@@ -56,18 +56,17 @@ def call(Map vars, Closure body=null) {
                         echo "UP RETURN CODE : ${up}"
                         if (up == 0) {
                             echo "TEST SUCCESS"
-                            //dockerCheckHealth("${vars.DOCKER_TEST_CONTAINER}","healthy")
                         } else if (up == vars.isFailReturnCode) {
-                            echo "TEST FAILURE"
-                            error 'There are errors in tests'
+                            echo "TEST FAILURE"                            
                             currentBuild.result = 'FAILURE'
+                            error 'There are errors staring containers'
                         } else if (up <= vars.isUnstableReturnCode) {
                             echo "TEST UNSTABLE"
                             currentBuild.result = 'UNSTABLE'
                         } else {
-                            echo "TEST FAILURE"
-                            error 'There are errors in tests'
+                            echo "TEST FAILURE"                            
                             currentBuild.result = 'FAILURE'
+                            error 'There are other errors'
                         }
                     }
 
@@ -76,13 +75,15 @@ def call(Map vars, Closure body=null) {
                 }  // withRegistryWrapper
 
             } catch(exc) {
-                echo 'Error: There were errors in compose tests. '+exc.toString()
-                error 'There are errors in compose tests'
+                dockerCheckHealth("test","healthy")                              
+                def containerId = getContainerId(vars)
+                //dockerCheckHealth("${vars.DOCKER_TEST_CONTAINER}","healthy")
                 currentBuild.result = 'FAILURE'
                 up = "FAIL" // make sure other exceptions are recorded as failure too
+                echo 'Error: There were errors in compose tests. '+exc.toString()
             } finally {
                 try {
-                    sh "docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps -q"
+                    sh "docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps"
                 }
                 catch(exc) {
                     echo 'Warn: There was a problem taking down the docker-compose. '+exc.toString()

@@ -1,6 +1,6 @@
 #!/usr/bin/groovy
 
-def call(isDefaultBranch = false, relativeTargetDir = "", timeout = 20, isCleaningEnabled = true) {
+def call(isDefaultBranch = false, relativeTargetDir = "", timeout = 20, isCleaningEnabled = true, isShallowEnabled = true) {
 
     def DEFAULT_EXTENTIONS = [
             //[$class: 'LocalBranch', localBranch: "**"],
@@ -14,8 +14,7 @@ def call(isDefaultBranch = false, relativeTargetDir = "", timeout = 20, isCleani
 
     // Saving time and disk space when you just want to access the latest version of a repository.
     def DEFAULT_CLONE_OPTIONS_EXTENTIONS = [
-            [$class: 'CloneOption', depth: 0, noTags: true, reference: '/var/lib/gitcache/test.git', shallow: true, honorRefspec: true, timeout: timeout]
-            //[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: false, timeout: timeout]
+            [$class: 'CloneOption', depth: 0, noTags: true, reference: '/var/lib/gitcache/test.git', shallow: isShallowEnabled, honorRefspec: true, timeout: timeout]
         ]
 
     def DEFAULT_CLEAN_OPTIONS_EXTENTIONS = [

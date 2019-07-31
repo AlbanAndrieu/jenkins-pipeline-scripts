@@ -60,7 +60,7 @@ def call(String shell) {
 						reportTitles: "Ansible CMDB Report Index"
 					])
 
-					junit testResults: 'target/ansible-lint.xml', healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [
+					junit testResults: 'ansible-lint.xml', healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [
 						[$class: 'ClaimTestDataPublisher']
 					]
 				} // configFileProvider
@@ -71,7 +71,7 @@ def call(String shell) {
 			build = "FAIL" // make sure other exceptions are recorded as failure too
 			throw e			
 		} finally {
-		    archiveArtifacts artifacts: "overview.html, target/ansible-lint*, ansible-cmdb.log", onlyIfSuccessful: false, allowEmptyArchive: true
+		    archiveArtifacts artifacts: "overview.html, ansible-lint.*, ansible-cmdb.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}
 		
 	} // if

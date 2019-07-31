@@ -11,6 +11,12 @@ import hudson.slaves.NodePropertyDescriptor;
 import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
 import com.cloudbees.groovy.cps.NonCPS
+import groovy.grape.Grape
+//import org.apache.ivy.core.report.ResolveReport
+
+//@Grab('org.apache.ivy:ivy:2.4.0')
+//@GrabResolver(name='jenkins', root='https://repo.jenkins-ci.org/public/')
+//@Grab(group='org.jenkins-ci.main', module='jenkins-core', version='2.9')
 
 //@CompileStatic
 class GlobalEnvironmentVariables implements Serializable {

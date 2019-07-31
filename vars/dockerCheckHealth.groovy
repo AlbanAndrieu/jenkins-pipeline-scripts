@@ -1,12 +1,15 @@
 #!/usr/bin/groovy
 
 def call(def container="test_sample_1", def status="healthy") {
-	timeout(10) {
-		// Wait until it is ready
-		waitUntil {
-			sleep time: 1, unit: 'MINUTES'
-			status.toString() == sh(returnStdout: true,
-				script: "docker inspect ${container} --format='{{ .State.Health.Status }}'").trim()
-		} // waitUntil
-	} // timeout
+    def health = sh(returnStdout: true, script: "docker inspect ${container} --format='{{ .State.Health.Status }}'").trim()
+    if (health.equalsIgnoreCase(status.trim())) {
+        echo "CHECK SUCESSFULL : ${status}"
+        return 0
+    } else {
+        echo "CHECK WRONG"
+        tee("${container}-NOK-${status}.log") {
+          sh "docker logs ${container}"
+        }
+        return 1
+    }
 }

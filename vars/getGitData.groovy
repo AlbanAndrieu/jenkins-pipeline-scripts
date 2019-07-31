@@ -43,14 +43,8 @@ def call(Map vars, Closure body=null) {
             echo "GIT_COMMIT: ${GIT_COMMIT} - ${GIT_COMMIT}"
         }
 
-        env.GIT_REVISION = getRevision()
-        if (DEBUG_RUN) {
-            echo "GIT_REVISION: ${GIT_REVISION} - ${GIT_REVISION}"
-        }
-
         if (body) { body() }
 
     } // script
 
-    //return env.GIT_REVISION
 }

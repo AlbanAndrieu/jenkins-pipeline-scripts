@@ -88,10 +88,10 @@
         <maven.tomcat7.plugin.version>2.2</maven.tomcat7.plugin.version>
         <maven.pitest.plugin.version>1.2.4</maven.pitest.plugin.version>
         <maven.sonar.plugin.version>3.5.0.1254</maven.sonar.plugin.version>
-        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.pitest.plugin.version>1.4.3</maven.pitest.plugin.version>
-        <groovy.eclipse.compiler.version>2.9.2-01</groovy.eclipse.compiler.version>
-        <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
+        <groovy.eclipse.compiler.version>3.4.0-01</groovy.eclipse.compiler.version>
+        <groovy.eclipse.batch.version>2.5.7-01</groovy.eclipse.batch.version>
         <maven.jetty.eclipse.plugin.version>${jetty9.version}</maven.jetty.eclipse.plugin.version>
         <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
         <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
@@ -137,7 +137,7 @@
         <jmockit.version>1.19</jmockit.version>
         <junit.version>4.12</junit.version>
         <hamcrest.all.version>1.3</hamcrest.all.version>
-        <groovy.version>2.4.15</groovy.version>
+        <groovy.version>2.5.7</groovy.version>
         <ivy.version>2.4.0</ivy.version>
         <groovy.cps.version>1.12</groovy.cps.version>
         <slf4j.version>1.6.6</slf4j.version>
@@ -172,8 +172,18 @@
         <maven.exec.skip>false</maven.exec.skip>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -189,11 +199,16 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <artifactId>groovy</artifactId>
             <version>${groovy.version}</version>
-            <type>pom</type>
         </dependency>
-
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-test</artifactId>
+            <version>${groovy.version}</version>
+            <scope>test</scope>
+        </dependency>      
+        
         <dependency>
             <groupId>com.cloudbees</groupId>
             <artifactId>groovy-cps</artifactId>
@@ -306,7 +321,8 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -504,7 +520,8 @@
                         <!-- define a default KREDITNETHOME env variable for unit test to work -->
                         <KREDITNETHOME>${kreditnet-home}</KREDITNETHOME>
                     </environmentVariables>
-                    <!--TODO must be used to detect test that are failing randomly due to wrong code for instance
+                    <!--TODO must be used to detect test that are failing randomly due to
+                        wrong code for instance
                     <runOrder>random</runOrder>-->
                     <runOrder>filesystem</runOrder>
                     <!--<forkMode>always</forkMode>-->

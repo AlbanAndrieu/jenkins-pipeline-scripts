@@ -38,24 +38,33 @@ def call(Map vars, Closure body=null) {
             
             sh 'ls -lrta ${DOCKER_CONFIG} || true'
 
-            retry(3) {
-                // true added, because Client.Timeout exceeded while awaiting headers
-                //sh 'docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ${DOCKER_REGISTRY_URL} || true'            
-                login = sh (
-                  script: 'docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ${DOCKER_REGISTRY_URL}',
-                  returnStatus: true
-                )
-	            
-                echo "LOGIN RETURN CODE : ${login}"
-                if (login == 0) {
-                    echo "LOGIN SUCCESS"
+            // true added, because Client.Timeout exceeded while awaiting headers
+            //sh 'docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ${DOCKER_REGISTRY_URL} || true'            
+            login = sh (
+              script: 'docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ${DOCKER_REGISTRY_URL}',
+              returnStatus: true
+            )
+	        
+            echo "LOGIN RETURN CODE : ${login}"
+            if (login == 0) {
+                echo "LOGIN SUCCESS"
+			
+                if (body) {
+                    body()
+                }                
+            
+            } else {
+                echo "LOGIN FAILURE"
+                //currentBuild.result = 'FAILURE'
+                // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
+                docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
 			    
                     if (body) {
                         body()
                     }
 			    
                 } // withRegistry                
-            }            
+            }   
 
         } // withCredentials
     } // withEnv
