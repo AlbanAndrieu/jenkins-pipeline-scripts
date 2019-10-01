@@ -4,7 +4,7 @@ def call() {
     def daysToKeep         = isReleaseBranch() ? '30' : '10'
     def numToKeep          = isReleaseBranch() ? '20' : '5'
     def artifactDaysToKeep = isReleaseBranch() ? '30' : '10'
-    def artifactNumToKeep  = isReleaseBranch() ? '3'  : '1'
+    def artifactNumToKeep  = isReleaseBranch() ? '5'  : '3'
     def cronString         = isReleaseBranch() ? 'H H(3-7) * * 1-5' : ''
     def pollSCMString      = isReleaseBranch() ? 'H H(3-7) * * 1-5' : 'H/10 * * * *'
 

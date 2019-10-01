@@ -36,7 +36,7 @@ def call(Map vars, Closure body=null) {
     vars.ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "./robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}")
 
     vars.dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
-    //vars.allowEmptyResults = vars.get("allowEmptyResults", env.allowEmptyResults ?: false).toBoolean()
+    vars.allowEmptyResults = vars.get("allowEmptyResults", env.allowEmptyResults ?: false).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
 
     vars.isFailReturnCode = vars.get("isFailReturnCode", env.isFailReturnCode ?: 255)
@@ -57,22 +57,32 @@ def call(Map vars, Closure body=null) {
                         }
 
                         dockerComposeTest(vars) {
-                        
-                            def containerId = getContainerId(vars)
-                            
-                            if (containerId?.trim()) {
-                                sh """
-                                    docker cp ${containerId}:${vars.ROBOT_RESULTS_PATH} result || true
-                                """
-                            } else {
-                                sh """
-                                    docker cp robot:${vars.ROBOT_RESULTS_PATH} result || true # OLD way when container name is hard coded in docker-compose. To be removed after full migration
-                                """                            
+
+                            try {
+
+                                def containerId = getContainerId(vars)
+
+                                if (containerId?.trim()) {
+                                    sh """
+                                        docker cp ${containerId}:${vars.ROBOT_RESULTS_PATH} result || true
+                                    """
+                                } else {
+                                    sh """
+                                        docker cp frrobot:${vars.ROBOT_RESULTS_PATH} result || true # OLD way when container name is hard coded in docker-compose. To be removed after full migration
+                                    """
+                                }
+
+							    if (!vars.allowEmptyResults) {
+                                    runHtmlPublishers(["RobotPublisher": [outputPath: "result"]])
+                                }
+
+                                //junit testResults: 'result/results/output.xml', healthScaleFactor: 2.0, allowEmptyResults: vars.allowEmptyResults, keepLongStdio: true
+
+                            } catch(exc) {
+                                if (!vars.allowEmptyResults) {
+                                    error 'There are retreiving results from docker container'
+                                }
                             }
-
-                            runHtmlPublishers(["RobotPublisher": [outputPath: "result"]])
-
-                            //junit testResults: 'result/results/output.xml', healthScaleFactor: 2.0, allowEmptyResults: vars.allowEmptyResults, keepLongStdio: true
 
                             if (body) { body() }
 

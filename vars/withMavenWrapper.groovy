@@ -58,15 +58,18 @@ def call(Map vars, Closure body=null) {
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
     vars.skipArtifacts = vars.get("skipArtifacts", false).toBoolean()
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
+    vars.skipDeploy = vars.get("skipDeploy", true).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
+    vars.pomFile = vars.get("pomFile", "pom.xml").trim()
     vars.mavenGoals = vars.get("mavenGoals", "").trim()
     vars.mavenOutputFile = vars.get("mavenOutputFile", "maven.log").trim()
+    vars.mavenHome = vars.get("mavenHome", "/jenkins/.m2/").trim()
 
     try {
         tee("${vars.mavenOutputFile}") {
 
-            configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: '/jenkins/.m2/settings.xml', variable: 'SETTINGS_XML'),
-                configFile(fileId: "${MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: '/jenkins/.m2/settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY_CONFIG')]) {
+            configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: 'SETTINGS_XML'),
+                configFile(fileId: "${MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: 'MAVEN_SETTINGS_SECURITY_CONFIG')]) {
                 withMaven(
                     maven: "${MAVEN_VERSION}",
                     jdk: "${JDK_VERSION}",
@@ -88,13 +91,13 @@ def call(Map vars, Closure body=null) {
 
                             if (!RELEASE_VERSION) {
                                 echo 'No RELEASE_VERSION specified'
-                                RELEASE_VERSION = getReleasedVersion()
+                                RELEASE_VERSION = getReleasedVersion(vars) ?: "LATEST"
                                 //if (!RELEASE_VERSION) {
                                 //   error 'No RELEASE_VERSION found'
                                 //}
                             }
 
-                            TARGET_TAG = getShortReleasedVersion()
+                            TARGET_TAG = getShortReleasedVersion(vars) ?: "LATEST"
                             echo "Maven RELEASE_VERSION: ${RELEASE_VERSION} - ${TARGET_TAG}"
 
                             manager.addShortText("${TARGET_TAG}")
@@ -112,7 +115,13 @@ def call(Map vars, Closure body=null) {
 
                         } // skipResults
 
-                        vars.mavenGoals += "-s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
+                        if (!vars.skipDeploy) {
+                           if ( BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
+                              vars.goal = "deploy"
+                           }
+                        }
+
+                        vars.mavenGoals += " -s ${SETTINGS_XML} -Dmaven.repo.local=./.repository "
 
                         if (CLEAN_RUN) {
                           vars.mavenGoals += " -U clean"
@@ -165,8 +174,8 @@ def call(Map vars, Closure body=null) {
                             } else {
                                 echo "MAVEN FAILURE"
                                 if (!vars.skipFailure) {
-                                    error 'There are errors in maven'
                                     currentBuild.result = 'FAILURE'
+                                    error 'There are errors in maven'
                                 }
                             }
                             if (body) { body() }
@@ -219,6 +228,6 @@ def call(Map vars, Closure body=null) {
             stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
         }
 
-        archiveArtifacts artifacts: "*.log, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+        archiveArtifacts artifacts: "*.log, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     }
 }

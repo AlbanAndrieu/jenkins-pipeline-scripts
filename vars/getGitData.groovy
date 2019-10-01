@@ -24,7 +24,6 @@ def call(Map vars, Closure body=null) {
 
         }
 
-        // TODO issue to get environement variable
         def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
         def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
         def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
@@ -42,6 +41,13 @@ def call(Map vars, Closure body=null) {
         if (DEBUG_RUN) {
             echo "GIT_COMMIT: ${GIT_COMMIT} - ${GIT_COMMIT}"
         }
+
+        env.GIT_COMMIT_SHORT = getCommitShortSHA1()
+        if (DEBUG_RUN) {
+            echo "GIT_COMMIT_SHORT: ${GIT_COMMIT_SHORT} - ${GIT_COMMIT_SHORT}"
+        }
+
+        environment()
 
         if (body) { body() }
 

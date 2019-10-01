@@ -14,6 +14,7 @@ def call(Map vars, Closure body=null) {
 
     vars.repository = vars.get("repository", "test")
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", false).toBoolean()
+    vars.skipUnstable = vars.get("skipUnstable", true).toBoolean()
 
     wrapInTEST(vars) {
 

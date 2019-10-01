@@ -8,27 +8,28 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/wrapCleanWs.groovy`"
-	
-    vars.isEmailEnabled = vars.get("isEmailEnabled", true).toBoolean()
 
-    node('docker-compose') {
+    vars.isEmailEnabled = vars.get("isEmailEnabled", true).toBoolean()
+    vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
+    vars.nodeLabel = vars.get("nodeLabel", "any").trim()
+
+    node("${vars.nodeLabel}") {
 
         script {
-
             //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
             def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
             def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
-            if (!DEBUG_RUN) {
-                cleanWs()
+            if (body) { body() }
+
+            if (!DEBUG_RUN && vars.isCleaningEnabled) {
+                cleanWs(disableDeferredWipeout: true, deleteDirs: true)
             } else {
                 echo "Hi from wrapCleanWs"
             }
             if (!DRY_RUN && !DEBUG_RUN && vars.isEmailEnabled) {
                 standardNotify { }
             }
-
-            if (body) { body() }
         } // script
 
     } // node

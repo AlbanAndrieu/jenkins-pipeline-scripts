@@ -152,10 +152,10 @@ pipeline {
       }
       steps {
         script {
-          withSonarQubeWrapper(verbose: true, 
-              skipMaven: true, 
+          withSonarQubeWrapper(verbose: true,
+              skipMaven: true,
               buildCmdParameters: "-Dsonar.findbugs.allowuncompiledcode=true",
-              project: "NABLA", 
+              project: "NABLA",
               repository: "jenkins-pipeline-scripts") {
           }
         }
@@ -211,7 +211,7 @@ pipeline {
             script {
                 stage('\u2795 Quality - Security - Checkmarx') {
                     script {
-                        withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx', 
+                        withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx',
                             preset: '1',
                             groupId: '1234',
                             lowThreshold: 10,

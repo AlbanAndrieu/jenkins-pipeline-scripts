@@ -118,7 +118,7 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 
 		helper.registerAllowedMethod("withSonarQubeWrapper", [Map.class], null)
 		helper.registerAllowedMethod("withSonarQubeWrapper", [Map.class, Closure.class], null)
-		
+
 		helper.registerAllowedMethod("withCheckmarxWrapper", [Map.class], null)
 		helper.registerAllowedMethod("withCheckmarxWrapper", [Map.class, Closure.class], null)
 

@@ -57,14 +57,14 @@ def call(Map vars, Closure body=null) {
                         if (up == 0) {
                             echo "TEST SUCCESS"
                         } else if (up == vars.isFailReturnCode) {
-                            echo "TEST FAILURE"                            
+                            echo "TEST FAILURE"
                             currentBuild.result = 'FAILURE'
                             error 'There are errors staring containers'
                         } else if (up <= vars.isUnstableReturnCode) {
                             echo "TEST UNSTABLE"
                             currentBuild.result = 'UNSTABLE'
                         } else {
-                            echo "TEST FAILURE"                            
+                            echo "TEST FAILURE"
                             currentBuild.result = 'FAILURE'
                             error 'There are other errors'
                         }
@@ -75,7 +75,7 @@ def call(Map vars, Closure body=null) {
                 }  // withRegistryWrapper
 
             } catch(exc) {
-                dockerCheckHealth("test","healthy")                              
+                dockerCheckHealth("test","healthy")
                 def containerId = getContainerId(vars)
                 //dockerCheckHealth("${vars.DOCKER_TEST_CONTAINER}","healthy")
                 currentBuild.result = 'FAILURE'

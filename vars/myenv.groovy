@@ -6,7 +6,7 @@ import com.cloudbees.groovy.cps.NonCPS
 import static com.test.jenkins.GlobalEnvironmentVariables.createGlobalEnvironmentVariables
 
 //@groovy.transform.Field
-//def DOCKER_REGISTRY_TMP = 
+//def DOCKER_REGISTRY_TMP =
 
 //@groovy.transform.Field
 //def DOCKER_LIST = [:]
@@ -41,7 +41,7 @@ def defineEnvironment() {
 	createGlobalEnvironmentVariables('DOCKER_ORGANISATION','fusion-risk')
 
 	createGlobalEnvironmentVariables('COMPOSE_HTTP_TIMEOUT','200')
-	
+
 	createGlobalEnvironmentVariables('SONAR_INSTANCE','sonardev')
 	createGlobalEnvironmentVariables('SONAR_SCANNER_OPTS','-Xmx2g')
 	createGlobalEnvironmentVariables('SONAR_USER_HOME',"$WORKSPACE")
@@ -53,7 +53,7 @@ def defineEnvironment() {
 	createGlobalEnvironmentVariables('RELEASE_VERSION',null)
 	createGlobalEnvironmentVariables('RELEASE',false)
 	createGlobalEnvironmentVariables('RELEASE_BASE',null)
-	
+
 }
 
 @NonCPS

@@ -75,7 +75,7 @@ def withStageTag(Map vars) {
                 vars.put("isScmEnabled", true)
                 vars.put("isCleaningEnabled", true)
                 wrapInTEST(vars) {
-            withTag(vars)
+                withTag(vars)
                 } // wrapInTEST
             } // script
         //} // steps

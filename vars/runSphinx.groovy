@@ -40,7 +40,7 @@ def call(String shell, String targetDirectory) {
 					if (build == 0) {
 						echo "SPHINX SUCCESS"
 					} else {
-						echo "SPHINX UNSTABLE"						
+						echo "SPHINX UNSTABLE"
 						currentBuild.result = 'UNSTABLE'
 						error 'There are errors in sphinx'
 						//sh "exit 1" // this fails the stage
@@ -56,7 +56,7 @@ def call(String shell, String targetDirectory) {
 						reportName: 'Sphinx Docs',
 						reportTitles: "Sphinx Docs Index"
 					])
-					
+
 					if (isReleaseBranch()) {
 						// Initially, we will want to publish only one version,
 						// i.e. the latest one from develop branch.
@@ -71,7 +71,7 @@ def call(String shell, String targetDirectory) {
 				} // dir docs
 
 			} // tee
-						
+
 		} catch (e) {
 			currentBuild.result = 'FAILURE'
 			build = "FAIL" // make sure other exceptions are recorded as failure too
@@ -79,6 +79,6 @@ def call(String shell, String targetDirectory) {
 		} finally {
 		    archiveArtifacts artifacts: "sphinx.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}
-	} // if 
+	} // if
 
 }

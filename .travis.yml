@@ -8,11 +8,11 @@ jdk:
 #  - oraclejdk11
   - openjdk8
 #  - openjdk11
-  
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-  
+
 #before_install:
 #  - ./gradlew wrapper --gradle-version=5.2.1 --distribution-type=bin
 

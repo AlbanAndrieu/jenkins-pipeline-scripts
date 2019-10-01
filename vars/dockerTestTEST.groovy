@@ -37,13 +37,12 @@ def call(Map vars, Closure body=null) {
 
     script {
 
-        if (!DRY_RUN && !RELEASE && BRANCH_NAME ==~ /develop|PR-.*|feature\/.*|bugfix\/.*/ ) {
+        //if (!DRY_RUN && !RELEASE && BRANCH_NAME ==~ /develop|master|master_.+|release\/.+|PR-.*|feature\/.*|bugfix\/.*/ ) {
+        if (!DRY_RUN && !RELEASE) {
 
             try {
 
                 lock(resource: "lock_ALMTEST_${env.NODE_NAME}", inversePrecedence: true) {
-
-                    timeout(180) {
 
                         if (CLEAN_RUN) {
                             sh "rm -Rf result"
@@ -51,7 +50,17 @@ def call(Map vars, Closure body=null) {
 
                         dockerComposeTest(vars) {
 
-                            sh "docker cp frarcalmtest:${vars.ALMTEST_RESULTS_PATH} result || true"
+                            def containerId = getContainerId(vars)
+
+                            if (containerId?.trim()) {
+                                sh """
+                                    docker cp ${containerId}:${vars.ALMTEST_RESULTS_PATH} result || true
+                                """
+                            } else {
+                                sh """
+                                    docker cp frarcalmtest:${vars.ALMTEST_RESULTS_PATH} result || true # OLD way when container name is hard coded in docker-compose. To be removed after full migration
+                                """
+                            }
 
                             runHtmlPublishers(["ALMTestPublisher": [reportDir: "result/latestResult/"]])
 
@@ -61,14 +70,12 @@ def call(Map vars, Closure body=null) {
 
                         } // dockerComposeTest
 
-                    } // timeout
-
                 } // lock
 
             } catch(exc) {
                 error 'There are errors in dockerTestALMTEST'
             } finally {
-                archiveArtifacts artifacts: "${vars.ALMTEST_RESULTS_PATH}/**/*.log, *.log, Build/logs/*.log, Output/**/MGR-ARC-*.stdout.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.ALMTEST_RESULTS_PATH}/**/*.log, *.log, result/**/*, Build/logs/*.log, Output/**/TEST-*.stdout.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
             } // finally
 
         }  // DRY_RUN

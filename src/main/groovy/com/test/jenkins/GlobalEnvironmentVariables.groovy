@@ -43,6 +43,6 @@ class GlobalEnvironmentVariables implements Serializable {
 		instance.save()
 	}
 
-} 
+}
 
 //createGlobalEnvironmentVariables('Var1','DummyValue')

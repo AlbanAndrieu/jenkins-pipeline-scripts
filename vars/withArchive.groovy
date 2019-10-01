@@ -16,7 +16,8 @@ def call(Map vars, Closure body=null) {
     //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
-    vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", true).toBoolean()    
+    vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", true).toBoolean()
+    vars.isOnlySuccessful = vars.get("isOnlySuccessful", true).toBoolean()
 
     if (!DRY_RUN) {
 
@@ -30,7 +31,7 @@ def call(Map vars, Closure body=null) {
 
         echo "artifacts : ${artifacts}"
 
-        archiveArtifacts artifacts: "${artifacts}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: true
+        archiveArtifacts artifacts: "${artifacts}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: vars.isOnlySuccessful
 
     } // if
 

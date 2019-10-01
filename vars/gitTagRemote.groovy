@@ -15,5 +15,5 @@ def call(def tagName="LATEST_SUCCESSFULL", def remote="origin") {
     catch(exc) {
         echo 'Warning: There were errors in gitTagRemote. '+exc.toString()
         sh "git config --global --list && ls -lrta /home/jenkins/.gitconfig"
-    }    
+    }
 }

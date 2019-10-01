@@ -1,9 +1,7 @@
 #!/usr/bin/groovy
 
 import hudson.model.*
-import com.cloudbees.groovy.cps.NonCPS
 
-@NonCPS
 def call(body) {
   // evaluate the body block, and collect configuration into the object
   def config = [:]

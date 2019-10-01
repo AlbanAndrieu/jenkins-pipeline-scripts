@@ -27,7 +27,7 @@ def call(Map vars, Closure body=null) {
                 vars.mavenGoals += " -Ddocker.username=${USER} -Ddocker.password=${PASSWORD}"
             }
         } // if DRY_RUN
-    } 
+    }
 
     if (body) { body() }
 

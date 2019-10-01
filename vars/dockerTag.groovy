@@ -3,7 +3,7 @@
 def call(def DOCKER_TAG, def commit = "", def dbms = "") {
 
     // create safe tag for docker image from given parameters
-    def branchSafeName = env.BRANCH_NAME.replaceAll("/", "-")
+    def branchSafeName = env.BRANCH_NAME.replaceAll("/", "-").replaceAll("%2F", "-")
 
     if (env.BRANCH_NAME ==~ /PR-.*|feature\/.*|bugfix\/.*/ ) {
         DOCKER_TAG = ("temp-${branchSafeName}-${env.BUILD_ID}").toLowerCase()

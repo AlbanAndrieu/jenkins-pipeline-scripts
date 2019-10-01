@@ -1,7 +1,18 @@
 #!/usr/bin/groovy
+import hudson.model.*
 
-def call(body) {
-    tokens = getReleasedVersion().tokenize('.')
+def call(Closure body=null) {
+    this.vars = [:]
+    call(vars, body)
+}
+
+def call(Map vars, Closure body=null) {
+
+    echo "[JPL] Executing `vars/getShortReleasedVersion.groovy`"
+
+    vars = vars ?: [:]
+
+    tokens = getReleasedVersion(vars).tokenize('.')
     MAJOR = tokens[tokens.size()-4] // MAJOR
     MINOR = tokens[tokens.size()-3] // MINOR
     RELEASE_VERSION_SHORT = MAJOR + "." + MINOR

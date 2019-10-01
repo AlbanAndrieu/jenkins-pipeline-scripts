@@ -9,12 +9,12 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/withShellCheckWrapper.groovy`"
-    
+
     vars = vars ?: [:]
 
     vars.pattern = vars.get("pattern", "*.sh")
     vars.shellcheckCmdParameters = vars.get("shellcheckCmdParameters", "")
-    
+
     tee("shellcheck.log") {
 
         shellcheckExitCode = sh(
@@ -22,7 +22,7 @@ def call(Map vars, Closure body=null) {
             returnStdout: true,
             returnStatus: true
         )
-	    
+
         echo "SHELL CHECK RETURN CODE : ${vars.shellcheckExitCode}"
         if (vars.shellcheckExitCode == 0) {
             echo "SHELL CHECK SUCCESS"
@@ -30,8 +30,8 @@ def call(Map vars, Closure body=null) {
         //    echo "SHELL CHECK UNSTABLE"
         //    currentBuild.result = 'UNSTABLE'
         }
-    
-    } // tee 
+
+    } // tee
 
     checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/checkstyle.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
 

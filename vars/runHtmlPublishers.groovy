@@ -81,7 +81,7 @@ class PublisherDefaults {
 
     static Map RobotPublisher = [
         $class: 'RobotPublisher',
-        outputPath: "/home/frrobot/results",
+        outputPath: "./results",
         outputFileName: "output.xml",
         reportFileName: 'report.html',
         logFileName: 'log.html',

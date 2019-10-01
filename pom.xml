@@ -207,8 +207,8 @@
             <artifactId>groovy-test</artifactId>
             <version>${groovy.version}</version>
             <scope>test</scope>
-        </dependency>      
-        
+        </dependency>
+
         <dependency>
             <groupId>com.cloudbees</groupId>
             <artifactId>groovy-cps</artifactId>
@@ -428,7 +428,7 @@
                         <dumpOnExit>true</dumpOnExit>
                         <append>true</append>
                         <output>file</output>
-                        <!--classDumpDir>${project.build.directory}/jacoco-instrumented</classDumpDir-->
+                        <!--classDumpDir>${project.build.directory}/jacoco-instrumented</classDumpDir -->
                     </configuration>
                 </plugin>
             </plugins>
@@ -596,9 +596,9 @@
                             <!-- Let's put failsafe reports with surefire to have access to tests failures/success reports in sonar -->
                             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                             <!--TODO must be used to detect test that are failing randomly due to wrong code for instance
-                            <runOrder>random</runOrder>-->
+                            <runOrder>random</runOrder> -->
                             <runOrder>filesystem</runOrder>
-                            <!--<forkMode>always</forkMode>-->
+                            <!--<forkMode>always</forkMode> -->
                             <!-- DEPRECATED since version 2.14 -->
                             <forkCount>1</forkCount>
                             <reuseForks>false</reuseForks>

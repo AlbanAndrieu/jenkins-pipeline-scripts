@@ -20,14 +20,14 @@ def call(Map vars, Closure body=null) {
     vars.continueOnError = vars.get("continueOnError", true).toBoolean()
     vars.cleanRemote = vars.get("cleanRemote", false).toBoolean()
     vars.flatten = vars.get("flatten", true).toBoolean()
-    vars.verbose = vars.get("verbose", false).toBoolean()
-    vars.sourceFiles = vars.get("sourceFiles", "**/Latest-*.tar.gz,**/TEST-*.tar.gz")
+    vars.verbose = vars.get("verbose", true).toBoolean()
+    vars.sourceFiles = vars.get("sourceFiles", "**/Latest-*.tar.gz,**/TEST-*.tar.gz,*_VERSION.TXT")
 
     if ( isReleaseBranch() ) {
         if (DEBUG_RUN) {
             echo 'Publish artifacts'
         }
-        
+
         if ( BRANCH_NAME ==~ /develop/ ) {
           vars.cleanRemote = true
         }

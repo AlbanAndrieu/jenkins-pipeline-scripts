@@ -66,13 +66,13 @@ def call(String shell) {
 				} // configFileProvider
 
 			} // tee
-		} catch (e) {			
+		} catch (e) {
 			currentBuild.result = 'FAILURE'
 			build = "FAIL" // make sure other exceptions are recorded as failure too
-			throw e			
+			throw e
 		} finally {
 		    archiveArtifacts artifacts: "overview.html, ansible-lint.*, ansible-cmdb.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}
-		
+
 	} // if
 }

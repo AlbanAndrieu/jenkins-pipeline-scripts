@@ -38,11 +38,12 @@ def call(Map vars, Closure body=null) {
     def scannerHome = tool name: "${SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     vars.sonarExecutable = vars.get("sonarExecutable", "${scannerHome}/bin/sonar-scanner")
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
+    vars.sonarOutputFile = vars.get("sonarOutputFile", "sonar.log").trim()
 
     script {
         if (!DRY_RUN && !RELEASE) {
 
-            tee("sonar.log") {
+            tee("${vars.sonarOutputFile}") {
 
                 if (!vars.skipMaven) {
                     if (vars.coverage?.trim()) {
@@ -129,14 +130,14 @@ def call(Map vars, Closure body=null) {
                     } else {
                         echo "SONAR UNSTABLE"
                         if (!vars.skipUnstable) {
-                            error 'There are errors in sonar'
                             currentBuild.result = 'UNSTABLE'
+                            error 'There are errors in sonar'
                         }
                     }
 
                 } // withSonarQubeEnv
 
-                archiveArtifacts artifacts: "sonar.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.sonarOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 
             } // tee
 
