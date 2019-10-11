@@ -21,7 +21,7 @@ def DOCKER_OPTS_BASIC = [
     '--dns-search=nabla.mobi',
     '-v /usr/local/sonar-build-wrapper:/usr/local/sonar-build-wrapper',
     '-v /workspace/slave/tools/:/workspace/slave/tools/',
-    '-v /jenkins:/home/jenkins',
+//    '-v /jenkins:/home/jenkins',
     DOCKER_OPTS_ROOT,
 ].join(" ")
 
@@ -36,7 +36,7 @@ pipeline {
   agent none
   parameters {
     booleanParam(defaultValue: false, description: 'Dry run', name: 'DRY_RUN')
-    booleanParam(defaultValue: true, description: 'Clean before run', name: 'CLEAN_RUN')
+    booleanParam(defaultValue: false, description: 'Clean before run', name: 'CLEAN_RUN')
     booleanParam(defaultValue: false, description: 'Debug run', name: 'DEBUG_RUN')
     booleanParam(defaultValue: false, description: 'Debug mvnw', name: 'MVNW_VERBOSE')
     booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")

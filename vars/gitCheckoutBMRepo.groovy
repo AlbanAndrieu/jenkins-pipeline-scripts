@@ -7,12 +7,17 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/gitCheckoutBMRepo.groovy`"
+
     vars = vars ?: [:]
 
-    def GIT_PROJECT = vars.get("GIT_PROJECT", "nabla")
+    def GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
+    def GIT_PROJECT = vars.get("GIT_PROJECT", "nabla").trim()
     def GIT_BROWSE_URL = vars.get("GIT_BROWSE_URL", "https://github.com/AlbanAndrieu//${GIT_PROJECT}/")
-    //def GIT_URL = vars.get("GIT_URL", "https://github.com/AlbanAndrieu/${GIT_PROJECT}.git")
-    def GIT_URL = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${GIT_PROJECT}.git")
+    def GIT_URL = vars.get("GIT_URL", "https://github.com/AlbanAndrieu/${GIT_PROJECT}.git")
+    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'jenkins-https')
+    //def GIT_URL = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${GIT_PROJECT}.git")
+    //def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'jenkins-ssh')
 
     def relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT)
     def isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
@@ -20,7 +25,6 @@ def call(Map vars, Closure body=null) {
     //echo "isDefaultBranch=" + isDefaultBranch
 
     def GIT_BRANCH_NAME_BUILDMASTER = vars.get("GIT_BRANCH_NAME_BUILDMASTER", "develop")
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins-ssh")
 
 	checkout([
 		$class: 'GitSCM',

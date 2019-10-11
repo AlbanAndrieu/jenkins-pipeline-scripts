@@ -12,6 +12,8 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/gitCheckoutTEST.groovy`"
+    
     vars = vars ?: [:]
 
     //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -22,10 +24,11 @@ def call(Map vars, Closure body=null) {
         echo 'No body specified'
     }
 
-    vars.relativeTargetDir = vars.get("relativeTargetDir", "test")
+    vars.relativeTargetDir = vars.get("relativeTargetDir", "bm")
     vars.isDefaultBranch = vars.get("isDefaultBranch", true).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
+    vars.isShallowEnabled = vars.get("isShallowEnabled", false).toBoolean()
 
     // TODO
     //def GIT_BRANCH_NAME = vars.get("GIT_BRANCH_NAME", "develop")
@@ -38,7 +41,7 @@ def call(Map vars, Closure body=null) {
         //
         //   dir ("test") {
         //
-        //       getGitData()
+        //       getGitData(vars)
         //
         //       if (body) { body() }
         //
@@ -49,9 +52,9 @@ def call(Map vars, Closure body=null) {
         // TODO
         //def GIT_BRANCH_NAME_BUILDMASTER = vars.get("GIT_BRANCH_NAME_BUILDMASTER", "develop")
 
-        gitCheckoutBMRepo(relativeTargetDir: "bm")
+        gitCheckoutBMRepo(vars)
 
-        getGitData()
+        getGitData(vars)
 
         if (body) { body() }
 

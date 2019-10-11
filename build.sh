@@ -41,9 +41,9 @@ fi
 #JENKINS_HOSTNAME=localhost
 #ssh -p $JENKINS_SSHD_PORT $JENKINS_HOSTNAME declarative-linter < Jenkinsfile
 
-./mvnw clean install
-
 echo -e "${green} ./mvnw clean install -Dpipeline.stack.write=true ${NC}"
+
+./mvnw clean install -Dpipeline.stack.write=true
 
 #./gradlew wrapper --gradle-version=5.2.1 --distribution-type=bin
 #./gradlew build

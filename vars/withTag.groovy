@@ -44,8 +44,12 @@ def call(Map vars, Closure body=null) {
                     git push ${remote} ${tagName} --force || echo "Could not push tag: invalid name or no access rights";
                 """
             } catch(exc) {
-                echo 'Warning: There were errors while tagging. '+exc.toString()
-                sh "git config --global --list && ls -lrta /home/jenkins/.gitconfig"
+                echo 'Warning: There were errors while tagging. ' + exc.toString()
+                try {
+                    sh "git config --global --list && ls -lrta /home/jenkins/.gitconfig"
+                } catch(e) {
+                    echo 'Warning: There were errors whith git config.'
+                }
             }
 
         }

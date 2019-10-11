@@ -168,7 +168,7 @@ def call(Map vars, Closure body=null) {
                             //if (DEBUG_RUN) {
                             //    writeFile file: '.archive-jenkins-maven-event-spy-logs', text: ''
                             //}
-                            echo "BUILD RETURN CODE : ${build}"
+                            echo "MAVEN RETURN CODE : ${build}"
                             if (build == 0) {
                                 echo "MAVEN SUCCESS"
                             } else {

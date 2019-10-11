@@ -1,8 +1,8 @@
 #!/usr/bin/groovy
 import hudson.model.*
 
-def call(def DOCKER_IMAGE = "", def REPORT_NAME = "" ) {
-  def AQUA_IMAGE = "nabla/test/aquasec-scanner-cli:latest"
+def call(def DOCKER_IMAGE = "", def REPORT_NAME = "", def AQUA_VERSION = "latest") {
+  def AQUA_IMAGE = "nabla/test/aquasec-scanner-cli:${AQUA_VERSION}"
   def AQUA_USER = '--user scanner'
   def AQUA_PASS = '--password password'
   def AQUA_HOST = '--host http://albandri:8080'

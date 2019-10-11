@@ -22,5 +22,5 @@ def call(Map vars, Closure body=null) {
         echo 'Error: There were errors in getReleasedVersion. '+exc.toString()
     }
 
-    return vars.releasedVersion
+    return vars.releasedVersion ?: "LATEST"
 }

@@ -23,11 +23,11 @@ def call(Map vars, Closure body=null) {
 
     script {
 
-        gitCheckoutBMRepo(relativeTargetDir: relativeTargetDir, isDefaultBranch: isDefaultBranch) {
+        gitCheckoutBMRepo(vars) {
 
             dir ("bm") {
 
-                getGitData()
+                getGitData(vars)
 
                 if (body) { body() }
 
@@ -35,7 +35,7 @@ def call(Map vars, Closure body=null) {
 
         }
 
-        gitCheckoutTESTRepo()
+        gitCheckoutTESTRepo(vars)
 
     } // script
 

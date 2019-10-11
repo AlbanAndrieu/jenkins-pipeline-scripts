@@ -8,6 +8,8 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/dockerComposeTest.groovy`"
+    
     vars = vars ?: [:]
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -65,7 +67,7 @@ def call(Map vars, Closure body=null) {
                             currentBuild.result = 'UNSTABLE'
                         } else {
                             echo "TEST FAILURE"
-                            currentBuild.result = 'FAILURE'
+                            //currentBuild.result = 'FAILURE'
                             error 'There are other errors'
                         }
                     }
@@ -84,6 +86,7 @@ def call(Map vars, Closure body=null) {
             } finally {
                 try {
                     sh "docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps"
+                    dockerComposeLogs(vars)
                 }
                 catch(exc) {
                     echo 'Warn: There was a problem taking down the docker-compose. '+exc.toString()
