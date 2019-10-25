@@ -81,6 +81,8 @@ class Sonar implements Serializable {
 				).openConnection()
 
 		filesForRevConn.setRequestProperty("Authorization", "Basic ${config.basicAuth}")
+		
+		println("[JPL] URLConnection: ${filesForRevConn.getURL()}")
 
 		def filesForRev = new groovy.json.JsonSlurper().parse(new BufferedReader(new InputStreamReader(filesForRevConn.getInputStream()))) // LazyMap
 

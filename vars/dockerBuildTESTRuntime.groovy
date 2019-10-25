@@ -8,6 +8,8 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/dockerBuildTESTRuntime.groovy`"
+
     vars = vars ?: [:]
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -20,14 +22,14 @@ def call(Map vars, Closure body=null) {
     def skipPush = vars.get("skipPush", true).toBoolean()
     def skipMaven = vars.get("skipMaven", true).toBoolean()
 
-    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi")
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").trim()
     def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
     def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins")
-    def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "nabla")
+    def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "nabla").trim()
 
     def DOCKER_TAG = vars.get("DOCKER_TEST_RUNTIME_TAG", env.DOCKER_TEST_RUNTIME_TAG ?: "temp")
     def DOCKER_RUNTIME_TAG = dockerTag(DOCKER_TAG)
-    def DOCKER_RUNTIME_NAME = vars.get("DOCKER_RUNTIME_NAME", env.DOCKER_RUNTIME_NAME ?: "test")
+    def DOCKER_RUNTIME_NAME = vars.get("DOCKER_RUNTIME_NAME", env.DOCKER_RUNTIME_NAME ?: "test").trim()
     def DOCKER_RUNTIME_IMG = vars.get("DOCKER_RUNTIME_IMG", env.DOCKER_RUNTIME_IMG ?: "${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_RUNTIME_NAME}:${DOCKER_RUNTIME_TAG}")
 
     def dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./")
@@ -48,11 +50,9 @@ def call(Map vars, Closure body=null) {
         }
         //DOCKER_BUILD_ARGS = [ "${DOCKER_BUILD_ARGS}"].join(" ")
 
-        docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
-        // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-        //withRegistryWrapper(DOCKER_REGISTRY: DOCKER_REGISTRY) {
+        //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
 
-	        sh 'docker images'
+            //sh 'docker images'
 
             def container = docker.build("${DOCKER_RUNTIME_IMG}", "${DOCKER_BUILD_ARGS} -f ${dockerFilePath}Dockerfile ${dockerTargetPath} ")
             //container.inside("") {
@@ -70,18 +70,17 @@ def call(Map vars, Closure body=null) {
             }
 
             if (!DRY_RUN && !skipPush) {
-                //image.push("${env.BUILD_NUMBER}")
+                //container.push("${env.BUILD_NUMBER}")
                 if ( BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
                     echo "Push image ${DOCKER_RUNTIME_IMG} to DTR"
                     container.push()
                 } // if
             }
-        } // withRegistryWrapper
+        //} // withRegistry
 
-        dockerFingerprintFrom dockerfile: "${dockerFilePath}Dockerfile", image: "${DOCKER_RUNTIME_IMG}"
+       // dockerFingerprintFrom dockerfile: "${dockerFilePath}Dockerfile", image: "${DOCKER_RUNTIME_IMG}"
 
     } // script
 
     return DOCKER_RUNTIME_TAG
-
 }

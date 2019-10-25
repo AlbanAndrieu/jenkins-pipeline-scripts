@@ -59,6 +59,7 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 
 		helper.registerAllowedMethod("post", [Closure.class], null)
 		helper.registerAllowedMethod("always", [Closure.class], null)
+		helper.registerAllowedMethod("cleanup", [Closure.class], null)
 
 		//helper.registerAllowedMethod("timeout", [Map.class, Closure.class], null)
 		helper.registerAllowedMethod("junit", [Map.class], null)

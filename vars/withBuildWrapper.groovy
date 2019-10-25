@@ -22,15 +22,16 @@ def call(Map vars, Closure body=null) {
 
     vars.artifacts = ['*_VERSION.TXT',
                    '**/MD5SUMS.md5',
-                   '**/Output/**/*.tar.gz'
+                   'Output/**/*.tar.gz'
                    ].join(', ')
 
     vars.isStashMavenEnabled = true
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    def SCONS_OPTS = vars.get("SCONS_OPTS", env.SCONS_OPTS ?: "")
+    vars.CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    vars.DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    vars.DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+    vars.SCONS_OPTS = vars.get("SCONS_OPTS", env.SCONS_OPTS ?: "").trim()
+    vars.filePath = vars.get("filePath", "./Build/step-2-0-0-build-env.sh").trim()
 
     wrapInTEST(vars) {
 
@@ -38,8 +39,8 @@ def call(Map vars, Closure body=null) {
 
 		    if (body) { body() }
 
-			if (DEBUG_RUN) {
-				getEnvironementData(filePath: "./Build/step-2-0-0-build-env.sh", DEBUG_RUN: DEBUG_RUN)
+			if (vars.DEBUG_RUN) {
+				getEnvironementData(vars)
 			}
 
 		} // withBuildCppWrapper

@@ -17,11 +17,10 @@ def call(Map vars, Closure body=null) {
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
-
-    //TARGET_PROJECT = sh(returnStdout: true, script: "echo ${env.JOB_NAME} | cut -d'/' -f 2").trim().toUpperCase()
+    
+    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins")
 
     setBuildName()
-    //createVersionTextFile("${TARGET_PROJECT} ${env.BRANCH_NAME}","${TARGET_PROJECT}_VERSION.TXT")
 
     if (!DRY_RUN && !RELEASE) {
 
@@ -38,7 +37,6 @@ def call(Map vars, Closure body=null) {
                 sh """
                     git tag -l | xargs git tag -d # remove all local tags;
                     git push --delete ${remote} ${tagName} || echo "Could not delete remote tag: does not exist or no access rights" || true;
-                    git tag --delete ${tagName} || echo "Could not delete local tag: does not exist or no access rights" || true; # remove local tag
                     git fetch --tags --prune > /dev/null 2>&1 || true;
                     git tag -a ${tagName} -m '${message}'; # create new tag
                     git push ${remote} ${tagName} --force || echo "Could not push tag: invalid name or no access rights";
@@ -46,7 +44,7 @@ def call(Map vars, Closure body=null) {
             } catch(exc) {
                 echo 'Warning: There were errors while tagging. ' + exc.toString()
                 try {
-                    sh "git config --global --list && ls -lrta /home/jenkins/.gitconfig"
+                    sh "git config --global --list && ls -lrta ${JENKINS_USER_HOME}/.gitconfig"
                 } catch(e) {
                     echo 'Warning: There were errors whith git config.'
                 }

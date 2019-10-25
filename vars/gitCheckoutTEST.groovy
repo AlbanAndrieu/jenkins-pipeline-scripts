@@ -25,7 +25,7 @@ def call(Map vars, Closure body=null) {
     }
 
     vars.relativeTargetDir = vars.get("relativeTargetDir", "bm")
-    vars.isDefaultBranch = vars.get("isDefaultBranch", true).toBoolean()
+    vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
     vars.isShallowEnabled = vars.get("isShallowEnabled", false).toBoolean()

@@ -31,6 +31,7 @@ def call(Map vars, Closure body=null) {
     def MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "mgr-settings-nexus") // fr-maven-default
     def MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "mgr-settings-security-nexus")
     def MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2") // maven-latest
+    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins") 
     def JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8") // java-latest
 
     if (DEBUG_RUN) {
@@ -62,12 +63,13 @@ def call(Map vars, Closure body=null) {
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.pomFile = vars.get("pomFile", "pom.xml").trim()
     vars.mavenGoals = vars.get("mavenGoals", "").trim()
-    vars.mavenOutputFile = vars.get("mavenOutputFile", "maven.log").trim()
-    vars.mavenHome = vars.get("mavenHome", "/jenkins/.m2/").trim()
+    vars.shellOutputFile = vars.get("shellOutputFile", "maven.log").trim()
+    vars.mavenHome = vars.get("mavenHome", "${JENKINS_USER_HOME}/.m2/").trim()
 
     try {
-        tee("${vars.mavenOutputFile}") {
+        tee("${vars.shellOutputFile}") {
 
+            // TODO configFileProvider do not work on docker, it is working on VM only and might fail then when JENKINS_USER_HOME do not exist
             configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: 'SETTINGS_XML'),
                 configFile(fileId: "${MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: 'MAVEN_SETTINGS_SECURITY_CONFIG')]) {
                 withMaven(
@@ -157,7 +159,7 @@ def call(Map vars, Closure body=null) {
                         vars.buildCmd += " ${vars.mavenGoals}"
 
                         // TODO Remove it when tee will be back
-                        //vars.buildCmd += " 2>&1 > ${vars.mavenOutputFile} "
+                        //vars.buildCmd += " 2>&1 > ${vars.shellOutputFile} "
 
                         //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                             // Run the maven build

@@ -13,10 +13,10 @@ def call(Map vars, Closure body=null) {
         echo 'No body specified'
     }
 
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+    vars.DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     vars.filePath = vars.get("filePath", "step-2-0-0-build-env.sh")
 
-    if (DEBUG_RUN) {
+    if (vars.DEBUG_RUN) {
         sh "set -xv && ${vars.filePath}"
     } else {
         sh "${vars.filePath}"

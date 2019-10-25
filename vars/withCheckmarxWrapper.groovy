@@ -19,12 +19,12 @@ def call(Map vars, Closure body=null) {
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    vars.excludeFolders = vars.get("excludeFolders", ", bm")
-    vars.projectName = vars.get("projectName", ", TEST_Checkmarx")
+    vars.excludeFolders = vars.get("excludeFolders", ", bm").trim()
+    vars.projectName = vars.get("projectName", ", TEST_Checkmarx").trim()
     vars.preset = vars.get("preset", '17')
 
-    vars.groupId = vars.get("groupId", '000')
-    vars.password = vars.get("password", '{AAA/BBB=}')
+    vars.groupId = vars.get("groupId", '000').trim()
+    vars.password = vars.get("password", '{AAA/BBB=}').trim()
     vars.generatePdfReport = vars.get("generatePdfReport", false).toBoolean()
     vars.lowThreshold = vars.get("lowThreshold", 1000)
     vars.mediumThreshold = vars.get("mediumThreshold", 100)

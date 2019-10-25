@@ -22,30 +22,31 @@ def call(Map vars, Closure body=null) {
 
     def GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
     def GIT_PROJECT_TEST = vars.get("GIT_PROJECT_TEST", "nabla-servers-bower-sample").trim()
-    def GIT_BROWSE_URL_TEST = vars.get("GIT_BROWSE_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}/")
-    def GIT_URL_TEST = vars.get("GIT_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}.git")
+    def GIT_BROWSE_URL_TEST = vars.get("GIT_BROWSE_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}/").trim()
+    def GIT_URL_TEST = vars.get("GIT_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}.git").trim()
     def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'jenkins-https') 
-    //def GIT_URL_TEST = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${GIT_REPO_PROJECT}/${GIT_PROJECT}.git")
+    //def GIT_URL_TEST = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${GIT_REPO_PROJECT}/${GIT_PROJECT}.git").trim()
     //def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins-ssh")
 
-    def relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT_TEST)
-    def isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
-    def isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
+    vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
+    vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
+    vars.relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT_TEST).trim()
+    vars.timeout = vars.get("timeout", 20)    
+    vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
+    vars.isShallowEnabled = vars.get("isShallowEnabled", true).toBoolean()
 
-    //echo "isDefaultBranch=" + isDefaultBranch
+    vars.GIT_BRANCH_NAME = vars.get("GIT_BRANCH_NAME", "develop")
 
-    def GIT_BRANCH_NAME = vars.get("GIT_BRANCH_NAME", "develop")
-
-    if (isScmEnabled) {
+    if (vars.isScmEnabled) {
 
        checkout([
            $class: 'GitSCM',
-           branches: getDefaultCheckoutBranches(isDefaultBranch, GIT_BRANCH_NAME),
+           branches: getDefaultCheckoutBranches(vars),
            browser: [
                $class: 'Stash',
                repoUrl: "${GIT_BROWSE_URL_TEST}"],
            doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-           extensions: getDefaultCheckoutExtensions(isDefaultBranch, relativeTargetDir),
+           extensions: getDefaultCheckoutExtensions(vars),
            gitTool: 'git-latest',
            submoduleCfg: [],
            userRemoteConfigs: [[
@@ -61,7 +62,7 @@ def call(Map vars, Closure body=null) {
         // This is a workaround because of the timeout which cannot be extended in jenkins
 
         // TODO
-        gitClone(GIT_BROWSE_URL_TEST, relativeTargetDir)
+        gitClone(GIT_BROWSE_URL_TEST, vars.relativeTargetDir)
 
         if (body) { body() }
     }

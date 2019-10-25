@@ -1,14 +1,24 @@
 #!/usr/bin/groovy
 
-def call(isDefaultBranch = false, gitDefaultBranchName = "develop") {
+def call(Closure body=null) {
+    this.vars = [:]
+    call(vars, body)
+}
+
+def call(Map vars, Closure body=null) {
+
+    vars = vars ?: [:]
+
+    vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
+    vars.gitDefaultBranchName = vars.get("gitDefaultBranchName", "develop").trim()
 
     def myBranches = null
 
-    if (isDefaultBranch) {
+    if (vars.isDefaultBranch) {
        //echo 'Default branches managed by Jenkins'
        myBranches = scm.branches
     } else {
-       myBranches = [[name: gitDefaultBranchName]]
+       myBranches = [[name: vars.gitDefaultBranchName]]
     }
 
     return myBranches

@@ -30,7 +30,7 @@ def call(Map vars, Closure body=null) {
     vars.skipArtifacts = vars.get("skipArtifacts", true).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
-    vars.mavenOutputFile = vars.get("mavenOutputFile", "maven-depcheck.log").trim()
+    vars.shellOutputFile = vars.get("shellOutputFile", "maven-depcheck.log").trim()
 
     if (!DRY_RUN) {
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
-@Library('jenkins-pipeline-scripts') _
+@Library('jenkins-pipeline-scripts')
 import com.test.jenkins.*
 
 def DOCKER_REGISTRY="hub.docker.com"
@@ -19,9 +19,8 @@ def DOCKER_OPTS_ROOT = [
 
 def DOCKER_OPTS_BASIC = [
     '--dns-search=nabla.mobi',
-    '-v /usr/local/sonar-build-wrapper:/usr/local/sonar-build-wrapper',
-    '-v /workspace/slave/tools/:/workspace/slave/tools/',
 //    '-v /jenkins:/home/jenkins',
+//    '-v /home/jenkins:/home/jenkins',
     DOCKER_OPTS_ROOT,
 ].join(" ")
 
@@ -120,6 +119,7 @@ pipeline {
               skipPitest: true,
               skipArtifacts: true,
               buildCmdParameters: "-Dserver=jetty9x -Dsonar.findbugs.allowuncompiledcode=true",
+              mavenHome: "/home/jenkins/.m2/",
               artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip") {
 
                 //sh 'chown -R jenkins:docker .[^.]* *'
@@ -155,6 +155,8 @@ pipeline {
           withSonarQubeWrapper(verbose: true,
               skipMaven: true,
               buildCmdParameters: "-Dsonar.findbugs.allowuncompiledcode=true",
+              isScannerHome: false,
+              sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
               project: "NABLA",
               repository: "jenkins-pipeline-scripts") {
           }
@@ -225,12 +227,12 @@ pipeline {
   } // stages
   post {
     always {
-      node('docker-compose') {
+      node('any') {
         runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
-        archiveArtifacts artifacts: "**/*.log", onlyIfSuccessful: false, allowEmptyArchive: true
-      } // node
-
-      wrapCleanWs()
-    }
+      }
+    } // always
+    cleanup {
+      wrapCleanWs(isEmailEnabled: false)
+    } // cleanup
   } // post
 } // pipeline

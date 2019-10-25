@@ -28,7 +28,7 @@ def call(Map vars, Closure body=null) {
     vars.skipPitest = vars.get("skipPitest", true).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "")
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
-    vars.mavenOutputFile = vars.get("mavenOutputFile", "maven-deploy.log").trim()
+    vars.shellOutputFile = vars.get("shellOutputFile", "maven-deploy.log").trim()
 
     if (!DRY_RUN) {
 

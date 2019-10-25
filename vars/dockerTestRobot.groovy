@@ -8,6 +8,8 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/dockerTestRobot.groovy`"
+    
     vars = vars ?: [:]
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -17,30 +19,30 @@ def call(Map vars, Closure body=null) {
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi")
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").trim()
     def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
-    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins")
-    def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "nabla")
+    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
+    def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "nabla").trim()
 
-    def DOCKER_ROBOT_RUNTIME_TAG = vars.get("DOCKER_ROBOT_RUNTIME_TAG", env.DOCKER_ROBOT_RUNTIME_TAG ?: "develop")
-    def DOCKER_ROBOT_RUNTIME_NAME = vars.get("DOCKER_ROBOT_RUNTIME_NAME", env.DOCKER_ROBOT_RUNTIME_NAME ?: "robot")
+    def DOCKER_ROBOT_RUNTIME_TAG = vars.get("DOCKER_ROBOT_RUNTIME_TAG", env.DOCKER_ROBOT_RUNTIME_TAG ?: "develop").trim()
+    def DOCKER_ROBOT_RUNTIME_NAME = vars.get("DOCKER_ROBOT_RUNTIME_NAME", env.DOCKER_ROBOT_RUNTIME_NAME ?: "robot").trim()
     def DOCKER_ROBOT_RUNTIME_IMG = vars.get("DOCKER_ROBOT_RUNTIME_IMG", env.DOCKER_ROBOT_RUNTIME_IMG ?: "${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_ROBOT_RUNTIME_NAME}:${DOCKER_ROBOT_RUNTIME_TAG}")
 
-    vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp")
+    vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp").trim()
     vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG)
-    vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_robot_1")
-    vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "--force-recreate --exit-code-from robot robot")
-    vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}")
+    vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_robot_1").trim()
+    vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "--force-recreate --exit-code-from robot robot").trim()
+    vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}").trim()
 
-    vars.ADDITIONAL_ROBOT_OPTS = vars.get("ADDITIONAL_ROBOT_OPTS", env.ADDITIONAL_ROBOT_OPTS ?: "-s PipelineTests.TEST -e disabled")
-    vars.ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "./robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}")
+    vars.ADDITIONAL_ROBOT_OPTS = vars.get("ADDITIONAL_ROBOT_OPTS", env.ADDITIONAL_ROBOT_OPTS ?: "-s PipelineTests.TEST -e disabled").trim()
+    vars.ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "./robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}").trim()
 
-    vars.dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
-    vars.allowEmptyResults = vars.get("allowEmptyResults", env.allowEmptyResults ?: false).toBoolean()
+    vars.dockerFilePath = vars.get("dockerFilePath", "./docker/centos7/run/").trim()
+    vars.allowEmptyResults = vars.get("allowEmptyResults", false).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
 
-    vars.isFailReturnCode = vars.get("isFailReturnCode", env.isFailReturnCode ?: 255)
-    vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", env.isUnstableReturnCode ?: 250)
+    vars.isFailReturnCode = vars.get("isFailReturnCode", 255)
+    vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 250)
 
     script {
 
@@ -92,8 +94,8 @@ def call(Map vars, Closure body=null) {
 
                 } // lock
 
-            } catch(exc) {
-                error 'There are errors in dockerTestRobot'
+            } catch(e) {
+                echo 'There are errors in dockerTestRobot'
             } finally {
                 archiveArtifacts artifacts: "${vars.ROBOT_RESULTS_PATH}/**/*.log, *.log, result/**/*", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
             } // finally

@@ -13,7 +13,6 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar")
-    //def SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-3.2") // Sonar-Scanner-3.2
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
     def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins")

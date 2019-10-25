@@ -14,8 +14,9 @@ def call(Map vars, Closure body=null) {
 
     vars.pattern = vars.get("pattern", "*.sh")
     vars.shellcheckCmdParameters = vars.get("shellcheckCmdParameters", "")
+    vars.shellOutputFile = vars.get("shellOutputFile", "shellcheck.log").trim()
 
-    tee("shellcheck.log") {
+    tee("${vars.shellOutputFile}") {
 
         shellcheckExitCode = sh(
             script: "shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml",
@@ -23,7 +24,7 @@ def call(Map vars, Closure body=null) {
             returnStatus: true
         )
 
-        echo "SHELL CHECK RETURN CODE : ${vars.shellcheckExitCode}"
+        echo "SHELL CHECK RETURN CODE : ${shellcheckExitCode}"
         if (vars.shellcheckExitCode == 0) {
             echo "SHELL CHECK SUCCESS"
         //} else {
@@ -35,4 +36,5 @@ def call(Map vars, Closure body=null) {
 
     checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/checkstyle.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
 
+    return shellcheckExitCode
 }

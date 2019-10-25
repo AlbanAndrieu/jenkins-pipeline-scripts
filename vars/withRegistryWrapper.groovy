@@ -13,12 +13,11 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry")
-    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
-    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins")
-    def DOCKER_CONFIG_DEFAULT = vars.get("DOCKER_CONFIG_DEFAULT", env.DOCKER_CONFIG_DEFAULT ?: "/home/jenkins/.docker/")
-
-    sh 'echo DOCKER_CONFIG_DEFAULT : ${DOCKER_CONFIG_DEFAULT}'
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").trim()
+    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
+    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
+    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
+    def DOCKER_CONFIG_DEFAULT = vars.get("DOCKER_CONFIG_DEFAULT", env.DOCKER_CONFIG_DEFAULT ?: "${JENKINS_USER_HOME}/.docker/").trim()
 
 //sh '''
 //echo "DOCKER_CONFIG BEFORE : $DOCKER_CONFIG"
@@ -28,10 +27,8 @@ def call(Map vars, Closure body=null) {
              "DOCKER_REGISTRY_URL=${DOCKER_REGISTRY_URL}",
             ]) {
 
-//sh '''
-//echo "DOCKER_CONFIG AFTER : $DOCKER_CONFIG"
-//'''
-
+        sh 'echo DOCKER_CONFIG_DEFAULT : ${DOCKER_CONFIG_DEFAULT}'
+    
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DOCKER_REGISTRY_CREDENTIAL, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]) {
             usr = DOCKER_USERNAME
             pswd = DOCKER_PASSWORD

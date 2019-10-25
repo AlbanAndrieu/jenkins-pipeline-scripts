@@ -123,7 +123,10 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("withCheckmarxWrapper", [Map.class, Closure.class], null)
 
 		helper.registerAllowedMethod("runHtmlPublishers", [List.class], null)
+		
 		helper.registerAllowedMethod("wrapCleanWs", [], null)
+		helper.registerAllowedMethod("wrapCleanWs", [Map.class], null)
+		helper.registerAllowedMethod("wrapCleanWs", [Map.class, Closure.class], null)
 	}
 
 	@Test

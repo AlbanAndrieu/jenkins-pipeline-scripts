@@ -19,18 +19,22 @@ def call(Map vars, Closure body=null) {
     //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp")
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nala.mobi")
+    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
+    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins")
+    
+    vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp").trim()
     vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG)
-    vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_test_1")
-    vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "-d --force-recreate test")
-    vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}")
+    vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_test_1").trim()
+    vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "-d --force-recreate test").trim()
+    vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}").trim()
 
-    vars.dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./docker/centos7/run/")
-    vars.dockerDownFile = vars.get("dockerDownFile", env.dockerDownFile ?: "${vars.dockerFilePath}docker-compose-down.sh")
-    vars.dockerUpFile = vars.get("dockerUpFile", env.dockerUpFile ?: "${vars.dockerFilePath}docker-compose-up.sh 2>&1 > docker-compose-up.log")
+    vars.dockerFilePath = vars.get("dockerFilePath", "./docker/centos7/run/").trim()
+    vars.dockerDownFile = vars.get("dockerDownFile", "${vars.dockerFilePath}docker-compose-down.sh").trim()
+    vars.dockerUpFile = vars.get("dockerUpFile", "${vars.dockerFilePath}docker-compose-up.sh 2>&1 > docker-compose-up.log").trim()
 
-    vars.isFailReturnCode = vars.get("isFailReturnCode", env.isFailReturnCode ?: 1)
-    vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", env.isUnstableReturnCode ?: 250)
+    vars.isFailReturnCode = vars.get("isFailReturnCode", 1)
+    vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 250)
 
     script {
 
@@ -38,8 +42,7 @@ def call(Map vars, Closure body=null) {
 
             try {
 
-                // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-                withRegistryWrapper() {
+                //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
 
                     if (CLEAN_RUN) {
                         if (vars.dockerDownFile?.trim()) {
@@ -61,7 +64,7 @@ def call(Map vars, Closure body=null) {
                         } else if (up == vars.isFailReturnCode) {
                             echo "TEST FAILURE"
                             currentBuild.result = 'FAILURE'
-                            error 'There are errors staring containers'
+                            error 'There are errors starting containers'
                         } else if (up <= vars.isUnstableReturnCode) {
                             echo "TEST UNSTABLE"
                             currentBuild.result = 'UNSTABLE'
@@ -74,7 +77,7 @@ def call(Map vars, Closure body=null) {
 
                     if (body) { body() }
 
-                }  // withRegistryWrapper
+                //}  // withRegistry
 
             } catch(exc) {
                 dockerCheckHealth("test","healthy")
@@ -85,7 +88,6 @@ def call(Map vars, Closure body=null) {
                 echo 'Error: There were errors in compose tests. '+exc.toString()
             } finally {
                 try {
-                    sh "docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps"
                     dockerComposeLogs(vars)
                 }
                 catch(exc) {

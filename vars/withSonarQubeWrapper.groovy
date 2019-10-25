@@ -14,10 +14,10 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar")
-    def SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-3.2") // Sonar-Scanner-3.2
+    def SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-4.2").trim()
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins")
+    def STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", "jenkins")
 
     //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
@@ -29,21 +29,27 @@ def call(Map vars, Closure body=null) {
     vars.coverage = vars.get("coverage", "").trim()
     vars.verbose = vars.get("verbose", false).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
-    vars.project = vars.get("project", "NABLA")
+    vars.project = vars.get("project", "NABLA").trim()
     vars.repository = vars.get("repository", "").trim()
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
     vars.skipUnstable = vars.get("skipUnstable", false).toBoolean()
     vars.skipInclusion = vars.get("skipInclusion", false).toBoolean()
     vars.targetBranch = vars.get("targetBranch", "develop").trim()
     def scannerHome = tool name: "${SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-    vars.sonarExecutable = vars.get("sonarExecutable", "${scannerHome}/bin/sonar-scanner")
+    vars.isScannerHome = vars.get("isScannerHome", true).toBoolean()
+    if (vars.isScannerHome == true) {
+        vars.sonarExecutable = vars.get("sonarExecutable", "${scannerHome}/bin/sonar-scanner")
+    } else {
+        // docker
+        vars.sonarExecutable = vars.get("sonarExecutable", "/usr/local/sonar-runner/bin/sonar-scanner")
+    }
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
-    vars.sonarOutputFile = vars.get("sonarOutputFile", "sonar.log").trim()
+    vars.shellOutputFile = vars.get("shellOutputFile", "sonar.log").trim()
 
     script {
         if (!DRY_RUN && !RELEASE) {
 
-            tee("${vars.sonarOutputFile}") {
+            tee("${vars.shellOutputFile}") {
 
                 if (!vars.skipMaven) {
                     if (vars.coverage?.trim()) {
@@ -79,7 +85,7 @@ def call(Map vars, Closure body=null) {
                             // SynchronousNonBlockingStepExecution with usernamePassword not available in static groovy JPL
                             withCredentials([
                                 usernamePassword(
-                                credentialsId: JENKINS_CREDENTIALS,
+                                credentialsId: STASH_CREDENTIALS,
                                 usernameVariable: 'stashLogin',
                                 passwordVariable: 'stashPass'
                                 )
@@ -97,7 +103,7 @@ def call(Map vars, Closure body=null) {
                 }
 
                 // TODO Remove it when tee will be back
-                //vars.buildCmdParameters += " 2>&1 > sonar.log "
+                //vars.buildCmdParameters += " 2>&1 > ${vars.shellOutputFile} "
 
                 echo "Sonar GOALS have been specified: ${vars.buildCmdParameters}"
 
@@ -137,7 +143,7 @@ def call(Map vars, Closure body=null) {
 
                 } // withSonarQubeEnv
 
-                archiveArtifacts artifacts: "${vars.sonarOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.shellOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 
             } // tee
 
