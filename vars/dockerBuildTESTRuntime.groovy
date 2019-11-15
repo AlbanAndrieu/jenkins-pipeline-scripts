@@ -19,8 +19,8 @@ def call(Map vars, Closure body=null) {
     //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    def skipPush = vars.get("skipPush", true).toBoolean()
-    def skipMaven = vars.get("skipMaven", true).toBoolean()
+    vars.skipPush = vars.get("skipPush", true).toBoolean()
+    vars.skipMaven = vars.get("skipMaven", true).toBoolean()
 
     def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").trim()
     def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
@@ -32,12 +32,13 @@ def call(Map vars, Closure body=null) {
     def DOCKER_RUNTIME_NAME = vars.get("DOCKER_RUNTIME_NAME", env.DOCKER_RUNTIME_NAME ?: "test").trim()
     def DOCKER_RUNTIME_IMG = vars.get("DOCKER_RUNTIME_IMG", env.DOCKER_RUNTIME_IMG ?: "${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_RUNTIME_NAME}:${DOCKER_RUNTIME_TAG}")
 
-    def dockerFilePath = vars.get("dockerFilePath", env.dockerFilePath ?: "./")
-    def dockerTargetPath = vars.get("dockerTargetPath", env.dockerTargetPath ?: ".")
+    vars.dockerFilePath = vars.get("dockerFilePath", "./").trim()
+    vars.dockerFileName = vars.get("dockerFileName", "Dockerfile").trim()
+    vars.dockerTargetPath = vars.get("dockerTargetPath", vars.get("dockerFilePath", "./")).trim()
 
     script {
 
-        if (!skipMaven) {
+        if (!vars.skipMaven) {
            unstash 'maven-artifacts'
         }
 
@@ -54,7 +55,7 @@ def call(Map vars, Closure body=null) {
 
             //sh 'docker images'
 
-            def container = docker.build("${DOCKER_RUNTIME_IMG}", "${DOCKER_BUILD_ARGS} -f ${dockerFilePath}Dockerfile ${dockerTargetPath} ")
+            def container = docker.build("${DOCKER_RUNTIME_IMG}", "${DOCKER_BUILD_ARGS} -f ${vars.dockerFilePath}${vars.dockerFileName} ${vars.dockerTargetPath} ")
             //container.inside("") {
             //    sh 'java -version'
             //}
@@ -69,16 +70,16 @@ def call(Map vars, Closure body=null) {
                 body()
             }
 
-            if (!DRY_RUN && !skipPush) {
+            if (!DRY_RUN && !vars.skipPush) {
                 //container.push("${env.BUILD_NUMBER}")
                 if ( BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
-                    echo "Push image ${DOCKER_RUNTIME_IMG} to DTR"
+                    echo "Push the container to the custom Registry : ${DOCKER_RUNTIME_IMG}"
                     container.push()
                 } // if
             }
         //} // withRegistry
 
-       // dockerFingerprintFrom dockerfile: "${dockerFilePath}Dockerfile", image: "${DOCKER_RUNTIME_IMG}"
+       // dockerFingerprintFrom dockerfile: "${vars.dockerFilePath}${vars.dockerFileName}", image: "${DOCKER_RUNTIME_IMG}"
 
     } // script
 

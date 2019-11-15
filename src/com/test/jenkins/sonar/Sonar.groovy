@@ -81,6 +81,8 @@ class Sonar implements Serializable {
 				).openConnection()
 
 		filesForRevConn.setRequestProperty("Authorization", "Basic ${config.basicAuth}")
+		
+		println("[JPL] URLConnection: ${filesForRevConn.getURL()}")
 
 		def filesForRev = new groovy.json.JsonSlurper().parse(new BufferedReader(new InputStreamReader(filesForRevConn.getInputStream()))) // LazyMap
 
@@ -105,7 +107,7 @@ class Sonar implements Serializable {
 		def sonarCmdParameters = vars.get("sonarCmdParameters", "")
 		//vars.project = vars.get("project", "RISK")
 
-		def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${WORKSPACE}/${filename}" }.join(",")
+		def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${filename}" }.join(",")
 
 		if (body) { body() }
 

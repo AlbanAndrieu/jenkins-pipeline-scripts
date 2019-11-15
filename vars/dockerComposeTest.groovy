@@ -24,7 +24,7 @@ def call(Map vars, Closure body=null) {
     def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins")
     
     vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp").trim()
-    vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG)
+    vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG).trim()
     vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_test_1").trim()
     vars.DOCKER_COMPOSE_UP_OPTIONS = vars.get("DOCKER_COMPOSE_UP_OPTIONS", env.DOCKER_COMPOSE_UP_OPTIONS ?: "-d --force-recreate test").trim()
     vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}").trim()
@@ -82,7 +82,6 @@ def call(Map vars, Closure body=null) {
             } catch(exc) {
                 dockerCheckHealth("test","healthy")
                 def containerId = getContainerId(vars)
-                //dockerCheckHealth("${vars.DOCKER_TEST_CONTAINER}","healthy")
                 currentBuild.result = 'FAILURE'
                 up = "FAIL" // make sure other exceptions are recorded as failure too
                 echo 'Error: There were errors in compose tests. '+exc.toString()

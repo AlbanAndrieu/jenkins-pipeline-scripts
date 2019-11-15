@@ -20,10 +20,10 @@ def call(Map vars, Closure body=null) {
         echo 'No body specified'
     }
 
-    vars.artifacts = ['*_VERSION.TXT',
+    vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT',
                    '**/MD5SUMS.md5',
                    'Output/**/*.tar.gz'
-                   ].join(', ')
+                   ].join(', '))                   
 
     vars.isStashMavenEnabled = true
 

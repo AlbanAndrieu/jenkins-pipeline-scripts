@@ -8,11 +8,11 @@ def call(def DOCKER_TAG, def commit = "", def dbms = "") {
     if (env.BRANCH_NAME ==~ /PR-.*|feature\/.*|bugfix\/.*/ ) {
         DOCKER_TAG = ("temp-${branchSafeName}-${env.BUILD_ID}").toLowerCase()
     } else if (env.BRANCH_NAME ==~ /develop/ ) {
-        DOCKER_TAG = "develop"
+        DOCKER_TAG = ("develop").toLowerCase()
     } else if (env.BRANCH_NAME ==~ /master.*/ ) {
-        DOCKER_TAG = "${branchSafeName}"
+        DOCKER_TAG = ("${branchSafeName}").toLowerCase()
     } else if (env.BRANCH_NAME ==~ /release\/.+/ ) {
-        DOCKER_TAG = "${branchSafeName}-${env.BUILD_ID}"
+        DOCKER_TAG = ("${branchSafeName}-${env.BUILD_ID}").toLowerCase()
     }
 
     if (commit != null && commit.trim() != "" ) {

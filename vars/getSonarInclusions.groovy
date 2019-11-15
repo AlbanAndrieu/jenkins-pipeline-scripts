@@ -96,7 +96,7 @@ def call(Map vars, Closure body=null) {
         echo "[JPL] isReleaseBranch, so no check for `vars/getSonarInclusions.groovy`"
     } else {
 
-        def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${env.WORKSPACE}/${filename}" }.join(",")
+        def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${filename}" }.join(",")
 
         if (body) { body() }
 

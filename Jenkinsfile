@@ -11,24 +11,8 @@ def DOCKER_REGISTRY_URL="https://${DOCKER_REGISTRY}"
 def DOCKER_REGISTRY_CREDENTIAL='nabla'
 def DOCKER_IMAGE="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}"
 
-def DOCKER_OPTS_ROOT = [
-    '-v /etc/passwd:/etc/passwd:ro',
-    '-v /etc/group:/etc/group:ro',
-    '--entrypoint=\'\'',
-].join(" ")
-
-def DOCKER_OPTS_BASIC = [
-    '--dns-search=nabla.mobi',
-//    '-v /jenkins:/home/jenkins',
-//    '-v /home/jenkins:/home/jenkins',
-    DOCKER_OPTS_ROOT,
-].join(" ")
-
-def DOCKER_OPTS_COMPOSE = [
-    DOCKER_OPTS_BASIC,
-    '-v /var/run/docker.sock:/var/run/docker.sock',
-].join(" ")
-
+def DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: true)
+                            
 def branchName = env.BRANCH_NAME
 
 pipeline {
@@ -74,6 +58,10 @@ pipeline {
       }
       steps {
         script {
+		  if (env.CLEAN_RUN == true) {
+		    cleanWs(isEmailEnabled: false, disableDeferredWipeout: true, deleteDirs: true)                   
+		  }        
+                                    
           def myenv = load "src/test/jenkins/lib/myenv.groovy"
           properties(myenv.getPropertyList())
 
@@ -104,7 +92,7 @@ pipeline {
       steps {
         script {
 
-          if (CLEAN_RUN) {
+          if (env.CLEAN_RUN) {
               sh "$WORKSPACE/clean.sh"
           }
 
@@ -141,8 +129,6 @@ pipeline {
           image DOCKER_IMAGE
           alwaysPull true
           reuseNode true
-          registryUrl DOCKER_REGISTRY_URL
-          registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
           args DOCKER_OPTS_COMPOSE
           label 'docker-compose'
         }
@@ -169,8 +155,6 @@ pipeline {
           image DOCKER_IMAGE
           alwaysPull true
           reuseNode true
-          registryUrl DOCKER_REGISTRY_URL
-          registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
           args DOCKER_OPTS_COMPOSE
           label 'docker-compose'
         }
@@ -198,7 +182,7 @@ pipeline {
         }
       } // steps
     } // stage SonarQube analysis
-    stage('\u2795 Quality - Security') {
+    stage('\u2795 Quality - Security - Checkmarx') {
         agent {
             docker {
                 image DOCKER_IMAGE
@@ -211,16 +195,12 @@ pipeline {
         }
         steps {
             script {
-                stage('\u2795 Quality - Security - Checkmarx') {
-                    script {
-                        withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx',
-                            preset: '1',
-                            groupId: '1234',
-                            lowThreshold: 10,
-                            mediumThreshold: 0,
-                            highThreshold: 0)
-                     }    // script                                                                                                                       }
-                }
+				withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx',
+					preset: '1',
+					groupId: '1234',
+					lowThreshold: 10,
+					mediumThreshold: 0,
+					highThreshold: 0)
             } // script
         } // steps
     } // stage Security

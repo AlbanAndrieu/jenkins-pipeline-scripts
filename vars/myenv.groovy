@@ -33,19 +33,20 @@ def getbranchType() {
 def defineEnvironment() {
 
 	//createGlobalEnvironmentVariables('Var1','DummyValue')
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP','registry-tmp.misys.global.ad')
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY','registry.misys.global.ad')
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP_URL',"https://${DOCKER_REGISTRY_TMP}")
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY_URL',"https://${DOCKER_REGISTRY}")
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY_CREDENTIAL','mgr.jenkins')
-	createGlobalEnvironmentVariables('DOCKER_ORGANISATION','fusion-risk')
+	// if you have Failed to run image Error: docker: invalid reference format.: repository name must be lowercase
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP','registry-tmp.nabla.mobi').toLowerCase().trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY','registry.nabla.mobi').toLowerCase().trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP_URL',"https://${DOCKER_REGISTRY_TMP}").trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY_URL',"https://${DOCKER_REGISTRY}").trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY_CREDENTIAL','jenkins').trim()
+	createGlobalEnvironmentVariables('DOCKER_ORGANISATION','nabla').trim()
 
 	createGlobalEnvironmentVariables('COMPOSE_HTTP_TIMEOUT','200')
 
-	createGlobalEnvironmentVariables('SONAR_INSTANCE','sonardev')
-	createGlobalEnvironmentVariables('SONAR_SCANNER_OPTS','-Xmx2g')
-	createGlobalEnvironmentVariables('SONAR_USER_HOME',"$WORKSPACE")
-	createGlobalEnvironmentVariables('JENKINS_CREDENTIALS','jenkins-ssh') // "jenkins-https"
+	createGlobalEnvironmentVariables('SONAR_INSTANCE','sonar').trim()
+	createGlobalEnvironmentVariables('SONAR_SCANNER_OPTS','-Xmx2g').trim()
+	createGlobalEnvironmentVariables('SONAR_USER_HOME',"$WORKSPACE").trim()
+	createGlobalEnvironmentVariables('JENKINS_CREDENTIALS','jenkins-ssh').trim()
 
 	createGlobalEnvironmentVariables('CLEAN_RUN',false)
 	createGlobalEnvironmentVariables('DRY_RUN',false)

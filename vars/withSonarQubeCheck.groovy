@@ -12,10 +12,10 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar")
+    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins")
+    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins").trim()
 
     //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()

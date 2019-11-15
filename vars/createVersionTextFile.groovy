@@ -7,7 +7,7 @@ def call(def description="TEST", def filename="TEST_VERSION.TXT", def pomFile="p
     echo "[JPL] Executing `vars/createVersionTextFile.groovy`"
 
     this.vars = [:]
-    
+
     vars.pomFile = pomFile.trim()
     vars.releaseVersion = getReleasedVersion(vars) ?: releaseVersion.trim()
     vars.filename = filename.trim()

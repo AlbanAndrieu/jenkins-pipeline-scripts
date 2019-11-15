@@ -1,6 +1,8 @@
 #!/usr/bin/groovy
 import hudson.model.*
 
+@Deprecated
+// use instead withAquaWrapper
 def call(def DOCKER_IMAGE = "", def REPORT_NAME = "", def AQUA_VERSION = "latest") {
   def AQUA_IMAGE = "nabla/test/aquasec-scanner-cli:${AQUA_VERSION}"
   def AQUA_USER = '--user scanner'

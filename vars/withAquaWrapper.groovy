@@ -51,31 +51,38 @@ def call(Map vars, Closure body=null) {
 
   try {
     //tee("${vars.shellOutputFile}") {
-    
+
     //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
 
       try {
         sh "rm -f ${pwd()}/${AQUA_REPORT}* || true"
-	  
+
         vars.buildCmdParameters+=" && docker run"
         vars.buildCmdParameters+=" --rm"
         vars.buildCmdParameters+=" --volume '${pwd()}:/mnt'"
         vars.buildCmdParameters+=" --volume /var/run/docker.sock:/var/run/docker.sock"
         vars.buildCmdParameters+=" ${vars.scanner_image}"
-        vars.buildCmdParameters+=        " import"
+
+        vars.buildCmdParameters+=        " scan"
+        //vars.buildCmdParameters+=        " import"
+
         vars.buildCmdParameters+=        " --user '${ASLOGIN}'"
         vars.buildCmdParameters+=        " --password '${ASPASSWORD}'"
+
         vars.buildCmdParameters+=        " --host '${ASURI}'"
         vars.buildCmdParameters+=        " ${AQUA_OPTS} "
-        //vars.buildCmdParameters+=        " /mnt/${reportJsonPath}"
-	  
-        //buildCmdParameters+ = " && docker run --rm --volume ${pwd()}:/mnt --volume /var/run/docker.sock:/var/run/docker.sock ${scanner_image} scan --user ${ASLOGIN} --password ${ASPASSWORD} --host ${ASURI} ${AQUA_OPTS} ${vars.imageName} > /dev/null"
-        //buildCmdParameters+ = " && docker run --rm --volume ${pwd()}:/ws --workdir /ws --volume /etc/passwd:/etc/passwd --volume /etc/group:/etc/group ubuntu chown -R \$(id -u):\$(id -g) ."
-	  
+        ////vars.buildCmdParameters+=        " /mnt/${reportJsonPath}"
+        vars.buildCmdParameters+=        " ${vars.imageName} > /dev/null"
+
+        //vars.buildCmdParameters+ = " && docker run --rm --volume ${pwd()}:/mnt --volume /var/run/docker.sock:/var/run/docker.sock ${vars.scanner_image} "
+        //vars.buildCmdParameters+ = " scan --user ${ASLOGIN} --password ${ASPASSWORD} --host ${ASURI} ${AQUA_OPTS} ${vars.imageName} > /dev/null"
+
+        vars.buildCmdParameters += " && docker run --rm --volume ${pwd()}:/ws --workdir /ws --volume /etc/passwd:/etc/passwd --volume /etc/group:/etc/group ubuntu chown -R \$(id -u):\$(id -g) ."
+
         if (vars.buildCmdParameters?.trim()) {
             vars.buildCmd += " ${vars.buildCmdParameters}"
         }
-        
+
         // TODO Remove it when tee will be back
         vars.buildCmd += " 2>&1 > ${vars.shellOutputFile} "
         //vars.buildCmd +=        " > /dev/null"
@@ -96,13 +103,13 @@ def call(Map vars, Closure body=null) {
             }
         }
         if (body) { body() }
-	  
+
       } catch (exc) {
         echo "Warn: There was a problem with aqua scan image \'${vars.imageName}\' " + exc.toString()
       }
-    
+
     //}  // withRegistry
-    
+
     if (fileExists("${pwd()}/${AQUA_REPORT}")) {
       publishHTML([
         allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: '',

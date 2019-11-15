@@ -1,8 +1,10 @@
 #!/usr/bin/groovy
 import hudson.model.*
 
-def call(def DOCKER_IMAGE = "", def CONFIG_FILE = "config.yaml" ) {
-  def CST_IMAGE = "gcr.io/gcp-runtimes/container-structure-test:1.5.0"
+@Deprecated
+// use instead withCSTWrapper
+def call(def DOCKER_IMAGE = "", def CONFIG_FILE = "config.yaml", def CST_VERSION = "1.5.0") {
+  def CST_IMAGE = "gcr.io/gcp-runtimes/container-structure-test:${CST_VERSION}"
   try {
     sh "docker pull ${CST_IMAGE}"
     sh "docker run --rm --volume ${pwd()}:/data --volume /var/run/docker.sock:/var/run/docker.sock ${CST_IMAGE} test --image ${DOCKER_IMAGE} --config /data/${CONFIG_FILE}"

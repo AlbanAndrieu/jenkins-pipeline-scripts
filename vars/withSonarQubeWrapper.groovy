@@ -13,16 +13,17 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar")
+    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
     def SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-4.2").trim()
-    def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
+    def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
-    def STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", "jenkins")
+    def STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", "jenkins").trim()
 
     //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
     def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
+    def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
 
     vars.propertiesPath = vars.get("propertiesPath", "sonar-project.properties")
     vars.bwoutputs = vars.get("bwoutputs", "").trim()
@@ -30,6 +31,7 @@ def call(Map vars, Closure body=null) {
     vars.verbose = vars.get("verbose", false).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
     vars.project = vars.get("project", "NABLA").trim()
+    vars.projectVersion = vars.get("projectVersion", "")
     vars.repository = vars.get("repository", "").trim()
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
     vars.skipUnstable = vars.get("skipUnstable", false).toBoolean()
@@ -69,6 +71,16 @@ def call(Map vars, Closure body=null) {
                 }
 
                 vars.buildCmdParameters += " -Dproject.settings=" + vars.propertiesPath
+
+                if (!RELEASE_VERSION) {
+                    echo 'No RELEASE_VERSION specified'
+                    RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "LATEST"
+                    vars.projectVersion = "${RELEASE_VERSION}"
+                }
+
+                if (vars.projectVersion?.trim()) {
+                    vars.buildCmdParameters += " -Dsonar.projectVersion=${vars.projectVersion} "
+                }
 
                 if (vars.verbose) {
                     vars.buildCmdParameters += " -X -Dsonar.verbose=true "

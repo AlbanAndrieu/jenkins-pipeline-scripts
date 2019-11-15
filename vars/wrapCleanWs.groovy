@@ -22,11 +22,14 @@ def call(Map vars, Closure body=null) {
 
             if (body) { body() }
 
+            cleanStash(vars)
+                
             if (!DEBUG_RUN && vars.isCleaningEnabled) {
                 cleanWs(disableDeferredWipeout: true, deleteDirs: true)
             } else {
                 echo "Hi from wrapCleanWs"
             }
+
             if (!DRY_RUN && !DEBUG_RUN && vars.isEmailEnabled) {
                 standardNotify { }
             }

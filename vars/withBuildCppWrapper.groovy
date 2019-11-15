@@ -23,6 +23,8 @@ def call(Map vars, Closure body=null) {
                    '*.tar.gz',
                    '*.tgz',
                    ].join(', '))
+    def excludes = vars.get("excludes", ['Latest*.tar.gz'
+                   ].join(', '))                   
 
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
@@ -53,6 +55,7 @@ def call(Map vars, Closure body=null) {
 			    	SCONS_OPTS += "--cache-disable"
 			    	sh "rm -Rf ./bw-outputs || true"
 			    	sh "rm -Rf ../bw-outputs || true"
+			    	sh "rm -f *_VERSION.TXT"
 			    }
 			    
 			    if (DEBUG_RUN) {
@@ -83,8 +86,8 @@ def call(Map vars, Closure body=null) {
 		//runHtmlPublishers(["WarningsPublisher"])
 		
 		artifacts += ", bw-outputs/build-wrapper.log, *.log"
-		echo "archiveArtifacts: "
-		archiveArtifacts artifacts: "${artifacts}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+		echo "archiveArtifacts: ${artifacts} - ${excludes}"
+		archiveArtifacts artifacts: "${artifacts}", excludes: "${excludes}", fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 
 		if (vars.isStashSconEnabled) {
 		   stash includes: "${artifacts}", name: 'scons-artifacts-' + arch

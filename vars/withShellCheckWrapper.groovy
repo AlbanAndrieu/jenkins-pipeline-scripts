@@ -16,6 +16,9 @@ def call(Map vars, Closure body=null) {
     vars.shellcheckCmdParameters = vars.get("shellcheckCmdParameters", "")
     vars.shellOutputFile = vars.get("shellOutputFile", "shellcheck.log").trim()
 
+    vars.isFailReturnCode = vars.get("isFailReturnCode", 255)
+    vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 1)
+    
     tee("${vars.shellOutputFile}") {
 
         shellcheckExitCode = sh(
@@ -24,13 +27,21 @@ def call(Map vars, Closure body=null) {
             returnStatus: true
         )
 
-        echo "SHELL CHECK RETURN CODE : ${shellcheckExitCode}"
-        if (vars.shellcheckExitCode == 0) {
-            echo "SHELL CHECK SUCCESS"
-        //} else {
-        //    echo "SHELL CHECK UNSTABLE"
-        //    currentBuild.result = 'UNSTABLE'
-        }
+        echo "SHELLCHECK RETURN CODE : ${shellcheckExitCode}"
+        if (shellcheckExitCode == 0) {
+            echo "SHELLCHECK SUCCESS"
+        } else if (shellcheckExitCode == vars.isFailReturnCode) {         
+           echo "SHELLCHECK FAILURE"
+           currentBuild.result = 'FAILURE'
+           error 'There are errors in shellcheck'
+		} else if (shellcheckExitCode <= vars.isUnstableReturnCode) {
+			echo "SHELLCHECK UNSTABLE"
+			currentBuild.result = 'UNSTABLE'
+		} else {
+			echo "SHELLCHECK FAILURE"
+			//currentBuild.result = 'FAILURE'
+			error 'There are other errors'
+		}
 
     } // tee
 

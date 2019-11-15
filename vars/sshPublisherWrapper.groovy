@@ -14,23 +14,23 @@ def call(Map vars, Closure body=null) {
 
     def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
-    vars.excludes = vars.get("excludes", "**/*Debug*.tar.gz")
-    vars.remoteDirectory = vars.get("remoteDirectory", "TEST/LatestBuildsUntested/latest")
+    vars.excludes = vars.get("excludes", "**/*Debug*.tar.gz").trim()
+    vars.remoteDirectory = vars.get("remoteDirectory", "TEST/LatestBuildsUntested/latest").trim()
     vars.alwaysPublishFromMaster = vars.get("alwaysPublishFromMaster", false).toBoolean()
     vars.continueOnError = vars.get("continueOnError", true).toBoolean()
     vars.cleanRemote = vars.get("cleanRemote", false).toBoolean()
     vars.flatten = vars.get("flatten", true).toBoolean()
     vars.verbose = vars.get("verbose", true).toBoolean()
-    vars.sourceFiles = vars.get("sourceFiles", "**/Latest-*.tar.gz,**/TEST-*.tar.gz,*_VERSION.TXT")
+    vars.sourceFiles = vars.get("sourceFiles", "**/Latest-*.tar.gz,**/TEST-*.tar.gz,*_VERSION.TXT").trim()
 
     if ( isReleaseBranch() ) {
         if (DEBUG_RUN) {
             echo 'Publish artifacts'
         }
 
-        if ( BRANCH_NAME ==~ /develop/ ) {
-          vars.cleanRemote = true
-        }
+        //if ( BRANCH_NAME ==~ /develop/ ) {
+        //  vars.cleanRemote = true
+        //}
 
         if (body) { body() }
 

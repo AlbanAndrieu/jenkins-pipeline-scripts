@@ -33,8 +33,8 @@ def call(String shell) {
 				]) {
 
 					build = sh (
-					script: shell,
-					returnStatus: true
+					    script: shell,
+					    returnStatus: true
 					)
 
 					echo "BUILD RETURN CODE : ${build}"

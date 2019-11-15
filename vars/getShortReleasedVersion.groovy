@@ -11,13 +11,19 @@ def call(Map vars, Closure body=null) {
     echo "[JPL] Executing `vars/getShortReleasedVersion.groovy`"
 
     vars = vars ?: [:]
+    
+    String RELEASE_VERSION_SHORT = "LATEST"
 
     tokens = getReleasedVersion(vars).tokenize('.')
-    MAJOR = tokens[tokens.size()-4] // MAJOR
-    MINOR = tokens[tokens.size()-3] // MINOR
-    RELEASE_VERSION_SHORT = MAJOR + "." + MINOR
-    PATCH = tokens[tokens.size()-2]
-    CUT = tokens[tokens.size()-1]
-    echo "MAJOR: ${MAJOR} - MINOR : ${MINOR} - SHORT : ${RELEASE_VERSION_SHORT} - PATCH : ${PATCH} - CUT - ${CUT}"
-    return "${RELEASE_VERSION_SHORT}"
+    
+    if (tokens.size() >= 4) {
+        MAJOR = tokens[0] // MAJOR
+        MINOR = tokens[1] // MINOR
+        RELEASE_VERSION_SHORT = MAJOR + "." + MINOR
+        PATCH = tokens[2]
+        CUT = tokens[3]
+        echo "MAJOR: ${MAJOR} - MINOR : ${MINOR} - SHORT : ${RELEASE_VERSION_SHORT} - PATCH : ${PATCH} - CUT - ${CUT}"
+    }
+    
+    return "${RELEASE_VERSION_SHORT}".trim()
 }

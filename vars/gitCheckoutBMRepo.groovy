@@ -29,6 +29,8 @@ def call(Map vars, Closure body=null) {
     //vars.noTags = vars.get("noTags", false).toBoolean()
 
     vars.GIT_BRANCH_NAME_BUILDMASTER = vars.get("GIT_BRANCH_NAME_BUILDMASTER", "develop")
+    
+    echo "GIT_URL : ${GIT_URL}"
 
     checkout([
         $class: 'GitSCM',
