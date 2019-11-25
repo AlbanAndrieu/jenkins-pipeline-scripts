@@ -29,10 +29,10 @@ def call(Map vars, Closure body=null) {
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
     //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
     def MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexus").trim()
-    def MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus")
-    def MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2") // maven-latest
-    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins") 
-    def JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8") // java-latest
+    def MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim() 
+    def MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2").trim()  // maven-latest
+    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim() 
+    def JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8").trim()  // java-latest
 
     if (DEBUG_RUN) {
          echo "debug added"
@@ -47,7 +47,7 @@ def call(Map vars, Closure body=null) {
 
     echo "Maven OPTS have been specified: ${MAVEN_OPTS} - ${CLEAN_RUN}/${DRY_RUN}/${DEBUG_RUN} - ${SONAR_INSTANCE}"
 
-    vars.goal = vars.get("goal", "install")
+    vars.goal = vars.get("goal", "install").trim()
     vars.profile = vars.get("profile", "sonar").trim()
     vars.skipTests = vars.get("skipTests", false).toBoolean()
     vars.skipResults = vars.get("skipResults", false).toBoolean()

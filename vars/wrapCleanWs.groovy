@@ -23,6 +23,7 @@ def call(Map vars, Closure body=null) {
             if (body) { body() }
 
             cleanStash(vars)
+            cleanCaches(vars)
                 
             if (!DEBUG_RUN && vars.isCleaningEnabled) {
                 cleanWs(disableDeferredWipeout: true, deleteDirs: true)

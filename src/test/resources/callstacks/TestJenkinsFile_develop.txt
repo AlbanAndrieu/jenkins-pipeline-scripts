@@ -83,8 +83,6 @@
                   Jenkinsfile.docker(groovy.lang.Closure)
                      Jenkinsfile.image(hub.docker.com/nabla/ansible-jenkins-slave-docker:latest)
                      Jenkinsfile.reuseNode(true)
-                     Jenkinsfile.registryUrl(https://hub.docker.com)
-                     Jenkinsfile.registryCredentialsId(nabla)
                      Jenkinsfile.args(-v /home/jenkins:/home/jenkins -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /var/run/docker.sock:/var/run/docker.sock)
                      Jenkinsfile.label(docker-inside)
                Jenkinsfile.steps(groovy.lang.Closure)

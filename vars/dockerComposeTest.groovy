@@ -19,9 +19,9 @@ def call(Map vars, Closure body=null) {
     //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nala.mobi")
-    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
-    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins")
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nala.mobi").toLowerCase().trim()
+    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
+    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
     
     vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp").trim()
     vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG).trim()
@@ -33,6 +33,7 @@ def call(Map vars, Closure body=null) {
     vars.dockerDownFile = vars.get("dockerDownFile", "${vars.dockerFilePath}docker-compose-down.sh").trim()
     vars.dockerUpFile = vars.get("dockerUpFile", "${vars.dockerFilePath}docker-compose-up.sh 2>&1 > docker-compose-up.log").trim()
 
+    vars.isSuccessReturnCode = vars.get("isSuccessReturnCode", 0)
     vars.isFailReturnCode = vars.get("isFailReturnCode", 1)
     vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 250)
 
@@ -59,7 +60,7 @@ def call(Map vars, Closure body=null) {
                     if (!DRY_RUN) {
                         def up = sh script: "${vars.dockerUpFile}", returnStatus: true
                         echo "UP RETURN CODE : ${up}"
-                        if (up == 0) {
+                        if (up == vars.isSuccessReturnCode) {
                             echo "TEST SUCCESS"
                         } else if (up == vars.isFailReturnCode) {
                             echo "TEST FAILURE"

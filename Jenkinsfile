@@ -12,7 +12,7 @@ def DOCKER_REGISTRY_CREDENTIAL='nabla'
 def DOCKER_IMAGE="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}"
 
 def DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: true)
-                            
+
 def branchName = env.BRANCH_NAME
 
 pipeline {
@@ -58,10 +58,10 @@ pipeline {
       }
       steps {
         script {
-		  if (env.CLEAN_RUN == true) {
-		    cleanWs(isEmailEnabled: false, disableDeferredWipeout: true, deleteDirs: true)                   
-		  }        
-                                    
+	  if (env.CLEAN_RUN == true) {
+	    cleanWs(isEmailEnabled: false, disableDeferredWipeout: true, deleteDirs: true)
+	  }
+
           def myenv = load "src/test/jenkins/lib/myenv.groovy"
           properties(myenv.getPropertyList())
 
@@ -187,20 +187,18 @@ pipeline {
             docker {
                 image DOCKER_IMAGE
                 reuseNode true
-                registryUrl DOCKER_REGISTRY_URL
-                registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
                 args DOCKER_OPTS_COMPOSE
                 label 'docker-inside'
             }
         }
         steps {
             script {
-				withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx',
-					preset: '1',
-					groupId: '1234',
-					lowThreshold: 10,
-					mediumThreshold: 0,
-					highThreshold: 0)
+		withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx',
+			preset: '1',
+			groupId: '1234',
+			lowThreshold: 10,
+			mediumThreshold: 0,
+			highThreshold: 0)
             } // script
         } // steps
     } // stage Security

@@ -19,7 +19,7 @@ def call(Map vars, Closure body=null) {
   def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
   def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-  def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").trim()
+  def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").toLowerCase().trim()
   def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
   def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
     
@@ -29,8 +29,8 @@ def call(Map vars, Closure body=null) {
   //def AQUA_PASS = vars.get("AQUA_PASS", env.AQUA_PASS ?: '--password password').trim()
   def ASPASSWORD = vars.get("ASPASSWORD", env.ASPASSWORD ?: 'password').trim()
 
-  //def AQUA_HOST = vars.get("AQUA_HOST", env.AQUA_HOST ?: '--host http://albandri:8080').trim()
-  def ASURI = vars.get("ASURI", env.ASURI ?: 'http://albandri:8080').trim()
+  //def AQUA_HOST = vars.get("AQUA_HOST", env.AQUA_HOST ?: '--host http://aqua:8080').trim()
+  def ASURI = vars.get("ASURI", env.ASURI ?: 'http://aqua:8080').trim()
 
   def AQUA_REPORT = vars.get("AQUA_REPORT", env.AQUA_REPORT ?: 'aqua.html').trim()
 
@@ -41,6 +41,8 @@ def call(Map vars, Closure body=null) {
     "--htmlfile /mnt/${AQUA_REPORT}"
   ].join(" ")
 
+  // docker login registry.aquasec.com
+  // docker pull registry.aquasec.com/scanner:4.2
   vars.scanner_image = vars.get("scanner_image", "${DOCKER_REGISTRY}/nabla/aquasec-scanner-cli:${AQUA_VERSION}").trim()
   vars.imageName = vars.get("imageName", "").trim()
   vars.reportName = vars.get("reportName", "").trim()
@@ -105,7 +107,8 @@ def call(Map vars, Closure body=null) {
         if (body) { body() }
 
       } catch (exc) {
-        echo "Warn: There was a problem with aqua scan image \'${vars.imageName}\' " + exc.toString()
+        currentBuild.result = 'FAILURE'
+        error "There was a problem with aqua scan image \'${vars.imageName}\' " + exc.toString()        
       }
 
     //}  // withRegistry
@@ -121,7 +124,7 @@ def call(Map vars, Closure body=null) {
 
     //} // tee
   } finally {
-    archiveArtifacts artifacts: "*.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+    archiveArtifacts artifacts: "*.log, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
   }
 
 }

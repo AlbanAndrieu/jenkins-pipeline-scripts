@@ -12,23 +12,26 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
+    def SHELLCHECK_OPTS = vars.get("SHELLCHECK_OPTS", env.SHELLCHECK_OPTS ?: "-e SC2154 -e SC2086").trim()
+
     vars.pattern = vars.get("pattern", "*.sh")
     vars.shellcheckCmdParameters = vars.get("shellcheckCmdParameters", "")
     vars.shellOutputFile = vars.get("shellOutputFile", "shellcheck.log").trim()
 
+    vars.isSuccessReturnCode = vars.get("isSuccessReturnCode", 0)
     vars.isFailReturnCode = vars.get("isFailReturnCode", 255)
     vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 1)
     
     tee("${vars.shellOutputFile}") {
 
         shellcheckExitCode = sh(
-            script: "shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml",
+            script: "export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\" && shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml",
             returnStdout: true,
             returnStatus: true
         )
 
         echo "SHELLCHECK RETURN CODE : ${shellcheckExitCode}"
-        if (shellcheckExitCode == 0) {
+        if (shellcheckExitCode == vars.isSuccessReturnCode) {
             echo "SHELLCHECK SUCCESS"
         } else if (shellcheckExitCode == vars.isFailReturnCode) {         
            echo "SHELLCHECK FAILURE"

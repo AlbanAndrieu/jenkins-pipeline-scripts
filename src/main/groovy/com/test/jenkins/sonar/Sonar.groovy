@@ -107,7 +107,7 @@ class Sonar implements Serializable {
 		def sonarCmdParameters = vars.get("sonarCmdParameters", "")
 		//vars.project = vars.get("project", "RISK")
 
-		def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${WORKSPACE}/${filename}" }.join(",")
+		def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${filename}" }.join(",")
 
 		if (body) { body() }
 

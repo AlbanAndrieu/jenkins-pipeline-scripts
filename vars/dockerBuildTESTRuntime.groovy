@@ -19,12 +19,12 @@ def call(Map vars, Closure body=null) {
     //def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-    vars.skipPush = vars.get("skipPush", true).toBoolean()
+    vars.isPushEnabled = vars.get("isPushEnabled", false).toBoolean()
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
 
-    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").trim()
-    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}")
-    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins")
+    def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").toLowerCase().trim()
+    def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
+    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins").trim()
     def DOCKER_ORGANISATION = vars.get("DOCKER_ORGANISATION", env.DOCKER_ORGANISATION ?: "nabla").trim()
 
     def DOCKER_TAG = vars.get("DOCKER_TEST_RUNTIME_TAG", env.DOCKER_TEST_RUNTIME_TAG ?: "temp")
@@ -70,12 +70,10 @@ def call(Map vars, Closure body=null) {
                 body()
             }
 
-            if (!DRY_RUN && !vars.skipPush) {
+            if ((!DRY_RUN && isReleaseBranch()) && vars.isPushEnabled ) {
+                echo "Push the container to the custom Registry : ${DOCKER_RUNTIME_IMG}"
                 //container.push("${env.BUILD_NUMBER}")
-                if ( BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
-                    echo "Push the container to the custom Registry : ${DOCKER_RUNTIME_IMG}"
-                    container.push()
-                } // if
+                container.push()
             }
         //} // withRegistry
 

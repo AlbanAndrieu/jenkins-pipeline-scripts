@@ -23,7 +23,7 @@ def call(Map vars, Closure body=null) {
   def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
   def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins").trim()
 
-  def CST_VERSION = vars.get("CST_VERSION", env.CST_VERSION ?: '1.0.5').trim()
+  def CST_VERSION = vars.get("CST_VERSION", env.CST_VERSION ?: 'latest').trim()
 
   vars.configFile = vars.get("configFile", env.configFile ?: 'config.yaml').trim()
   vars.scanner_image = vars.get("scanner_image", "gcr.io/gcp-runtimes/container-structure-test:${CST_VERSION}").trim()
@@ -77,7 +77,8 @@ def call(Map vars, Closure body=null) {
         if (body) { body() }
 
       } catch (exc) {
-        echo "Warn: There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
+        currentBuild.result = 'FAILURE'      
+        error "There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
       }
 
     //}  // withRegistry
