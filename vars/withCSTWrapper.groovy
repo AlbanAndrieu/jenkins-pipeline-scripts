@@ -12,17 +12,6 @@ def call(Map vars, Closure body=null) {
 
   vars = vars ?: [:]
 
-  def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-  def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-  def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-  def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-  def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
-  def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
-
-  def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.misys.global.ad").trim()
-  def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
-  def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "mgr.jenkins").trim()
-
   def CST_VERSION = vars.get("CST_VERSION", env.CST_VERSION ?: 'latest').trim()
 
   vars.configFile = vars.get("configFile", env.configFile ?: 'config.yaml').trim()
@@ -32,11 +21,10 @@ def call(Map vars, Closure body=null) {
   vars.buildCmd = vars.get("buildCmd", "").trim()
   vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
   vars.shellOutputFile = vars.get("shellOutputFile", "cst.log").trim()
-
+  vars.skipFailure = vars.get("skipFailure", false).toBoolean()
+  
   try {
     //tee("${vars.shellOutputFile}") {
-
-    //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
 
       try {
 
@@ -68,9 +56,11 @@ def call(Map vars, Closure body=null) {
         if (build == 0) {
             echo "CST SUCCESS"
         } else {
-            echo "CST FAILURE"
             if (!vars.skipFailure) {
-                currentBuild.result = 'UNSTABLE'
+                echo "CST UNSTABLE"
+                currentBuild.result = 'UNSTABLE'                
+            } else {
+                echo "CST FAILURE skipped"
                 //error 'There are errors in cst'
             }
         }
@@ -80,9 +70,6 @@ def call(Map vars, Closure body=null) {
         currentBuild.result = 'FAILURE'      
         error "There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
       }
-
-    //}  // withRegistry
-
 
     //} // tee
   } finally {

@@ -1,11 +1,12 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v1.3.0
+    rev: v2.1.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
     -   id: autopep8-wrapper
     -   id: check-added-large-files
+        args: ['--maxkb=123']
     -   id: check-case-conflict
     -   id: check-docstring-first
     -   id: check-executables-have-shebangs

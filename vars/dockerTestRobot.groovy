@@ -35,7 +35,9 @@ def call(Map vars, Closure body=null) {
     vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "-p ${vars.DOCKER_TEST_TAG}").trim()
 
     vars.ADDITIONAL_ROBOT_OPTS = vars.get("ADDITIONAL_ROBOT_OPTS", env.ADDITIONAL_ROBOT_OPTS ?: "-s PipelineTests.TEST -e disabled").trim()
-    vars.ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "./robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}").trim()
+    vars.containerName = vars.get("containerName", "robot").trim()
+    vars.dockerResultPath = vars.get("dockerResultPath", "./${vars.containerName}-${env.GIT_COMMIT}-${env.BUILD_NUMBER}").trim()
+    //vars.ROBOT_RESULTS_PATH = vars.get("ROBOT_RESULTS_PATH", env.ROBOT_RESULTS_PATH ?: "./robot-${env.GIT_COMMIT}-${env.BUILD_NUMBER}").trim()
 
     vars.dockerFilePath = vars.get("dockerFilePath", "./docker/centos7/run/").trim()
     vars.allowEmptyResults = vars.get("allowEmptyResults", false).toBoolean()
@@ -62,19 +64,9 @@ def call(Map vars, Closure body=null) {
                         dockerComposeTest(vars) {
 
                             try {
-
-                                def containerId = getContainerId(vars)
-
-                                if (containerId?.trim()) {
-                                    sh """
-                                        docker cp ${containerId}:${vars.ROBOT_RESULTS_PATH} result || true
-                                    """
-                                } else {
-                                    sh """
-                                        docker cp frrobot:${vars.ROBOT_RESULTS_PATH} result || true # OLD way when container name is hard coded in docker-compose. To be removed after full migration
-                                    """
-                                }
-
+                            
+                                getContainerResults(vars)
+                                
 							    if (!vars.allowEmptyResults) {
                                     runHtmlPublishers(["RobotPublisher": [outputPath: "result"]])
                                 }
@@ -98,7 +90,7 @@ def call(Map vars, Closure body=null) {
             } catch(e) {
                 echo 'There are errors in dockerTestRobot'
             } finally {
-                archiveArtifacts artifacts: "${vars.ROBOT_RESULTS_PATH}/**/*.log, *.log, result/**/*", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.dockerResultPath}/**/*.log, *.log, result/**/*", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
             } // finally
 
         }  // DRY_RUN

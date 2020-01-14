@@ -16,10 +16,6 @@ def call(Map vars, Closure body=null) {
   def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
   def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
-  //def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nala.mobi").toLowerCase().trim()
-  //def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
-  //def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
-
   def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins/").trim()
 
   vars.isVirtualHost = vars.get("isVirtualHost", false).toBoolean()
@@ -43,8 +39,10 @@ def call(Map vars, Closure body=null) {
   vars.isEntrypoint = vars.get("isEntrypoint", true).toBoolean()
 
   String DOCKER_OPTS_USER_ID = [
-      '-v /etc/passwd:/etc/passwd:ro',
-      '-v /etc/group:/etc/group:ro',
+     '-v /etc/passwd:/etc/passwd:ro',
+     '-v /etc/group:/etc/group:ro',
+     '--group-add 2000',
+     '--group-add 1101',
   ].join(" ")
 
   String DOCKER_OPTS_BASIC = DOCKER_OPTS_USER_ID
@@ -80,8 +78,8 @@ def call(Map vars, Closure body=null) {
           "-v ${JENKINS_USER_HOME}:/home/jenkins"
       ].join(" ")
   } else if (vars.isLocalMavenRepository == true) {
-	  // Only mounting maven repository
-	  DOCKER_OPTS_BASIC += " -v ${vars.mavenHome}:/home/jenkins/.m2:ro"
+      // Only mounting maven repository
+      DOCKER_OPTS_BASIC += " -v ${vars.mavenHome}:/home/jenkins/.m2:ro"
   }
 
   // On Virtual host or bare metal hardware we can use local settings

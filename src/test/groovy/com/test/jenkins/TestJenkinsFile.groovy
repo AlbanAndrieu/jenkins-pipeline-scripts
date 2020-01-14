@@ -127,7 +127,10 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("wrapCleanWs", [], null)
 		helper.registerAllowedMethod("wrapCleanWs", [Map.class], null)
 		helper.registerAllowedMethod("wrapCleanWs", [Map.class, Closure.class], null)
-		
+		helper.registerAllowedMethod("wrapCleanWsOnNode", [], null)
+		helper.registerAllowedMethod("wrapCleanWsOnNode", [Map.class], null)
+		helper.registerAllowedMethod("wrapCleanWsOnNode", [Map.class, Closure.class], null)
+				
 		helper.registerAllowedMethod("getDockerOpts", [], null)
 		helper.registerAllowedMethod("getDockerOpts", [Map.class], {c ->"-v /home/jenkins:/home/jenkins -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /var/run/docker.sock:/var/run/docker.sock"})
 		

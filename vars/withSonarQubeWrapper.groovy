@@ -16,8 +16,8 @@ def call(Map vars, Closure body=null) {
     def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
     def SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-4.2").trim()
     def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
-    //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
-    def STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", "jenkins").trim()
+    //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE").trim()
+    def STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", env.STASH_CREDENTIALS ?: "jenkins").trim()
 
     //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
@@ -36,10 +36,11 @@ def call(Map vars, Closure body=null) {
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
     vars.skipUnstable = vars.get("skipUnstable", false).toBoolean()
     vars.skipInclusion = vars.get("skipInclusion", false).toBoolean()
+    vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.targetBranch = vars.get("targetBranch", "develop").trim()
-    def scannerHome = tool name: "${SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     vars.isScannerHome = vars.get("isScannerHome", true).toBoolean()
     if (vars.isScannerHome == true) {
+        def scannerHome = tool name: "${SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
         vars.sonarExecutable = vars.get("sonarExecutable", "${scannerHome}/bin/sonar-scanner")
     } else {
         // docker
@@ -154,6 +155,10 @@ def call(Map vars, Closure body=null) {
                     }
 
                 } // withSonarQubeEnv
+                
+                if (!vars.skipSonarCheck) {               
+                    withSonarQubeCheck(vars)
+                }
 
                 archiveArtifacts artifacts: "${vars.shellOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 

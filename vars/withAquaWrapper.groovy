@@ -50,6 +50,7 @@ def call(Map vars, Closure body=null) {
   vars.buildCmd = vars.get("buildCmd", "").trim()
   vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
   vars.shellOutputFile = vars.get("shellOutputFile", "aqua.log").trim()
+  vars.skipFailure = vars.get("skipFailure", false).toBoolean()
 
   try {
     //tee("${vars.shellOutputFile}") {
@@ -97,10 +98,12 @@ def call(Map vars, Closure body=null) {
         echo "AQUA RETURN CODE : ${build}"
         if (build == 0) {
             echo "AQUA SUCCESS"
-        } else {
-            echo "AQUA FAILURE"
+        } else {            
             if (!vars.skipFailure) {
-                currentBuild.result = 'UNSTABLE'
+                echo "AQUA UNSTABLE"
+                currentBuild.result = 'UNSTABLE'                
+            } else {
+                echo "AQUA FAILURE skipped"
                 //error 'There are errors in aqua'
             }
         }

@@ -43,8 +43,6 @@ def call() {
       } catch(NullPointerException e) {
           // happens the first time if there is no branch at all
           echo 'Error: There were errors in abortPreviousRunningBuilds. '+e.toString()
-      } finally {
-          // carry on as if nothing went wrong
       }
 
   } // isReleaseBranch

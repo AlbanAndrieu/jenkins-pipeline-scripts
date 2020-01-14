@@ -2,21 +2,32 @@
 @Library('jenkins-pipeline-scripts')
 import com.test.jenkins.*
 
-def DOCKER_REGISTRY="hub.docker.com"
-def DOCKER_ORGANISATION="nabla"
-def DOCKER_TAG="latest"
-def DOCKER_NAME="ansible-jenkins-slave-docker"
+String DOCKER_REGISTRY="hub.docker.com".trim()
+String DOCKER_ORGANISATION="nabla".trim()
+String DOCKER_TAG="latest".trim()
+String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
 
-def DOCKER_REGISTRY_URL="https://${DOCKER_REGISTRY}"
-def DOCKER_REGISTRY_CREDENTIAL='nabla'
-def DOCKER_IMAGE="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}"
+String DOCKER_REGISTRY_URL="https://${DOCKER_REGISTRY}".trim()
+String DOCKER_REGISTRY_CREDENTIAL=env.DOCKER_REGISTRY_CREDENTIAL ?: "nabla".trim()
+String DOCKER_IMAGE="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}".trim()
 
 def DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: true)
 
 def branchName = env.BRANCH_NAME
 
 pipeline {
-  agent none
+  //agent none
+  agent {
+    docker {
+      image DOCKER_IMAGE
+      alwaysPull true
+      reuseNode true
+      registryUrl DOCKER_REGISTRY_URL
+      registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
+      args DOCKER_OPTS_COMPOSE
+      label 'docker-compose||docker32G'
+    }
+  }
   parameters {
     booleanParam(defaultValue: false, description: 'Dry run', name: 'DRY_RUN')
     booleanParam(defaultValue: false, description: 'Clean before run', name: 'CLEAN_RUN')
@@ -24,7 +35,7 @@ pipeline {
     booleanParam(defaultValue: false, description: 'Debug mvnw', name: 'MVNW_VERBOSE')
     booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")
     string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
-    string(defaultValue: "", name: "RELEASE_VERSION", description: "Release version for artifacts")
+    string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
   }
   environment {
     DRY_RUN = "${params.DRY_RUN}".toBoolean()
@@ -45,17 +56,6 @@ pipeline {
   }
   stages {
     stage('Setup') {
-      agent {
-        docker {
-          image DOCKER_IMAGE
-          alwaysPull true
-          reuseNode true
-          registryUrl DOCKER_REGISTRY_URL
-          registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
-          args DOCKER_OPTS_COMPOSE
-          label 'docker-compose'
-        }
-      }
       steps {
         script {
 	  if (env.CLEAN_RUN == true) {
@@ -78,17 +78,6 @@ pipeline {
       }
     } // stage setup
     stage('\u27A1 Build - Maven') {
-      agent {
-        docker {
-          image DOCKER_IMAGE
-          alwaysPull true
-          reuseNode true
-          registryUrl DOCKER_REGISTRY_URL
-          registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
-          args DOCKER_OPTS_COMPOSE
-          label 'docker-compose'
-        }
-      }
       steps {
         script {
 
@@ -124,15 +113,6 @@ pipeline {
       } // steps
     } // stage Maven
     stage('SonarQube analysis') {
-      agent {
-        docker {
-          image DOCKER_IMAGE
-          alwaysPull true
-          reuseNode true
-          args DOCKER_OPTS_COMPOSE
-          label 'docker-compose'
-        }
-      }
       environment {
         SONAR_USER_HOME = "$WORKSPACE"
       }
@@ -150,15 +130,6 @@ pipeline {
       } // steps
     } // stage SonarQube analysis
     stage('E2E tests') {
-      agent {
-        docker {
-          image DOCKER_IMAGE
-          alwaysPull true
-          reuseNode true
-          args DOCKER_OPTS_COMPOSE
-          label 'docker-compose'
-        }
-      }
       steps {
         script {
           try {
@@ -183,17 +154,9 @@ pipeline {
       } // steps
     } // stage SonarQube analysis
     stage('\u2795 Quality - Security - Checkmarx') {
-        agent {
-            docker {
-                image DOCKER_IMAGE
-                reuseNode true
-                args DOCKER_OPTS_COMPOSE
-                label 'docker-inside'
-            }
-        }
         steps {
             script {
-		withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts_Checkmarx',
+		withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts',
 			preset: '1',
 			groupId: '1234',
 			lowThreshold: 10,
@@ -210,7 +173,7 @@ pipeline {
       }
     } // always
     cleanup {
-      wrapCleanWs(isEmailEnabled: false)
+      wrapCleanWsOnNode(isEmailEnabled: false)
     } // cleanup
   } // post
 } // pipeline

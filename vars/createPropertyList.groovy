@@ -18,7 +18,7 @@ def call(Map vars, Closure body=null) {
     vars.cronString = vars.get("cronString", isReleaseBranch() ? 'H H(3-7) * * 1-5' : '').trim()
     vars.pollSCMString = vars.get("pollSCMString", isReleaseBranch() ? 'H H(3-7) * * 1-5' : 'H/10 * * * *').trim()
 
-    def triggers           = isReleaseBranch() ? [snapshotDependencies(), cron(vars.cronString)] : [cron(vars.cronString)]
+    def triggers = isReleaseBranch() ? [snapshotDependencies(), cron(vars.cronString)] : [cron(vars.cronString)]
 
     def propertyList = [
         buildDiscarder(

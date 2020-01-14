@@ -4,181 +4,186 @@ package com.test.jenkins.sonar
 
 import hudson.model.*
 import com.cloudbees.groovy.cps.NonCPS
+import static com.test.jenkins.Utils.callURL;
 
 class Sonar implements Serializable {
-	/**
-	 * get_project_name
-	 *
-	 * Defines separate behaviour for Jenkins `Multibranch Pipeline` and `Bitbucket Team Project`
-	 * returns project name from JOB_BASE_NAME
-	 *
-	 */
-	@NonCPS
-	static def get_project_name(jobName, defaultProject="RISK") {
-		def tokenized_job_name = jobName.split('/')
-		if (tokenized_job_name.size() == 2) {
-			return defaultProject  // e.g. CMR/develop, there is no good way to get Stash project name
-		} else {
-			return tokenized_job_name[0]
-		}
-	}
+    /**
+     * get_project_name
+     *
+     * Defines separate behaviour for Jenkins `Multibranch Pipeline` and `Bitbucket Team Project`
+     * returns project name from JOB_BASE_NAME
+     *
+     */
+    @NonCPS
+    static def get_project_name(jobName, defaultProject="RISK") {
+        def tokenized_job_name = jobName.split('/')
+        if (tokenized_job_name.size() == 2) {
+            return defaultProject  // e.g. CMR/develop, there is no good way to get Stash project name
+        } else {
+            return tokenized_job_name[0]
+        }
+    }
 
-	/**
-	 * get_repository_name
-	 *
-	 * Defines separate behaviour for Jenkins `Multibranch Pipeline` and `Bitbucket Team Project`
-	 * returns repository name from JOB_BASE_NAME
-	 *
-	 */
-	@NonCPS
-	static def get_repository_name(jobName) {
-		def tokenized_job_name = jobName.split('/')
-		if (tokenized_job_name.size() == 2) {
-			return tokenized_job_name[0]  // e.g. CMR/develop
-		} else {
-			return tokenized_job_name[1]  // e.g. RISK/generic_limits/develop
-		}
-	}
+    /**
+     * get_repository_name
+     *
+     * Defines separate behaviour for Jenkins `Multibranch Pipeline` and `Bitbucket Team Project`
+     * returns repository name from JOB_BASE_NAME
+     *
+     */
+    @NonCPS
+    static def get_repository_name(jobName) {
+        def tokenized_job_name = jobName.split('/')
+        if (tokenized_job_name.size() == 2) {
+            return tokenized_job_name[0]  // e.g. CMR/develop
+        } else {
+            return tokenized_job_name[1]  // e.g. RISK/generic_limits/develop
+        }
+    }
 
-	/**
-	 * diffCommitsForRev
-	 *
-	 * returns a list of commits between current and target branch revision. Target defaults to develop.
-	 */
-	@NonCPS
-	static def List<String> diffCommitsForRev(Map<String,String> config) {
-		try {
-			URLConnection filesForRevConn = new URL(
-					"${config.baseUrl}/rest/api/1.0/projects/${config.project}/repos/${config.repository}/commits?since=${config.targetRevision}&until=${config.currentRevision}&limit=${config.commitCap}"
-					).openConnection()
+    /**
+     * diffCommitsForRev
+     *
+     * returns a list of commits between current and target branch revision. Target defaults to develop.
+     */
+    @NonCPS
+    static def List<String> diffCommitsForRev(Map<String,String> config) {
+        try {
+            URLConnection filesForRevConn = new URL(
+                    "${config.baseUrl}/rest/api/1.0/projects/${config.project}/repos/${config.repository}/commits?since=${config.targetRevision}&until=${config.currentRevision}&limit=${config.commitCap}"
+                    ).openConnection()
 
-			filesForRevConn.setRequestProperty("Authorization", "Basic ${config.basicAuth}")
+            filesForRevConn.setRequestProperty("Authorization", "Basic ${config.basicAuth}")
 
-			def filesForRev = new groovy.json.JsonSlurper().parse(new BufferedReader(new InputStreamReader(filesForRevConn.getInputStream())))
+            def filesForRev = new groovy.json.JsonSlurper().parse(new BufferedReader(new InputStreamReader(filesForRevConn.getInputStream())))
 
-			List<String> diffRevisions = filesForRev.values.collect {
-				it.id
-			}
+            List<String> diffRevisions = filesForRev.values.collect {
+                it.id
+            }
 
-			diffRevisions
+            diffRevisions
 
-		}
-		catch(exc) {
-			echo 'Error: There were errors to connecting to sonar. '+exc.toString() // but we do not fail the whole build because of that
-		}
-	}
+        }
+        catch(exc) {
+            echo 'Error: There were errors to connecting to sonar. '+exc.toString() // but we do not fail the whole build because of that
+        }
+    }
 
-	/**
-	 * filesForRev
-	 *
-	 * returns a list of commits between current and target branch revision. Target defaults to develop.
-	 */
-	@NonCPS
-	static def List<String> filesForRev(Map<String,String> config, String revision) {
-		try {
-		URLConnection filesForRevConn = new URL(
-				"${config.baseUrl}/rest/api/1.0/projects/${config.project}/repos/${config.repository}/commits/${revision}/changes?limit=${config.fileCap}"
-				).openConnection()
+    /**
+     * filesForRev
+     *
+     * returns a list of commits between current and target branch revision. Target defaults to develop.
+     */
+    @NonCPS
+    static def List<String> filesForRev(Map<String,String> config, String revision) {
+        try {
+        URLConnection filesForRevConn = new URL(
+                "${config.baseUrl}/rest/api/1.0/projects/${config.project}/repos/${config.repository}/commits/${revision}/changes?limit=${config.fileCap}"
+                ).openConnection()
 
-		filesForRevConn.setRequestProperty("Authorization", "Basic ${config.basicAuth}")
-		
-		println("[JPL] URLConnection: ${filesForRevConn.getURL()}")
+        filesForRevConn.setRequestProperty("Authorization", "Basic ${config.basicAuth}")
 
-		def filesForRev = new groovy.json.JsonSlurper().parse(new BufferedReader(new InputStreamReader(filesForRevConn.getInputStream()))) // LazyMap
+        echo "[JPL] URLConnection: ${filesForRevConn.getURL()}"
 
-		List<String> diffRevisions = filesForRev.values.collect {
-			it.path.toString
-		}
+        def filesForRev = new groovy.json.JsonSlurper().parse(new BufferedReader(new InputStreamReader(filesForRevConn.getInputStream()))) // LazyMap
 
-		diffRevisions
-		}
-		catch(exc) {
-			echo 'Error: There were errors to connecting to sonar. '+exc.toString() // but we do not fail the whole build because of that
-		}
-	}
+        List<String> diffRevisions = filesForRev.values.collect {
+            it.path.toString
+        }
 
-	@NonCPS
-	static def getSonarInclusions(Map vars, Closure body=null) {
+        diffRevisions
+        }
+        catch(exc) {
+            echo 'Error: There were errors to connecting to sonar. '+exc.toString() // but we do not fail the whole build because of that
+        }
+    }
 
-		println("[JPL] Executing `Sonar getSonarInclusions`")
+    @NonCPS
+    static def getSonarInclusions(Map vars, Closure body=null) {
 
-		vars = vars ?: [:]
+        echo "[JPL] Executing Sonar getSonarInclusions"
 
-		def sonarCmdParameters = vars.get("sonarCmdParameters", "")
-		//vars.project = vars.get("project", "RISK")
+        vars = vars ?: [:]
 
-		def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${filename}" }.join(",")
+        def sonarCmdParameters = vars.get("sonarCmdParameters", "")
+        //vars.project = vars.get("project", "RISK")
 
-		if (body) { body() }
+        def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${filename}" }.join(",")
 
-		println("[JPL] Sonar Sources: ${sonarInclusions}")
+        if (body) { body() }
 
-		if (sonarInclusions?.trim()) {
-			sonarCmdParameters = " -Dsonar.inclusions=\"${sonarInclusions}\" "
-		}
+        echo "[JPL] Sonar Sources: ${sonarInclusions}"
 
-		return sonarCmdParameters
+        if (sonarInclusions?.trim()) {
+            sonarCmdParameters = " -Dsonar.inclusions=\"${sonarInclusions}\" "
+        }
 
-	}
+        return sonarCmdParameters
 
-	@NonCPS
-	static def filesChanged(Map vars, Closure body=null) {
+    }
 
-		println("[JPL] Executing `Sonar getSonarInclusions` filesChanged")
+    @NonCPS
+    static def filesChanged(Map vars, Closure body=null) {
 
-		def config = [:]
-		body.resolveStrategy = Closure.DELEGATE_FIRST
-		body.delegate = config
-		body()
+        echo "[JPL] Executing Sonar getSonarInclusions filesChanged"
 
-		println("[JPL] Base CONFIG params set from JENKINSFILE are: ${config}")
+        def config = [:]
+        body.resolveStrategy = Closure.DELEGATE_FIRST
+        body.delegate = config
+        body()
 
-		vars = vars ?: [:]
+        echo "[JPL] Base CONFIG params set from JENKINSFILE are: ${config}"
 
-		// Run configuration
-		// If number of commits exceeds the Cap, file list will not be searched (to save time); the script will return ["*"]
-		vars.commitCap            = vars.get("commitCap", 50)
-		// If number of files changes exceeds the Cap, all files should be Sonar-scanned; the script will return ["*"]
-		vars.fileCap              = vars.get("fileCap", 50)
-		vars.baseUrl              = vars.get("baseUrl", "https://scm-git-eur.misys.global.ad/")
-		vars.jobName              = vars.get("jobName", "unknown")
-		vars.project              = vars.get("project", get_project_name(vars.jobName, "RISK"))
-		vars.repository           = vars.get("repository", get_repository_name(vars.jobName))
-		vars.targetRevision       = vars.get("targetRevision", "refs/heads/develop")
-		vars.currentRevision      = vars.get("currentRevision", "0")
+        vars = vars ?: [:]
 
-		//println("[JPL] Repository: ${vars.repository}")
+        // Run configuration
+        // If number of commits exceeds the Cap, file list will not be searched (to save time); the script will return ["*"]
+        vars.commitCap            = vars.get("commitCap", 50)
+        // If number of files changes exceeds the Cap, all files should be Sonar-scanned; the script will return ["*"]
+        vars.fileCap              = vars.get("fileCap", 50)
+        vars.baseUrl              = vars.get("baseUrl", "https://gitub.com/")
+        vars.jobName              = vars.get("jobName", "unknown")
+        vars.project              = vars.get("project", get_project_name(vars.jobName, "NABLA"))
+        vars.repository           = vars.get("repository", get_repository_name(vars.jobName))
+        vars.targetRevision       = vars.get("targetRevision", "refs/heads/develop")
+        vars.currentRevision      = vars.get("currentRevision", "0")
 
-		println("[JPL] Full CONFIG after applying the default values is: ${vars}")
+        //echo "[JPL] Repository: ${vars.repository}"
 
-		List<String> diffRevisions = diffCommitsForRev(vars)
-		if (diffRevisions.size() >= vars.commitCap) {
-			println("[JPL] Number of unique commits between the two revisions: ${diffRevisions.size()} exceeds the Cap: ${vars.commitCap}; returning default value")
-			return ["*"]
-		}
+        echo "[JPL] Full CONFIG after applying the default values is: ${vars}"
 
-		println("[JPL] Found following revisions between source and target branch: ${diffRevisions}")
+        List<String> diffRevisions = diffCommitsForRev(vars)
+        if (diffRevisions.size() >= vars.commitCap) {
+            echo "[JPL] Number of unique commits between the two revisions: ${diffRevisions.size()} exceeds the Cap: ${vars.commitCap}; returning default value"
+            return ["*"]
+        }
 
-		List<String> filesChanged = []
-		for (diffRevision in diffRevisions) {
-			filesChanged += filesForRev(vars, diffRevision)
-		}
-		filesChanged = filesChanged.unique()
+        echo "[JPL] Found following revisions between source and target branch: ${diffRevisions}"
 
-		println("[JPL] Found following changed files source and target branch: ${filesChanged}")
+        List<String> filesChanged = []
+        for (diffRevision in diffRevisions) {
+            filesChanged += filesForRev(vars, diffRevision)
+        }
+        filesChanged = filesChanged.unique()
 
-		if (filesChanged.size() >= vars.fileCap) {
-			println("[JPL] Number of files changes: ${filesChanged.size()} exceeds the Cap: ${vars.fileCap}; returning default value")
-			return ["*"]
-		}
+        echo "[JPL] Found following changed files source and target branch: ${filesChanged}"
 
-		filesChanged
+        if (filesChanged.size() >= vars.fileCap) {
+            echo "[JPL] Number of files changes: ${filesChanged.size()} exceeds the Cap: ${vars.fileCap}; returning default value"
+            return ["*"]
+        }
 
-	}
+        filesChanged
+
+    }
+
+    static def sonarRestCall(def apiUrl, def login, def password, def method, def query="") {
+      def token = ("${login}:${password}").bytes.encodeBase64().toString()
+      def headers = [:]
+      headers["Content-Type"] = "application/json"
+      headers["Authorization"] = "Basic ${token}"
+
+      return callURL("${apiUrl}", "${query}", method, headers)
+    }
 
 }
-
-//def call(Closure body=null) {
-//	this.vars = [:]
-//	this.getSonarInclusions(vars, body)
-//}
