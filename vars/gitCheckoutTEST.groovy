@@ -13,7 +13,7 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/gitCheckoutTEST.groovy`"
-    
+
     vars = vars ?: [:]
 
     //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()

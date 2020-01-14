@@ -17,7 +17,7 @@ def call(Map vars, Closure body=null) {
     //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
-    
+
     def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins")
 
     setBuildName()

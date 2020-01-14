@@ -155,8 +155,8 @@ def call(Map vars, Closure body=null) {
                     }
 
                 } // withSonarQubeEnv
-                
-                if (!vars.skipSonarCheck) {               
+
+                if (!vars.skipSonarCheck) {
                     withSonarQubeCheck(vars)
                 }
 

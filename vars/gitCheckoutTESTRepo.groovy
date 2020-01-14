@@ -31,7 +31,7 @@ def call(Map vars, Closure body=null) {
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
     vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
     vars.relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT_TEST).trim()
-    vars.timeout = vars.get("timeout", 20)    
+    vars.timeout = vars.get("timeout", 20)
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
     vars.isShallowEnabled = vars.get("isShallowEnabled", true).toBoolean()
 

@@ -4,7 +4,7 @@
 def call(def tagName="LATEST_SUCCESSFULL", def message="Jenkins") {
 
     def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins")
-    
+
     try {
         sh """
             git tag -l | xargs git tag -d # remove all local tags;

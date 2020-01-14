@@ -24,7 +24,7 @@ def call(Map vars, Closure body=null) {
                    '*.tgz',
                    ].join(', '))
     def excludes = vars.get("excludes", ['Latest*.tar.gz'
-                   ].join(', '))                   
+                   ].join(', '))
 
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
@@ -41,7 +41,7 @@ def call(Map vars, Closure body=null) {
 	try {
 
 		//tee("${vars.shellOutputFile}") {
-		
+
 		    lock(resource: "lock_CPP_${env.NODE_NAME}", inversePrecedence: true) {
 
 			    echo "DRY_RUN : ${DRY_RUN}"
@@ -50,25 +50,25 @@ def call(Map vars, Closure body=null) {
 			    	unstash 'maven-artifacts'
 			    	unstash 'app'
 			    }
-			    
+
 			    if (CLEAN_RUN) {
 			    	SCONS_OPTS += "--cache-disable"
 			    	sh "rm -Rf ./bw-outputs || true"
 			    	sh "rm -Rf ../bw-outputs || true"
 			    	sh "rm -f *_VERSION.TXT"
 			    }
-			    
+
 			    if (DEBUG_RUN) {
 			    	echo "Scons OPTS have been specified: ${SCONS_OPTS}"
 			    }
-			    
+
 			    if (body) { body() }
-			    
+
 			    build = sh (
 			      script: "${script} 2>&1 > ${vars.shellOutputFile}",
 			      returnStatus: true
 			    )
-			    
+
 			    echo "BUILD RETURN CODE : ${build}"
 			    if (build == 0) {
 			    	echo "BUILD SUCCESS"
@@ -77,14 +77,14 @@ def call(Map vars, Closure body=null) {
 			    	currentBuild.result = 'FAILURE'
 			    	error 'There are errors in build'
 			    }
-			
+
 			} // lock
 
 		//} // tee
 
 	} finally {
 		//runHtmlPublishers(["WarningsPublisher"])
-		
+
 		artifacts += ", bw-outputs/build-wrapper.log, *.log"
 		echo "archiveArtifacts: ${artifacts} - ${excludes}"
 		archiveArtifacts artifacts: "${artifacts}", excludes: "${excludes}", fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true

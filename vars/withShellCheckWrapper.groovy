@@ -21,7 +21,7 @@ def call(Map vars, Closure body=null) {
     vars.isSuccessReturnCode = vars.get("isSuccessReturnCode", 0)
     vars.isFailReturnCode = vars.get("isFailReturnCode", 255)
     vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 1)
-    
+
     tee("${vars.shellOutputFile}") {
 
         shellcheckExitCode = sh(
@@ -33,7 +33,7 @@ def call(Map vars, Closure body=null) {
         echo "SHELLCHECK RETURN CODE : ${shellcheckExitCode}"
         if (shellcheckExitCode == vars.isSuccessReturnCode) {
             echo "SHELLCHECK SUCCESS"
-        } else if (shellcheckExitCode == vars.isFailReturnCode) {         
+        } else if (shellcheckExitCode == vars.isFailReturnCode) {
            echo "SHELLCHECK FAILURE"
            currentBuild.result = 'FAILURE'
            error 'There are errors in shellcheck'

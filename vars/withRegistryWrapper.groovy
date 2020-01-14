@@ -32,7 +32,7 @@ def call(Map vars, Closure body=null) {
             ]) {
 
         sh 'echo DOCKER_CONFIG_DEFAULT : ${DOCKER_CONFIG_DEFAULT}'
-    
+
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DOCKER_REGISTRY_CREDENTIAL, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]) {
             usr = DOCKER_USERNAME
             pswd = DOCKER_PASSWORD

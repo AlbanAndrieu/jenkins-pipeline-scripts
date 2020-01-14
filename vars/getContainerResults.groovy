@@ -8,9 +8,9 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/getContainerResults.groovy`"
-    
+
     vars = vars ?: [:]
-    
+
     vars.containerName = vars.get("containerName", "frrobot").trim()
     vars.dockerResultPath = vars.get("dockerResultPath", "./${vars.containerName}-${env.GIT_COMMIT}-${env.BUILD_NUMBER}").trim()
 
@@ -29,7 +29,7 @@ def call(Map vars, Closure body=null) {
 		}
 
 		if (body) { body() }
-            
+
     } // script
 
 }

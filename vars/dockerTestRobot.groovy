@@ -9,7 +9,7 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/dockerTestRobot.groovy`"
-    
+
     vars = vars ?: [:]
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -64,9 +64,9 @@ def call(Map vars, Closure body=null) {
                         dockerComposeTest(vars) {
 
                             try {
-                            
+
                                 getContainerResults(vars)
-                                
+
 							    if (!vars.allowEmptyResults) {
                                     runHtmlPublishers(["RobotPublisher": [outputPath: "result"]])
                                 }

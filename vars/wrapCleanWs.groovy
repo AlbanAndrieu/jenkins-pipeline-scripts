@@ -25,7 +25,7 @@ def call(Map vars, Closure body=null) {
 		if (!DEBUG_RUN && vars.isCleaningEnabled) {
 			cleanWs(disableDeferredWipeout: true, deleteDirs: true)
 		}
-		
+
 		if (!DRY_RUN && !DEBUG_RUN && vars.isEmailEnabled) {
 			standardNotify { }
 		}

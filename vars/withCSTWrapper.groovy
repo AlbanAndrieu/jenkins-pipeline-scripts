@@ -22,7 +22,7 @@ def call(Map vars, Closure body=null) {
   vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
   vars.shellOutputFile = vars.get("shellOutputFile", "cst.log").trim()
   vars.skipFailure = vars.get("skipFailure", false).toBoolean()
-  
+
   try {
     //tee("${vars.shellOutputFile}") {
 
@@ -58,7 +58,7 @@ def call(Map vars, Closure body=null) {
         } else {
             if (!vars.skipFailure) {
                 echo "CST UNSTABLE"
-                currentBuild.result = 'UNSTABLE'                
+                currentBuild.result = 'UNSTABLE'
             } else {
                 echo "CST FAILURE skipped"
                 //error 'There are errors in cst'
@@ -67,7 +67,7 @@ def call(Map vars, Closure body=null) {
         if (body) { body() }
 
       } catch (exc) {
-        currentBuild.result = 'FAILURE'      
+        currentBuild.result = 'FAILURE'
         error "There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
       }
 

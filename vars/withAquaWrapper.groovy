@@ -22,7 +22,7 @@ def call(Map vars, Closure body=null) {
   def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").toLowerCase().trim()
   def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
   def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
-    
+
   def AQUA_VERSION = vars.get("AQUA_VERSION", env.AQUA_VERSION ?: "latest").trim()
   //def AQUA_USER = vars.get("AQUA_USER", env.AQUA_USER ?: '--user scanner').trim()
   def ASLOGIN = vars.get("ASLOGIN", env.ASLOGIN ?: 'scanner').trim()
@@ -89,7 +89,7 @@ def call(Map vars, Closure body=null) {
         // TODO Remove it when tee will be back
         vars.buildCmd += " 2>&1 > ${vars.shellOutputFile} "
         //vars.buildCmd +=        " > /dev/null"
-        
+
         // Run the aqua build
         build = sh (
                 script: "${vars.buildCmd}",
@@ -98,10 +98,10 @@ def call(Map vars, Closure body=null) {
         echo "AQUA RETURN CODE : ${build}"
         if (build == 0) {
             echo "AQUA SUCCESS"
-        } else {            
+        } else {
             if (!vars.skipFailure) {
                 echo "AQUA UNSTABLE"
-                currentBuild.result = 'UNSTABLE'                
+                currentBuild.result = 'UNSTABLE'
             } else {
                 echo "AQUA FAILURE skipped"
                 //error 'There are errors in aqua'
@@ -111,7 +111,7 @@ def call(Map vars, Closure body=null) {
 
       } catch (exc) {
         currentBuild.result = 'FAILURE'
-        error "There was a problem with aqua scan image \'${vars.imageName}\' " + exc.toString()        
+        error "There was a problem with aqua scan image \'${vars.imageName}\' " + exc.toString()
       }
 
     //}  // withRegistry

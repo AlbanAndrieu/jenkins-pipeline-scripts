@@ -23,7 +23,7 @@ def call(Map vars, Closure body=null) {
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT',
                    '**/MD5SUMS.md5',
                    'Output/**/*.tar.gz'
-                   ].join(', '))                   
+                   ].join(', '))
 
     vars.isStashMavenEnabled = true
 

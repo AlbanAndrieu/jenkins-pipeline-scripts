@@ -94,7 +94,7 @@ Quality Gate status: ${qg.status}"""
                 //error "Pipeline aborted because of quality gate status on short-lived branch"
               }
           }
-			  
+
         } // tee
 
         archiveArtifacts artifacts: "${vars.sonarCheckOutputFile}, ${vars.sonarCheckResultFile}, ${vars.reportTaskFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true

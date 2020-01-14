@@ -11,7 +11,7 @@ def call(Map vars, Closure body=null) {
     echo "[JPL] Executing `vars/getSemVerReleasedVersion.groovy`"
 
     vars = vars ?: [:]
-    
+
     String RELEASE_VERSION_SEMVER = "LATEST"
 
     tokens = getReleasedVersion(vars).tokenize('.')

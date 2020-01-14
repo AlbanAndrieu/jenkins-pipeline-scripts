@@ -9,7 +9,7 @@ def call(Closure body=null) {
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/dockerComposeTest.groovy`"
-    
+
     vars = vars ?: [:]
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -22,7 +22,7 @@ def call(Map vars, Closure body=null) {
     def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nala.mobi").toLowerCase().trim()
     def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
     def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
-    
+
     vars.DOCKER_TAG = vars.get("DOCKER_TEST_TAG", env.DOCKER_TEST_TAG ?: "temp").trim()
     vars.DOCKER_TEST_TAG = dockerTag(vars.DOCKER_TAG).trim()
     vars.DOCKER_TEST_CONTAINER = vars.get("DOCKER_TEST_CONTAINER", env.DOCKER_TEST_CONTAINER ?: "${vars.DOCKER_TEST_TAG}_test_1").trim()

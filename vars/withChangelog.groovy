@@ -123,9 +123,9 @@ Changelog of Git Changelog.
 		untaggedName: 'Unreleased',
 		useConfigFile: false,
 		useFile: true]])
-									
+
 	archiveArtifacts artifacts: 'CHANGELOG.html', excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
-	
+
 	if (vars.isPublishEnabled) {
 		publishHTML (target: [
 		  allowMissing: true,
@@ -133,7 +133,7 @@ Changelog of Git Changelog.
 		  keepAll: true,
 		  reportFiles: 'CHANGELOG.html',
 		  reportName: "Changelog"
-		])                 
+		])
 	}
 
 }
