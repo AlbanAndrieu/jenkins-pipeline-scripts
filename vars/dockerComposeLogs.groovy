@@ -24,10 +24,11 @@ def call(Map vars, Closure body=null) {
     vars.DOCKER_COMPOSE_OPTIONS = vars.get("DOCKER_COMPOSE_OPTIONS", env.DOCKER_COMPOSE_OPTIONS ?: "").trim() // -p ${vars.DOCKER_TEST_TAG}
 
     vars.dockerFilePath = vars.get("dockerFilePath", "").trim()
+    vars.shellOutputFile = vars.get("shellOutputFile", "docker-compose-logs.log").trim()
 
     script {
 
-        //tee('docker-compose-logs.log') {
+        //tee("${vars.shellOutputFile}") {
 
             try {
 

@@ -36,10 +36,12 @@ def call(Map vars, Closure body=null) {
     vars.isSuccessReturnCode = vars.get("isSuccessReturnCode", 0)
     vars.isFailReturnCode = vars.get("isFailReturnCode", 1)
     vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 250)
+    vars.skipLogDump = vars.get("skipLogDump", false).toBoolean()
+    vars.shellOutputFile = vars.get("shellOutputFile", "docker-compose.log").trim()
 
     script {
 
-        tee('docker-compose.log') {
+        tee("${vars.shellOutputFile}") {
 
             try {
 
@@ -88,7 +90,9 @@ def call(Map vars, Closure body=null) {
                 echo 'Error: There were errors in compose tests. '+exc.toString()
             } finally {
                 try {
-                    dockerComposeLogs(vars)
+                    if (! vars.skipLogDump) {
+                        dockerComposeLogs(vars)
+                    }
                 }
                 catch(exc) {
                     echo 'Warn: There was a problem taking down the docker-compose. '+exc.toString()

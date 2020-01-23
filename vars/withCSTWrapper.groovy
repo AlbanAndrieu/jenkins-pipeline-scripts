@@ -27,6 +27,8 @@ def call(Map vars, Closure body=null) {
     //tee("${vars.shellOutputFile}") {
 
       try {
+      
+        vars.buildCmdParameters+=" && docker pull ${DOCKER_RUNTIME_IMG}"
 
         vars.buildCmdParameters+=" && docker run"
         vars.buildCmdParameters+=" --rm"
@@ -67,13 +69,13 @@ def call(Map vars, Closure body=null) {
         if (body) { body() }
 
       } catch (exc) {
-        currentBuild.result = 'FAILURE'
-        error "There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
+        //currentBuild.result = 'FAILURE'
+        echo "WARNING : There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
       }
 
     //} // tee
   } finally {
-    archiveArtifacts artifacts: "*.log", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+    archiveArtifacts artifacts: "${vars.shellOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
   }
 
 }

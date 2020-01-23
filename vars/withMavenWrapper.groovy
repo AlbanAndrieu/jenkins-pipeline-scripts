@@ -196,6 +196,11 @@ def call(Map vars, Closure body=null) {
                 } // withMaven
             } // configFileProvider
 
+			if (!vars.skipSonarCheck && !vars.skipSonar) {
+				vars.sonarCheckOutputFile = "maven-sonar-check.log"
+				withSonarQubeCheck(vars)
+			}
+			
             if (!vars.skipResults) {
                 if (!DRY_RUN) {
 
@@ -211,11 +216,6 @@ def call(Map vars, Closure body=null) {
                 } // if DRY_RUN
 
             } // skipResults
-
-			if (!vars.skipSonarCheck && !vars.skipSonar) {
-			    vars.sonarCheckOutputFile = "maven-sonar-check.log"
-				withSonarQubeCheck(vars)
-			}
 
         } // tee
     } catch (e) {

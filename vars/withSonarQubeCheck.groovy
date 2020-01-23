@@ -35,65 +35,77 @@ def call(Map vars, Closure body=null) {
 
     script {
         tee("${vars.sonarCheckOutputFile}") {
-            def qg = null
-            // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
-            retry(10) {
-                sleep(time: vars.sleep, unit:"MINUTES")
-                println "Wait for Quality Gate"
-                qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
-                if (qg.status == 'OK')
-                  echo "Quality Gate status is OK"
-                else
-                  echo "WARNING: Quality Gate status is ${qg.status}"
-            }
-            // Read branch and projectKey from report-task.txt
-            def report = readProperties file: vars.reportTaskFile
-            def branch = report["branch"]
-            def projectKey = report["projectKey"]
-            def dashboardUrl = report["dashboardUrl"]
 
-            // Create REST call to SonarQube for issues count grouped by severity
-            def apiUrl = "https://${SONAR_INSTANCE}/api/issues/search"
-            def severities = ""
-            def query = "branch=${branch}"
-            query += "&componentKeys=${projectKey}"
-            query += "&resolved=false"
-            query += "&severities=${severities}"
-            query += "&facets=severities"
-            query += "&ps=1"
-            query += "&additionalFields=_all"
+        try {
 
-            def results = [:]
-            // Make REST call
-            withCredentials([usernamePassword(credentialsId: "${SONAR_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
-
-               if (body) {
-                 body()
-               }
-
-              def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
-              // Parse issues count from json response
-              ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
-              for (item in ret_json["facets"]) {
-                if (item["property"] == "severities")
-                severities = item["values"]
-              }
-              for (item in severities) {
-                results.put(item["val"], item["count"])
-              }
-            } // withCredentials
-            writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
+            withSonarQubeEnv("${SONAR_INSTANCE}") {
+            
+                def qg = null
+                // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
+                retry(10) {
+                    sleep(time: vars.sleep, unit:"MINUTES")
+                    println "Wait for Quality Gate"
+                    qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
+                    if (qg.status == 'OK')
+                      echo "Quality Gate status is OK"
+                    else
+                      echo "WARNING: Quality Gate status is ${qg.status}"
+                }
+                // Read branch and projectKey from report-task.txt
+                def report = readProperties file: vars.reportTaskFile
+                def branch = report["branch"]
+                def projectKey = report["projectKey"]
+                def dashboardUrl = report["dashboardUrl"]
+			    
+                // Create REST call to SonarQube for issues count grouped by severity
+                def apiUrl = "https://${SONAR_INSTANCE}/api/issues/search"
+                def severities = ""
+                def query = "branch=${branch}"
+                query += "&componentKeys=${projectKey}"
+                query += "&resolved=false"
+                query += "&severities=${severities}"
+                query += "&facets=severities"
+                query += "&ps=1"
+                query += "&additionalFields=_all"
+			    
+                def results = [:]
+                // Make REST call
+                withCredentials([usernamePassword(credentialsId: "${SONAR_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+			    
+                   if (body) {
+                     body()
+                   }
+			    
+                  def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
+                  // Parse issues count from json response
+                  ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
+                  for (item in ret_json["facets"]) {
+                    if (item["property"] == "severities")
+                      severities = item["values"]
+                  }
+                  for (item in severities) {
+                    results.put(item["val"], item["count"])
+                  }
+                } // withCredentials
+                writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
 Dashboard URL: ${dashboardUrl}
 Issue count: ${results}
 Quality Gate status: ${qg.status}"""
-          // Fail the build if not release branch and quality gate status is not OK
-          if (!isReleaseBranch() && qg.status != 'OK') {
-              echo "Quality gate status NOT met on short-lived branch"
-              if (!vars.allowQualityStatusFailure) {
-                currentBuild.result = 'UNSTABLE'
-                //error "Pipeline aborted because of quality gate status on short-lived branch"
-              }
-          }
+                // Fail the build if not release branch and quality gate status is not OK
+                if (!isReleaseBranch() && qg.status != 'OK') {
+                  echo "Quality gate status NOT met on short-lived branch"
+                  if (!vars.allowQualityStatusFailure) {
+                    currentBuild.result = 'UNSTABLE'
+                    //error "Pipeline aborted because of quality gate status on short-lived branch"
+                  }
+                }
+            
+            } // withSonarQubeEnv
+
+        } catch (exc) {
+          //currentBuild.result = 'UNSTABLE' // we do not fail the build on purpose
+          echo "WARNING : There was a problem retrieving sonar scan results" + exc.toString()
+        }
 
         } // tee
 

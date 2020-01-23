@@ -41,8 +41,8 @@ def call(Map vars, Closure body=null) {
   String DOCKER_OPTS_USER_ID = [
      '-v /etc/passwd:/etc/passwd:ro',
      '-v /etc/group:/etc/group:ro',
-     '--group-add 2000',
-     '--group-add 1101',
+#     '--group-add 2000',
+#     '--group-add 1101',
   ].join(" ")
 
   String DOCKER_OPTS_BASIC = DOCKER_OPTS_USER_ID

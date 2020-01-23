@@ -150,7 +150,7 @@ def call(Map vars, Closure body=null) {
                         echo "SONAR UNSTABLE"
                         if (!vars.skipUnstable) {
                             currentBuild.result = 'UNSTABLE'
-                            error 'There are errors in sonar'
+                            echo 'WARNING : There are errors in sonar'
                         }
                     }
 
