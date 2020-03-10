@@ -25,6 +25,8 @@ def call(Map vars, Closure body=null) {
   String DOCKER_NAME_RUNTIME="ansible-jenkins-slave-docker".trim()
   //String DOCKER_RUNTIME_IMG="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME_RUNTIME}:${DOCKER_RUNTIME_TAG}".trim()
 
+  String AQUA_URL="http://fr1cslbmts0304:8080/".trim()
+
   vars.imageName = vars.get("imageName", "${DOCKER_NAME_RUNTIME}").trim()
   vars.imageTag = vars.get("imageTag", "${DOCKER_RUNTIME_TAG}").trim()
 
@@ -33,22 +35,36 @@ def call(Map vars, Closure body=null) {
   vars.localImage = vars.get("localImage", "${DOCKER_ORGANISATION}/${vars.imageName}:${vars.imageTag}").trim()
   
   vars.locationType = vars.get("locationType", "hosted").trim() // hosted or local
+  vars.register = vars.get("register", true).toBoolean()
 
   vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
   vars.aquaOutputFile = vars.get("aquaOutputFile", "aqua.log").trim()
-  //vars.skipFailure = vars.get("skipFailure", false).toBoolean()
+  vars.skipFailure = vars.get("skipFailure", false).toBoolean()
 
   try {
     //tee("${vars.aquaOutputFile}") {
+    
+    if (vars.locationType.trim() == "local") {
+       vars.register = false // needed when is empty registry
+       vars.hostedImage = ""
+    }
 
-	aqua customFlags: '', hideBase: true, hostedImage: vars.hostedImage, localImage: vars.localImage, locationType: vars.locationType, notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: true, registry: vars.registry, showNegligible: true
+	aqua customFlags: '', hideBase: true, hostedImage: vars.hostedImage, localImage: vars.localImage, locationType: vars.locationType, notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: vars.register, registry: vars.registry, showNegligible: true
 
 	if (body) { body() }
 
     //} // tee
   } catch (exc) {
-	//currentBuild.result = 'UNSTABLE'
-	echo "WARNING : There was a problem with aqua scan" + exc.toString()    
+	if (!vars.skipFailure) {
+		echo "AQUA UNSTABLE"
+		currentBuild.result = 'UNSTABLE'
+	} else {
+		echo "AQUA FAILURE skipped"
+		//error 'There are errors in aqua' // not needed
+	}  
+	echo "WARNING : Scan failed, check output at \'${vars.aquaOutputFile}\' "
+	echo "WARNING : There was a problem with aqua scan : " + exc.toString()    	
+	echo "Check on : ${AQUA_URL}"
   } finally {
     archiveArtifacts artifacts: "${vars.aquaOutputFile}, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
   }

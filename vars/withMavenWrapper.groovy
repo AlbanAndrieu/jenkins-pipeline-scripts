@@ -19,33 +19,24 @@ def call(Map vars, Closure body=null) {
         //"-Djava.io.tmpdir=./target/tmp",
         ].join(" ")
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-    def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
-    def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
+    getJenkinsOpts(vars)
 
-    def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
-    //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
-    def MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexus").trim()
-    def MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
-    def MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2").trim() // maven-latest
-    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
-    def JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8").trim() // java-latest
+    vars.MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexus").trim()
+    vars.MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
+    vars.MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2").trim() // maven-latest
+    //def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
+    vars.JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8").trim() // java-latest
 
-    if (DEBUG_RUN) {
+    if (vars.DEBUG_RUN) {
          echo "debug added"
          MAVEN_OPTS_DEFAULT = ["${MAVEN_OPTS_DEFAULT}",
              "-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError",
          ].join(" ")
     }
 
-    def MAVEN_OPTS = vars.get("MAVEN_OPTS", "${MAVEN_OPTS_DEFAULT}")
+    vars.MAVEN_OPTS = vars.get("MAVEN_OPTS", "${MAVEN_OPTS_DEFAULT}")
 
-    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
-
-    echo "Maven OPTS have been specified: ${MAVEN_OPTS} - ${CLEAN_RUN}/${DRY_RUN}/${DEBUG_RUN} - ${SONAR_INSTANCE}"
+    echo "Maven OPTS have been specified: ${vars.MAVEN_OPTS} - ${vars.CLEAN_RUN}/${vars.DRY_RUN}/${vars.DEBUG_RUN} - ${vars.SONAR_INSTANCE}"
 
     vars.goal = vars.get("goal", "install").trim()
     vars.profile = vars.get("profile", "sonar").trim()
@@ -61,25 +52,25 @@ def call(Map vars, Closure body=null) {
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
     vars.skipDeploy = vars.get("skipDeploy", true).toBoolean()
     vars.skipMavenSettings = vars.get("skipMavenSettings", false).toBoolean()
-    vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
+    vars.skipSonarCheck = vars.get("skipSonarCheck", false).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.pomFile = vars.get("pomFile", "pom.xml").trim()
     vars.mavenGoals = vars.get("mavenGoals", "").trim()
     vars.shellOutputFile = vars.get("shellOutputFile", "maven.log").trim()
-    vars.mavenHome = vars.get("mavenHome", "${JENKINS_USER_HOME}/.m2/").trim()
+    vars.mavenHome = vars.get("mavenHome", "${vars.JENKINS_USER_HOME}/.m2/").trim()
 
     try {
         tee("${vars.shellOutputFile}") {
 
             // TODO configFileProvider do not work on docker, it is working on VM only and might fail then when JENKINS_USER_HOME do not exist
-            configFileProvider([configFile(fileId: "${MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: 'SETTINGS_XML'),
-                configFile(fileId: "${MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: 'MAVEN_SETTINGS_SECURITY_CONFIG')]) {
+            configFileProvider([configFile(fileId: "${vars.MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: vars.SETTINGS_XML),
+                configFile(fileId: "${vars.MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: vars.MAVEN_SETTINGS_SECURITY_CONFIG)]) {
                 withMaven(
-                    maven: "${MAVEN_VERSION}",
-                    jdk: "${JDK_VERSION}",
-                    mavenSettingsConfig: "${MAVEN_SETTINGS_CONFIG}",
+                    maven: "${vars.MAVEN_VERSION}",
+                    jdk: "${vars.JDK_VERSION}",
+                    mavenSettingsConfig: "${vars.MAVEN_SETTINGS_CONFIG}",
                     mavenLocalRepo: './.repository',
-                    mavenOpts: "${MAVEN_OPTS}",
+                    mavenOpts: "${vars.MAVEN_OPTS}",
                     options: [
                         pipelineGraphPublisher(
                             ignoreUpstreamTriggers: !isReleaseBranch(),
@@ -89,30 +80,30 @@ def call(Map vars, Closure body=null) {
                         artifactsPublisher(disabled: true)
                     ]
                 ) {
-                    withSonarQubeEnv("${SONAR_INSTANCE}") {
+                    withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
 
                         if (!vars.skipResults) {
 
-                            if (!RELEASE_VERSION) {
+                            if (!vars.RELEASE_VERSION) {
                                 echo 'No RELEASE_VERSION specified'
-                                RELEASE_VERSION = getReleasedVersion(vars) ?: "LATEST"
-                                //if (!RELEASE_VERSION) {
+                                vars.RELEASE_VERSION = getReleasedVersion(vars) ?: "LATEST"
+                                //if (!vars.RELEASE_VERSION) {
                                 //   error 'No RELEASE_VERSION found'
                                 //}
                             }
 
                             TARGET_TAG = getShortReleasedVersion(vars) ?: "LATEST"
-                            echo "Maven RELEASE_VERSION: ${RELEASE_VERSION} - ${TARGET_TAG}"
+                            echo "Maven RELEASE_VERSION: ${vars.RELEASE_VERSION} - ${TARGET_TAG}"
 
                             manager.addShortText("${TARGET_TAG}")
 
-                            if (RELEASE) {
-                              if (!RELEASE_VERSION) {
-                                  RELEASE_VERSION = RELEASE_BASE
+                            if (vars.RELEASE) {
+                              if (!vars.RELEASE_VERSION) {
+                                  vars.RELEASE_VERSION = vars.RELEASE_BASE
                               } else {
-                                  RELEASE_VERSION = RELEASE_VERSION
+                                  vars.RELEASE_VERSION = vars.RELEASE_VERSION
                                   substitutePomXmlVersion {
-                                      newVersion = RELEASE_VERSION
+                                      newVersion = vars.RELEASE_VERSION
                                   }
                               }
                             }
@@ -128,14 +119,14 @@ def call(Map vars, Closure body=null) {
                         vars.mavenGoals += " -Dmaven.repo.local=./.repository "
 
                         if (!vars.skipMavenSettings) {
-                           vars.mavenGoals += " -s ${SETTINGS_XML} "
+                           vars.mavenGoals += " -s ${vars.SETTINGS_XML} "
                         }
 
-                        if (CLEAN_RUN) {
+                        if (vars.CLEAN_RUN) {
                           vars.mavenGoals += " -U clean"
                         }
 
-                        if (!DRY_RUN) {
+                        if (!vars.DRY_RUN) {
                             if (vars.goal?.trim()) {
                                 vars.mavenGoals += " ${vars.goal}"
                             }
@@ -202,7 +193,7 @@ def call(Map vars, Closure body=null) {
 			}
 			
             if (!vars.skipResults) {
-                if (!DRY_RUN) {
+                if (!vars.DRY_RUN) {
 
                     if (!vars.skipArtifacts) {
                         stash includes: "${vars.artifacts}", name: 'maven-artifacts'
@@ -211,7 +202,7 @@ def call(Map vars, Closure body=null) {
                     stash includes: "**/target/classes/**", name: 'classes'
                 }
 
-                if ((!DRY_RUN && !RELEASE) && !vars.skipTests) {
+                if ((!vars.DRY_RUN && !vars.RELEASE) && !vars.skipTests) {
                     junit '**/target/surefire-reports/TEST-*.xml'
                 } // if DRY_RUN
 

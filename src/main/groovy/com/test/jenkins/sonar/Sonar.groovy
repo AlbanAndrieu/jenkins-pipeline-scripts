@@ -4,6 +4,7 @@ package com.test.jenkins.sonar
 
 import hudson.model.*
 import com.cloudbees.groovy.cps.NonCPS
+import static com.test.jenkins.Utils.callURL;
 
 class Sonar implements Serializable {
 	/**
@@ -177,8 +178,3 @@ class Sonar implements Serializable {
 	}
 
 }
-
-//def call(Closure body=null) {
-//	this.vars = [:]
-//	this.getSonarInclusions(vars, body)
-//}

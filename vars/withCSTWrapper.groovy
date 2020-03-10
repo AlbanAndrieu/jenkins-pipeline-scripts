@@ -24,11 +24,11 @@ def call(Map vars, Closure body=null) {
   vars.skipFailure = vars.get("skipFailure", false).toBoolean()
 
   try {
-    //tee("${vars.shellOutputFile}") {
+    tee("${vars.shellOutputFile}") {
 
       try {
       
-        vars.buildCmdParameters+=" && docker pull ${DOCKER_RUNTIME_IMG}"
+        vars.buildCmdParameters+=" && docker pull ${vars.imageName} || true"
 
         vars.buildCmdParameters+=" && docker run"
         vars.buildCmdParameters+=" --rm"
@@ -39,7 +39,7 @@ def call(Map vars, Closure body=null) {
         vars.buildCmdParameters+=        " --image ${vars.imageName} "
         vars.buildCmdParameters+=        " --config /data/${vars.configFile}"
 
-        vars.buildCmdParameters += " && docker run --rm --volume ${pwd()}:/ws --workdir /ws --volume /etc/passwd:/etc/passwd --volume /etc/group:/etc/group ubuntu chown -R \$(id -u):\$(id -g) ."
+        vars.buildCmdParameters+= " && docker run --rm --volume ${pwd()}:/ws --workdir /ws --volume /etc/passwd:/etc/passwd --volume /etc/group:/etc/group ubuntu chown -R \$(id -u):\$(id -g) ."
 
         if (vars.buildCmdParameters?.trim()) {
             vars.buildCmd += " ${vars.buildCmdParameters}"
@@ -61,9 +61,10 @@ def call(Map vars, Closure body=null) {
             if (!vars.skipFailure) {
                 echo "CST UNSTABLE"
                 currentBuild.result = 'UNSTABLE'
+                echo "WARNING : Scan failed, check output at \'${vars.shellOutputFile}\' "
             } else {
                 echo "CST FAILURE skipped"
-                //error 'There are errors in cst'
+                error 'There are errors in cst'
             }
         }
         if (body) { body() }
@@ -73,7 +74,7 @@ def call(Map vars, Closure body=null) {
         echo "WARNING : There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
       }
 
-    //} // tee
+    } // tee
   } finally {
     archiveArtifacts artifacts: "${vars.shellOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
   }

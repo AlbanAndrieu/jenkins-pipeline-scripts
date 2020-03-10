@@ -13,23 +13,15 @@ def call(Map vars, Closure body=null) {
     echo "[JPL] Executing `vars/withSonarQubeCheck.groovy`"
 
     vars = vars ?: [:]
-
-    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
-    def SONAR_CREDENTIALS = vars.get("SONAR_CREDENTIALS", env.SONAR_CREDENTIALS ?: "jenkins").trim()
-    def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g")
-    //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE")
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_CREDENTIALS ?: "jenkins").trim()
-
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
+    
+    getJenkinsOpts(vars)
 
     vars.reportTaskFile = vars.get("reportTaskFile", ".scannerwork/report-task.txt").trim() // .scannerwork/report-task.txt or .sonar/report-task.txt
+    vars.timeout = vars.get("timeout", 5)
     vars.sleep = vars.get("sleep", 1)
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.isAbortPipeline = vars.get("isAbortPipeline", false).toBoolean() // true = set pipeline to UNSTABLE, false = don't
-    vars.allowQualityStatusFailure = vars.get("allowQualityStatusFailure", env.allowQualityStatusFailure ?: true).toBoolean()
+    vars.skipFailure = vars.get("skipFailure", true).toBoolean()
     vars.sonarCheckOutputFile = vars.get("sonarCheckOutputFile", "sonar-check.log").trim()
     vars.sonarCheckResultFile = vars.get("sonarCheckResultFile", "sonar-result.log").trim()
 
@@ -38,19 +30,27 @@ def call(Map vars, Closure body=null) {
 
         try {
 
-            withSonarQubeEnv("${SONAR_INSTANCE}") {
+            withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
             
                 def qg = null
+                
                 // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
                 retry(10) {
                     sleep(time: vars.sleep, unit:"MINUTES")
                     println "Wait for Quality Gate"
-                    qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
-                    if (qg.status == 'OK')
-                      echo "Quality Gate status is OK"
-                    else
-                      echo "WARNING: Quality Gate status is ${qg.status}"
-                }
+                    
+                    timeout(time: vars.timeout, unit: 'MINUTES') {
+                    
+                      qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
+                      if (qg.status == 'OK')
+                        echo "Quality Gate status is OK"
+                      else
+                        echo "WARNING: Quality Gate status is ${qg.status}"
+                      
+                    } // timeout
+   
+                } // retry
+                
                 // Read branch and projectKey from report-task.txt
                 def report = readProperties file: vars.reportTaskFile
                 def branch = report["branch"]
@@ -58,7 +58,7 @@ def call(Map vars, Closure body=null) {
                 def dashboardUrl = report["dashboardUrl"]
 			    
                 // Create REST call to SonarQube for issues count grouped by severity
-                def apiUrl = "https://${SONAR_INSTANCE}/api/issues/search"
+                def apiUrl = "https://${vars.SONAR_INSTANCE}/api/issues/search"
                 def severities = ""
                 def query = "branch=${branch}"
                 query += "&componentKeys=${projectKey}"
@@ -70,7 +70,7 @@ def call(Map vars, Closure body=null) {
 			    
                 def results = [:]
                 // Make REST call
-                withCredentials([usernamePassword(credentialsId: "${SONAR_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+                withCredentials([usernamePassword(credentialsId: "${vars.SONAR_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
 			    
                    if (body) {
                      body()
@@ -94,7 +94,8 @@ Quality Gate status: ${qg.status}"""
                 // Fail the build if not release branch and quality gate status is not OK
                 if (!isReleaseBranch() && qg.status != 'OK') {
                   echo "Quality gate status NOT met on short-lived branch"
-                  if (!vars.allowQualityStatusFailure) {
+                  if (!vars.skipFailure) {
+                    echo "SONAR CHECK UNSTABLE on QUALITY GATE"
                     currentBuild.result = 'UNSTABLE'
                     //error "Pipeline aborted because of quality gate status on short-lived branch"
                   }
@@ -103,7 +104,13 @@ Quality Gate status: ${qg.status}"""
             } // withSonarQubeEnv
 
         } catch (exc) {
-          //currentBuild.result = 'UNSTABLE' // we do not fail the build on purpose
+          if (!vars.skipFailure) {
+              echo "SONAR CHECK UNSTABLE"
+              currentBuild.result = 'UNSTABLE'
+          } else {
+              echo "SONAR CHECK FAILURE skipped"
+              //error 'There are errors in sonar check'
+          }
           echo "WARNING : There was a problem retrieving sonar scan results" + exc.toString()
         }
 

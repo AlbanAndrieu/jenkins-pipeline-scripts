@@ -40,7 +40,7 @@ def call(Map vars, Closure body=null) {
 
 	try {
 
-		//tee("${vars.shellOutputFile}") {
+		tee("${vars.shellOutputFile}") {
 
 		    lock(resource: "lock_CPP_${env.NODE_NAME}", inversePrecedence: true) {
 
@@ -65,7 +65,8 @@ def call(Map vars, Closure body=null) {
 			    if (body) { body() }
 
 			    build = sh (
-			      script: "${script} 2>&1 > ${vars.shellOutputFile}",
+			      //script: "${script} 2>&1 > ${vars.shellOutputFile}",
+                              script: "${script},
 			      returnStatus: true
 			    )
 
@@ -80,7 +81,7 @@ def call(Map vars, Closure body=null) {
 
 			} // lock
 
-		//} // tee
+		} // tee
 
 	} finally {
 		//runHtmlPublishers(["WarningsPublisher"])

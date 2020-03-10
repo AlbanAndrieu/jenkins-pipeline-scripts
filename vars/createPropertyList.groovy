@@ -9,6 +9,8 @@ def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/createPropertyList.groovy`"
 
+    vars = vars ?: [:]
+    
     vars.daysToKeep = vars.get("daysToKeep", isReleaseBranch() ? '30' : '10').trim()
     vars.numToKeep = vars.get("numToKeep", isReleaseBranch() ? '20' : '5').trim()
 

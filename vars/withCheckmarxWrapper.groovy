@@ -32,8 +32,7 @@ def call(Map vars, Closure body=null) {
     vars.avoidDuplicateProjectScans = vars.get("avoidDuplicateProjectScans", false).toBoolean()
     vars.incremental = vars.get("incremental", true).toBoolean()
 
-    //if (!vars.skipPitest && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/))) {
-    if ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/)) {
+    if ((env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/)) {
         echo "Force incremental mode"
         vars.incremental = true
         echo "Force Default 2017 - light preset mode"

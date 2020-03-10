@@ -24,7 +24,6 @@ def call(Map vars, Closure body=null) {
 
 }
 
-@NonCPS
 def call(String roleName) {
 
     if (roleName != null && roleName.trim() != "" ) {

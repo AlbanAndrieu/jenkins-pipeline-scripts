@@ -13,17 +13,7 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
-    def SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-4.2").trim()
-    def SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
-    //def SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE").trim()
-    def STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", env.STASH_CREDENTIALS ?: "jenkins").trim()
-
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
-    def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
+    getJenkinsOpts(vars)
 
     vars.propertiesPath = vars.get("propertiesPath", "sonar-project.properties")
     vars.bwoutputs = vars.get("bwoutputs", "").trim()
@@ -34,7 +24,7 @@ def call(Map vars, Closure body=null) {
     vars.projectVersion = vars.get("projectVersion", "")
     vars.repository = vars.get("repository", "").trim()
     vars.skipMaven = vars.get("skipMaven", true).toBoolean()
-    vars.skipUnstable = vars.get("skipUnstable", false).toBoolean()
+    vars.skipFailure = vars.get("skipFailure", true).toBoolean()
     vars.skipInclusion = vars.get("skipInclusion", false).toBoolean()
     vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.targetBranch = vars.get("targetBranch", "develop").trim()
@@ -50,7 +40,7 @@ def call(Map vars, Closure body=null) {
     vars.shellOutputFile = vars.get("shellOutputFile", "sonar.log").trim()
 
     script {
-        if (!DRY_RUN && !RELEASE) {
+        if (!vars.DRY_RUN && !vars.RELEASE) {
 
             tee("${vars.shellOutputFile}") {
 
@@ -66,17 +56,17 @@ def call(Map vars, Closure body=null) {
                     unstash vars.bwoutputs
                 }
 
-                if (DEBUG_RUN) {
-                    echo "SONAR_INSTANCE: ${SONAR_INSTANCE}"
+                if (vars.DEBUG_RUN) {
+                    echo "SONAR_INSTANCE: ${vars.SONAR_INSTANCE}"
                     vars.verbose = true
                 }
 
                 vars.buildCmdParameters += " -Dproject.settings=" + vars.propertiesPath
 
-                if (!RELEASE_VERSION) {
+                if (!vars.RELEASE_VERSION) {
                     echo 'No RELEASE_VERSION specified'
-                    RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "LATEST"
-                    vars.projectVersion = "${RELEASE_VERSION}"
+                    vars.RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "LATEST"
+                    vars.projectVersion = "${vars.RELEASE_VERSION}"
                 }
 
                 if (vars.projectVersion?.trim()) {
@@ -98,7 +88,7 @@ def call(Map vars, Closure body=null) {
                             // SynchronousNonBlockingStepExecution with usernamePassword not available in static groovy JPL
                             withCredentials([
                                 usernamePassword(
-                                credentialsId: STASH_CREDENTIALS,
+                                credentialsId: vars.STASH_CREDENTIALS,
                                 usernameVariable: 'stashLogin',
                                 passwordVariable: 'stashPass'
                                 )
@@ -120,11 +110,13 @@ def call(Map vars, Closure body=null) {
 
                 echo "Sonar GOALS have been specified: ${vars.buildCmdParameters}"
 
-                withSonarQubeEnv("${SONAR_INSTANCE}") {
+                withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
                     if (body) {
                         body()
                     }
                     def build = "FAIL"
+                    
+                    echo "${vars.sonarExecutable} -Dsonar.branch.name=${env.BRANCH_NAME} " + vars.buildCmdParameters + " "
 
                     if ( BRANCH_NAME ==~ /develop|master|master_.+/ ) {
                         build = sh (
@@ -148,7 +140,8 @@ def call(Map vars, Closure body=null) {
                         echo "SONAR SUCCESS"
                     } else {
                         echo "SONAR UNSTABLE"
-                        if (!vars.skipUnstable) {
+                        echo "WARNING : Scan failed, check output at \'${vars.shellOutputFile}\' "
+                        if (!vars.skipFailure) {
                             currentBuild.result = 'UNSTABLE'
                             echo 'WARNING : There are errors in sonar'
                         }

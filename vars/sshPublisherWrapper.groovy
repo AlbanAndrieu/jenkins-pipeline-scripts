@@ -38,7 +38,7 @@ def call(Map vars, Closure body=null) {
             sshPublisher alwaysPublishFromMaster: vars.alwaysPublishFromMaster, continueOnError: vars.continueOnError,
                 publishers: [
                     sshPublisherDesc(
-                        configName: 'albandri',
+                        configName: 'albandrieu',
                         transfers: [
                             sshTransfer(cleanRemote: vars.cleanRemote,
                                 excludes: vars.excludes,

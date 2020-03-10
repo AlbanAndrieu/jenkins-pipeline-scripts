@@ -1,26 +1,28 @@
 #!/usr/bin/groovy
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
 
-    vars = vars ?: [:]
+  echo "[JPL] Executing `vars/getEnvironementData.groovy`"
 
-    if (!body) {
-        echo 'No body specified'
-    }
+  vars = vars ?: [:]
 
-    vars.DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    vars.filePath = vars.get("filePath", "step-2-0-0-build-env.sh")
+  if (!body) {
+      echo 'No body specified'
+  }
 
-    if (vars.DEBUG_RUN) {
-        sh "set -xv && ${vars.filePath}"
-    } else {
-        sh "${vars.filePath}"
-    }
+  vars.DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+  vars.filePath = vars.get("filePath", "step-2-0-0-build-env.sh").trim()
 
-    load "./jenkins-env.groovy"
+  if (vars.DEBUG_RUN) {
+      sh "set -xv && ${vars.filePath}"
+  } else {
+      sh "${vars.filePath}"
+  }
+
+  load "./jenkins-env.groovy"
 }

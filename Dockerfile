@@ -3,23 +3,17 @@ FROM maven:3-jdk-11 as BUILD
 COPY . /usr/src/app
 RUN mvn --batch-mode -f /usr/src/app/pom.xml clean package
 
-FROM openjdk:11-jre-slim
-ENV PORT 4567
-EXPOSE 4567
-COPY --from=BUILD /usr/src/app/target /opt/target
-WORKDIR /opt/target
+FROM jenkins/jenkins:lts-jdk11 as RUNTIME
 
-CMD ["/bin/bash", "-c", "find -type f -name '*-with-dependencies.jar' | xargs java -jar"]
-
-FROM jenkins/jenkins:lts as RUNTIME
-
-RUN mkdir $JENKINS_HOME/configs
-COPY ./jenkins.yaml $JENKINS_HOME/configs/jenkins.yaml
-ENV CASC_JENKINS_CONFIG=$JENKINS_HOME/configs
+#RUN mkdir $JENKINS_HOME/configs
+#COPY ./jenkins.yaml $JENKINS_HOME/configs/jenkins.yaml
+#ENV CASC_JENKINS_CONFIG=$JENKINS_HOME/configs
 
 ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
-RUN install-plugins.sh \
+RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
+  && /usr/local/bin/install-plugins.sh \
+#  groovy-events-listener-plugin:latest \ # warning about groovy version
   configuration-as-code \
   configuration-as-code-support \
   blueocean \
@@ -29,3 +23,7 @@ RUN install-plugins.sh \
   pipeline-utility-steps \
   generic-webhook-trigger \
   git-changelog
+
+USER 0
+
+EXPOSE 8080 50000

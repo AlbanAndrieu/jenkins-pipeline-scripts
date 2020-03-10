@@ -1,6 +1,11 @@
 jenkins-pipeline-scripts
 ========================
 
+[![Join the chat at https://gitter.im/jenkinsci/warnings-plugin](https://badges.gitter.im/jenkinsci/warnings-plugin.svg)](https://gitter.im/jenkinsci/warnings-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Jenkins Version](https://img.shields.io/badge/Jenkins-2.138.4-green.svg?label=min.%20Jenkins)](https://jenkins.io/download/)
+![JDK8](https://img.shields.io/badge/jdk-8-yellow.svg?label=min.%20JDK)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 *NOTE: This repository is being deprecated internally at Nabla and hence
 will receive few updates going forward.*
 
@@ -35,6 +40,19 @@ Run test
 ./mvnw -Dtest=TestSharedLibrary test
 ```
 
+Run docker
+
+```
+$ docker build -t groovy-test .
+#You can reproduce issue `Conflicting module versions. Module [groovy-all is loaded in version 2.4.8 and you are trying to load version 2.4.12` with 
+$ docker run -it groovy-test:latest
+```
+
 ========================
 
 See [Extending environment variables with Shared Libraries](https://devops.datenkollektiv.de/programatically-add-environment-variables-to-a-jenkins-instance.html)
+
+[![GitHub Actions](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/workflows/GitHub%20Actions/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1999b59401394431a1c2fea2923a919d)](https://www.codacy.com/app/uhafner/jenkins-pipeline-scripts?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlbanAndrieu/jenkins-pipeline-scripts&amp;utm_campaign=Badge_Grade)
+[![Codecov](https://img.shields.io/codecov/c/github/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://codecov.io/gh/AlbanAndrieu/jenkins-pipeline-scripts)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/pulls)
