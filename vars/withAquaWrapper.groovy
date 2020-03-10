@@ -18,9 +18,9 @@ def call(Map vars, Closure body=null) {
 
   String DOCKER_REGISTRY="registry".trim()
   String DOCKER_ORGANISATION="nabla".trim()
-  
+
   String DOCKER_REGISTRY_URL="https://${DOCKER_REGISTRY}".trim()
-  
+
   String DOCKER_RUNTIME_TAG="latest".trim()
   String DOCKER_NAME_RUNTIME="ansible-jenkins-slave-docker".trim()
   //String DOCKER_RUNTIME_IMG="${DOCKER_REGISTRY}/${DOCKER_ORGANISATION}/${DOCKER_NAME_RUNTIME}:${DOCKER_RUNTIME_TAG}".trim()
@@ -33,7 +33,7 @@ def call(Map vars, Closure body=null) {
   vars.registry = vars.get("registry", "${DOCKER_REGISTRY}").trim()
   vars.hostedImage = vars.get("hostedImage", "${DOCKER_ORGANISATION}/${vars.imageName}:${vars.imageTag}").trim()
   vars.localImage = vars.get("localImage", "${DOCKER_ORGANISATION}/${vars.imageName}:${vars.imageTag}").trim()
-  
+
   vars.locationType = vars.get("locationType", "hosted").trim() // hosted or local
   vars.register = vars.get("register", true).toBoolean()
 
@@ -43,7 +43,7 @@ def call(Map vars, Closure body=null) {
 
   try {
     //tee("${vars.aquaOutputFile}") {
-    
+
     if (vars.locationType.trim() == "local") {
        vars.register = false // needed when is empty registry
        vars.hostedImage = ""
@@ -61,9 +61,9 @@ def call(Map vars, Closure body=null) {
 	} else {
 		echo "AQUA FAILURE skipped"
 		//error 'There are errors in aqua' // not needed
-	}  
+	}
 	echo "WARNING : Scan failed, check output at \'${vars.aquaOutputFile}\' "
-	echo "WARNING : There was a problem with aqua scan : " + exc.toString()    	
+	echo "WARNING : There was a problem with aqua scan : " + exc.toString()
 	echo "Check on : ${AQUA_URL}"
   } finally {
     archiveArtifacts artifacts: "${vars.aquaOutputFile}, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true

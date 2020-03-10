@@ -54,7 +54,7 @@ def defineEnvironment() {
 	createGlobalEnvironmentVariables('RELEASE_VERSION',null)
 	createGlobalEnvironmentVariables('RELEASE',false)
 	createGlobalEnvironmentVariables('RELEASE_BASE',null)
-	
+
 	println GroovySystem.version
 
 }

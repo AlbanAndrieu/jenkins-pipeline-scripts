@@ -27,7 +27,7 @@ def call(Map vars, Closure body=null) {
     tee("${vars.shellOutputFile}") {
 
       try {
-      
+
         vars.buildCmdParameters+=" && docker pull ${vars.imageName} || true"
 
         vars.buildCmdParameters+=" && docker run"

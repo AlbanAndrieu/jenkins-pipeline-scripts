@@ -24,12 +24,12 @@ script:
 #  ./gradlew verify -x sign
 #  ./gradlew build -x sign
   ./gradlew build --stacktrace
-  
+
 cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
-  
+
 # safelist
 branches:
   only:

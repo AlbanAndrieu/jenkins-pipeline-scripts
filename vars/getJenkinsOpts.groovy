@@ -66,7 +66,7 @@ def call(Map vars, Closure body=null) {
   } else {
     echo "JPL is NOT supported"
     vars.isLogParserPublisher = false
-    vars.SONAR_INSTANCE = "sonar".trim() 
+    vars.SONAR_INSTANCE = "sonar".trim()
     vars.SONAR_CREDENTIALS = "jenkins".trim()
   }
 
@@ -77,13 +77,13 @@ def call(Map vars, Closure body=null) {
   if (vars.DEBUG_RUN) {
     try {
       echo "JENKINS_URL : ${JENKINS_URL}"
-    
+
       echo "NODE_NAME : ${NODE_NAME}"
       echo "NODE_LABELS : ${NODE_LABELS}"
-    
+
       echo "JOB_NAME : ${JOB_NAME}"
       echo "JOB_BASE_NAME : ${JOB_BASE_NAME}"
-    
+
       echo "SONAR_INSTANCE : ${vars.SONAR_INSTANCE}"
       echo "SONAR_CREDENTIALS : ${vars.SONAR_CREDENTIALS}"
     } catch(exc) {

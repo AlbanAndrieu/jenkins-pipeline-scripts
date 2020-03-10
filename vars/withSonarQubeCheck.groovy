@@ -13,7 +13,7 @@ def call(Map vars, Closure body=null) {
     echo "[JPL] Executing `vars/withSonarQubeCheck.groovy`"
 
     vars = vars ?: [:]
-    
+
     getJenkinsOpts(vars)
 
     vars.reportTaskFile = vars.get("reportTaskFile", ".scannerwork/report-task.txt").trim() // .scannerwork/report-task.txt or .sonar/report-task.txt
@@ -31,32 +31,32 @@ def call(Map vars, Closure body=null) {
         try {
 
             withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
-            
+
                 def qg = null
-                
+
                 // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
                 retry(10) {
                     sleep(time: vars.sleep, unit:"MINUTES")
                     println "Wait for Quality Gate"
-                    
+
                     timeout(time: vars.timeout, unit: 'MINUTES') {
-                    
+
                       qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
                       if (qg.status == 'OK')
                         echo "Quality Gate status is OK"
                       else
                         echo "WARNING: Quality Gate status is ${qg.status}"
-                      
+
                     } // timeout
-   
+
                 } // retry
-                
+
                 // Read branch and projectKey from report-task.txt
                 def report = readProperties file: vars.reportTaskFile
                 def branch = report["branch"]
                 def projectKey = report["projectKey"]
                 def dashboardUrl = report["dashboardUrl"]
-			    
+
                 // Create REST call to SonarQube for issues count grouped by severity
                 def apiUrl = "https://${vars.SONAR_INSTANCE}/api/issues/search"
                 def severities = ""
@@ -67,15 +67,15 @@ def call(Map vars, Closure body=null) {
                 query += "&facets=severities"
                 query += "&ps=1"
                 query += "&additionalFields=_all"
-			    
+
                 def results = [:]
                 // Make REST call
                 withCredentials([usernamePassword(credentialsId: "${vars.SONAR_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
-			    
+
                    if (body) {
                      body()
                    }
-			    
+
                   def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
                   // Parse issues count from json response
                   ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
@@ -100,7 +100,7 @@ Quality Gate status: ${qg.status}"""
                     //error "Pipeline aborted because of quality gate status on short-lived branch"
                   }
                 }
-            
+
             } // withSonarQubeEnv
 
         } catch (exc) {

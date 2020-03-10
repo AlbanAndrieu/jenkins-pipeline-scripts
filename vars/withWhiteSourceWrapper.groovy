@@ -47,7 +47,7 @@ def call(Map vars, Closure body=null) {
                   //vars.productVersion += vars.projectVersion
               }
           }
-		  
+
           whitesource jobApiToken: WHITESOURCE_TOKEN, jobCheckPolicies: 'global', jobForceUpdate: 'global', jobUserKey: vars.jobUserKey, libExcludes: vars.libExcludes, libIncludes: vars.libIncludes, product: vars.product, productVersion: vars.productVersion, projectToken: vars.projectToken, requesterEmail: vars.requesterEmail
 
         if (body) { body() }

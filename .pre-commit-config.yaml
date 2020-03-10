@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v2.1.0
+    rev: v2.5.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -29,16 +29,16 @@ repos:
     -   id: flake8
         args: [--max-line-length=120]
 -   repo: https://github.com/pre-commit/pre-commit.git
-    rev: v1.10.1
+    rev: v2.1.1
     hooks:
     -   id: validate_manifest
 -   repo: https://github.com/asottile/reorder_python_imports.git
-    rev: v1.0.1
+    rev: v2.0.0
     hooks:
     -   id: reorder-python-imports
 #        language_version: python2.7
 -   repo: https://github.com/asottile/add-trailing-comma
-    rev: v0.6.4
+    rev: v2.0.1
     hooks:
     -   id: add-trailing-comma
 #-   repo: meta
@@ -52,7 +52,7 @@ repos:
 #        files: \.(yaml|yml)$
 #        exclude: '.travis.yml'
 -   repo: git://github.com/doublify/pre-commit-hindent
-    rev: 73078a9ff6f276461c63568445972d6365dfeab2
+    rev: b3680b6ebf9f7cf29b19307f246adef66756feef
     hooks:
     -   id: hindent
 #-   repo: git://github.com/detailyang/pre-commit-shell

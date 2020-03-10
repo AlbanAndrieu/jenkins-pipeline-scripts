@@ -115,7 +115,7 @@ def call(Map vars, Closure body=null) {
                         body()
                     }
                     def build = "FAIL"
-                    
+
                     echo "${vars.sonarExecutable} -Dsonar.branch.name=${env.BRANCH_NAME} " + vars.buildCmdParameters + " "
 
                     if ( BRANCH_NAME ==~ /develop|master|master_.+/ ) {

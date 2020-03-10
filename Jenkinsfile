@@ -117,6 +117,21 @@ pipeline {
         } // script
       } // steps
     } // stage Maven
+    stage('\u27A1 Build - Gradle') {
+      steps {
+        script {
+
+          if (env.CLEAN_RUN) {
+              sh "$WORKSPACE/clean.sh"
+          }
+
+          sh './gradlew build --stacktrace'
+
+          publishHTML([reportDir: 'build/reports/tests/test', reportFiles: 'index.html', reportName: 'HTML Report'])
+
+        } // script
+      } // steps
+    } // stage Maven
     stage('SonarQube analysis') {
       environment {
         SONAR_USER_HOME = "$WORKSPACE"
@@ -146,9 +161,9 @@ pipeline {
         }
         steps {
             script {
-	    
+
                 tee("docker-build.log") {
-	    
+
                     // this give the registry
                     // sh(returnStdout: true, script: "echo ${DOCKER_BUILD_IMG} | cut -d'/' -f -1").trim()
                     DOCKER_BUILD_ARGS = ["--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz"].join(" ")
@@ -162,24 +177,24 @@ pipeline {
                                           "--label 'version=1.0.0'",
                                         ].join(" ")
 
-                    def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
-                    container.inside {
-                        sh 'echo DEBUGING image : $PATH'
-                        sh 'git --version || true'
-                        sh 'java -version || true'
-                        sh 'id jenkins || true'
-                        sh 'ls -lrta'
-                        //sh 'ls -lrta /home/jenkins/ || true'
-                        sh 'date > /tmp/test.txt'
-                        sh "cp /tmp/test.txt ${WORKSPACE}"
-                        sh "cp ${HOME}/microscanner.log ${WORKSPACE} || true"
-                        archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
-                    }
-	    
+                    //def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
+                    //container.inside {
+                    //    sh 'echo DEBUGING image : $PATH'
+                    //    sh 'git --version || true'
+                    //    sh 'java -version || true'
+                    //    sh 'id jenkins || true'
+                    //    sh 'ls -lrta'
+                    //    //sh 'ls -lrta /home/jenkins/ || true'
+                    //    sh 'date > /tmp/test.txt'
+                    //    sh "cp /tmp/test.txt ${WORKSPACE}"
+                    //    sh "cp ${HOME}/microscanner.log ${WORKSPACE} || true"
+                    //    archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
+                    //}
+
                     //dockerFingerprintFrom dockerfile: 'docker/ubuntu16/Dockerfile', image: "${DOCKER_BUILD_IMG}"
-	    
+
                 } // tee
-	    
+
             } // script
         } // steps
     } // Build - Docker

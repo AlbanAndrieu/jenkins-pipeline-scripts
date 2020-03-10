@@ -45,7 +45,7 @@ Run docker
 
 ```
 $ docker build -t groovy-test .
-#You can reproduce issue `Conflicting module versions. Module [groovy-all is loaded in version 2.4.8 and you are trying to load version 2.4.12` with 
+#You can reproduce issue `Conflicting module versions. Module [groovy-all is loaded in version 2.4.8 and you are trying to load version 2.4.12` with
 $ docker run -it groovy-test:latest
 ```
 

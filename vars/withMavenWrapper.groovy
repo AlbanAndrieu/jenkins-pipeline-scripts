@@ -191,7 +191,7 @@ def call(Map vars, Closure body=null) {
 				vars.sonarCheckOutputFile = "maven-sonar-check.log"
 				withSonarQubeCheck(vars)
 			}
-			
+
             if (!vars.skipResults) {
                 if (!vars.DRY_RUN) {
 

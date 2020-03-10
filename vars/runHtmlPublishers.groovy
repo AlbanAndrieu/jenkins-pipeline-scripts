@@ -115,11 +115,11 @@ def call(Map publishers) {
 
     publishers.each { publisherName, publisherConfig ->
         echo "[JPL] Running ${publisherName} with configuration: ${publisherConfig.toString()}"
-        
+
         if (getJenkinsOpts(isProperties: "LogParserPublisher") == false) {
           echo "[JPL] ${publisherName} UNSUPPORTED"
         }
-        
+
         switch (publisherName) {
             case "LogParserPublisher":
                 Map LogParserPublisherConfig = PublisherDefaults.LogParserPublisher << publisherConfig

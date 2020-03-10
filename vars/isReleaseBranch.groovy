@@ -26,8 +26,8 @@ def call(Map vars) {
     }
     catch(exc) {
         echo 'Warning: There were errors in isReleaseBranch. '+exc.toString()
-    }    
-    
+    }
+
     return false
-    
+
 }
