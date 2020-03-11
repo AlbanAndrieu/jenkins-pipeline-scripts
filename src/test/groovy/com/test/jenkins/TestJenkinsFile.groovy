@@ -79,7 +79,8 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 
 		//binding.setVariable('myenv' , '')
 		helper.registerAllowedMethod("myenv", [Map.class], {c -> "myenv"})
-		helper.registerAllowedMethod("getPropertyList", [], {c -> []})
+		helper.registerAllowedMethod("getPropertyList", [], {c -> []})	
+		
 		helper.registerAllowedMethod("defineEnvironment", [], null)
 		helper.registerAllowedMethod("printEnvironment", [], null)
 
@@ -105,7 +106,9 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 				)
 				)
 			]})
-
+		//helper.registerAllowedMethod("createPropertyList", [Map.class], null)
+		//helper.registerAllowedMethod("createPropertyList", [Map.class, Closure.class], null)
+		
 		helper.registerAllowedMethod("setBuildName", [], null)
 
 		helper.registerAllowedMethod("sh", [Map.class], {c -> "build.sh"})
@@ -134,9 +137,14 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("getDockerOpts", [], null)
 		helper.registerAllowedMethod("getDockerOpts", [Map.class], {c ->"-v /home/jenkins:/home/jenkins -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /var/run/docker.sock:/var/run/docker.sock"})
 
+		helper.registerAllowedMethod("getJenkinsOpts", [], null)
+		helper.registerAllowedMethod("getJenkinsOpts", [Map.class], {c ->"true"})
+		
 		helper.registerAllowedMethod("cleanStash", [], null)
 		helper.registerAllowedMethod("cleanStash", [Map.class], null)
 		helper.registerAllowedMethod("cleanStash", [Map.class, Closure.class], null)
+
+		helper.registerAllowedMethod("dockerTag", [String.class], {c ->"test"})
 	}
 
 	@Test

@@ -157,7 +157,7 @@ pipeline {
         //    CST_CONFIG = "docker/ubuntu18/config-BUILD.yaml"
         //}
         when {
-            expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+            expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
         }
         steps {
             script {

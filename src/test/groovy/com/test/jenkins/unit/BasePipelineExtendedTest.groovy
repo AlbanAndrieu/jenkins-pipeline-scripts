@@ -49,6 +49,9 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 
 		helper.registerAllowedMethod("steps", [Closure.class], null)
 		helper.registerAllowedMethod("script", [Closure.class], null)
+		
+		helper.registerAllowedMethod("when", [Closure.class], null)
+		helper.registerAllowedMethod("expression", [Closure.class], null)
 
 		helper.registerAllowedMethod("sh", [Map.class], {c -> "bcc19744"})
 		//helper.registerAllowedMethod("sh", [Map.class], null)
@@ -65,6 +68,11 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 		helper.registerAllowedMethod("junit", [Map.class], null)
 		helper.registerAllowedMethod("file", [Map.class], stringInterceptor)
 		helper.registerAllowedMethod("archiveArtifacts", [String.class], null)
+		
+		helper.registerAllowedMethod("tee", [String.class, Closure.class], null)
+		
+		binding.setVariable('docker', "")
+		helper.registerAllowedMethod("build", [String.class], null)
 	}
 
 }

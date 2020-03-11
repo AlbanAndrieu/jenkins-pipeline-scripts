@@ -28,7 +28,7 @@ def call(Map vars, Closure body=null) {
 
     script {
 
-        //tee("${vars.shellOutputFile}") {
+        tee("${vars.shellOutputFile}") {
 
             try {
 
@@ -52,7 +52,7 @@ def call(Map vars, Closure body=null) {
                 echo 'Warning: There were errors retrieving compose tests logs. '+exc.toString()
             }
 
-        //} // tee
+        } // tee
 
     } // script
 

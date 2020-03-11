@@ -1,7 +1,21 @@
-    import com.test.gradle.*
+import java.util.zip.ZipFile
+import com.test.gradle.*
 
 plugins {
     id "io.codearte.nexus-staging" version "0.8.0"
+    id 'org.gradle.test-retry' version '1.0.0'
+    id 'org.jenkins-ci.jpi' version '0.38.0'
+    id 'ru.vyarus.animalsniffer' version '1.5.0'
+    id 'com.github.spotbugs' version '3.0.0'
+    id 'codenarc'    
+    id 'jacoco'    
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+    throw new GradleException("Build requires Java ${JavaVersion.VERSION_1_8}")
 }
 
 apply plugin: 'groovy'
@@ -59,16 +73,6 @@ tasks.withType(GroovyCompile) {
   groovyClasspath += configurations.ivy
 }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from groovydoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
 artifacts {
     archives javadocJar, sourcesJar
 }
@@ -77,10 +81,50 @@ artifacts {
 //    sign configurations.archives
 //}
 
+if (project.hasProperty('maxParallelForks')) {
+  project.maxParallelForks = Integer.valueOf(project.maxParallelForks, 10)
+} else {
+  ext.maxParallelForks = 3
+}
+
+animalsniffer {
+    toolVersion = '1.18'
+    sourceSets = [sourceSets.main]
+    // We need to exclude this dependency from animalsniffer since it contains an invalid class
+    excludeJars 'icu4j-*'
+}
+
+spotbugs {
+    toolVersion '3.1.12'
+    // This prevents logging some errors when SpotBugs tries to open files as jar files.
+    // See https://github.com/gradle/gradle/issues/1094.
+    sourceSets = [sourceSets.main]
+}
+
+spotbugsMain {
+    classes = sourceSets.main.output
+}
+
+codenarc {
+    toolVersion '1.5'
+    sourceSets = [sourceSets.test]
+}
+
 test {
+    systemProperties['hudson.model.DownloadService.noSignatureCheck'] = 'true'
+    //exclude '**/integration/**'
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
     testLogging {
         events "PASSED", "FAILED", "SKIPPED"
     }
+    maxParallelForks = project.maxParallelForks
+    retry {
+      maxRetries = 1
+      maxFailures = 10
+    }        
 }
 
 jacocoTestReport {
@@ -167,3 +211,41 @@ task deploy(dependsOn: [build, uploadArchives, closeAndReleaseRepository])
 
 //task release(dependsOn: [writeVersion, tagVersion, commitRelease])
 //task nextDevVersion(dependsOn: [writeNextSnapshot, commitNextDevVersion])
+
+def checkArchiveManifest(File archive) {
+  new ZipFile(archive).withCloseable { archiveZip ->
+    archiveZip.getInputStream(archiveZip.getEntry('META-INF/MANIFEST.MF')).withStream {
+      assert it.text.contains("Plugin-Version: ${project.version}"): "Wrong metadate in file ${archive} - run a clean build"
+    }
+  }
+}
+
+tasks.withType(AbstractArchiveTask) {
+  inputs.property('pluginVersion') {
+    project.version
+  }
+}
+
+task checkArchiveManifests {
+  dependsOn jar, war
+  doLast {
+    checkArchiveManifest(jar.archiveFile.get().asFile)
+    checkArchiveManifest(war.archiveFile.get().asFile)
+  }
+}
+
+tasks.withType(AbstractPublishToMaven) {
+  dependsOn checkArchiveManifests
+}
+
+task createWrapperZip(type: Zip) {
+  archiveFileName = 'wrapper.zip'
+  destinationDirectory = new File(sourceSets.test.output.resourcesDir, 'gradle')
+
+  from(project.rootDir) {
+    include('gradle/**')
+    include('gradlew*')
+  }
+}
+
+processTestResources.dependsOn(createWrapperZip)
