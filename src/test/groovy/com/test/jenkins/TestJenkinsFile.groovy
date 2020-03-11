@@ -145,6 +145,7 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("cleanStash", [Map.class, Closure.class], null)
 
 		helper.registerAllowedMethod("dockerTag", [String.class], {c ->"test"})
+		
 	}
 
 	@Test

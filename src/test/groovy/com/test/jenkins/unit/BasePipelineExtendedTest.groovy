@@ -72,7 +72,28 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 		helper.registerAllowedMethod("tee", [String.class, Closure.class], null)
 		
 		binding.setVariable('docker', "")
-		helper.registerAllowedMethod("build", [String.class], null)
+		//helper.registerAllowedMethod("build", [String.class, String.class], null)
+		//helper.registerAllowedMethod("build", [], null)
+		
+		
+		helper.registerAllowedMethod("publishHTML", [], null)
+		helper.registerAllowedMethod("publishHTML", [Map.class], null)
+		
+		helper.registerAllowedMethod("checkStyle", [], null)
+		helper.registerAllowedMethod("cpd", [], null)
+		helper.registerAllowedMethod("cpd", [Map.class], null)
+		helper.registerAllowedMethod("pmdParser", [], null)
+		helper.registerAllowedMethod("pmdParser", [Map.class], null)
+		helper.registerAllowedMethod("pit", [], null)
+		helper.registerAllowedMethod("mavenConsole", [], null)
+		helper.registerAllowedMethod("java", [], null)
+		helper.registerAllowedMethod("java", [Map.class], null)
+		helper.registerAllowedMethod("javaDoc", [], null)
+		helper.registerAllowedMethod("spotBugs", [], null)
+		helper.registerAllowedMethod("excludeFile", [String.class], null)
+		
+		helper.registerAllowedMethod("recordIssues", [Map.class], null)
+		
 	}
 
 }

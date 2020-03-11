@@ -9,6 +9,8 @@ import static com.lesfurets.jenkins.unit.MethodCall.callArgsToString
 import static org.junit.Assert.assertTrue
 
 class TestExampleJob extends BasePipelineTest {
+	
+	private static String JOB = "job/exampleJob.jenkins"
 
     @Override
     @Before
@@ -25,7 +27,7 @@ class TestExampleJob extends BasePipelineTest {
 
     @Test
     void should_execute_without_errors() throws Exception {
-        def script = runScript("job/exampleJob.jenkins")
+        def script = runScript(JOB)
         script.execute()
         printCallStack()
         assertJobStatusSuccess()
@@ -33,7 +35,7 @@ class TestExampleJob extends BasePipelineTest {
 
     @Test
     void should_print_property_value() {
-        def script = runScript('job/exampleJob.jenkins')
+        def script = runScript(JOB)
         script.execute()
 
         def value = 'value'

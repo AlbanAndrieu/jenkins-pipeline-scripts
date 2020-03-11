@@ -65,8 +65,7 @@ def call(Map vars, Closure body=null) {
 			    if (body) { body() }
 
 			    build = sh (
-			      //script: "${script} 2>&1 > ${vars.shellOutputFile}",
-                              script: "${script},
+                  script: "${script}",
 			      returnStatus: true
 			    )
 

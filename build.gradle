@@ -6,8 +6,8 @@ plugins {
     id 'org.gradle.test-retry' version '1.0.0'
     id 'org.jenkins-ci.jpi' version '0.38.0'
     id 'ru.vyarus.animalsniffer' version '1.5.0'
-    id 'com.github.spotbugs' version '3.0.0'
-    id 'codenarc'    
+    //id 'com.github.spotbugs' version '3.0.0'
+    //id 'codenarc'    
     id 'jacoco'    
 }
 
@@ -94,21 +94,21 @@ animalsniffer {
     excludeJars 'icu4j-*'
 }
 
-spotbugs {
-    toolVersion '3.1.12'
-    // This prevents logging some errors when SpotBugs tries to open files as jar files.
-    // See https://github.com/gradle/gradle/issues/1094.
-    sourceSets = [sourceSets.main]
-}
+//spotbugs {
+//    toolVersion '3.1.12'
+//    // This prevents logging some errors when SpotBugs tries to open files as jar files.
+//    // See https://github.com/gradle/gradle/issues/1094.
+//    sourceSets = [sourceSets.main]
+//}
+//
+//spotbugsMain {
+//    classes = sourceSets.main.output
+//}
 
-spotbugsMain {
-    classes = sourceSets.main.output
-}
-
-codenarc {
-    toolVersion '1.5'
-    sourceSets = [sourceSets.test]
-}
+//codenarc {
+//    toolVersion '1.5'
+//    sourceSets = [sourceSets.test]
+//}
 
 test {
     systemProperties['hudson.model.DownloadService.noSignatureCheck'] = 'true'

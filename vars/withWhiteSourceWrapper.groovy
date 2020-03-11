@@ -25,7 +25,7 @@ def call(Map vars, Closure body=null) {
   vars.libIncludes = vars.get("libIncludes", "").trim()
   vars.libExcludes = vars.get("libExcludes", "").trim()
   vars.projectToken = vars.get("projectToken", "").trim()
-  #productToken 2dcf60630aca4d3fb29fe59ad731d488747f2f6b0ba04b8b8664ae3629a1c3ae
+  //productToken 2dcf60630aca4d3fb29fe59ad731d488747f2f6b0ba04b8b8664ae3629a1c3ae
   vars.jobUserKey = vars.get("jobUserKey", "cf5b762ee7ab4f2cb9fdab9728e59c2a3ccc2d77cb9b4718986dfe90fac671bb").trim()
   vars.skipFailure = vars.get("skipFailure", true).toBoolean()
 
@@ -50,7 +50,7 @@ def call(Map vars, Closure body=null) {
 
           whitesource jobApiToken: WHITESOURCE_TOKEN, jobCheckPolicies: 'global', jobForceUpdate: 'global', jobUserKey: vars.jobUserKey, libExcludes: vars.libExcludes, libIncludes: vars.libIncludes, product: vars.product, productVersion: vars.productVersion, projectToken: vars.projectToken, requesterEmail: vars.requesterEmail
 
-        if (body) { body() }
+          if (body) { body() }
 
         } // tee
       } catch (exc) {

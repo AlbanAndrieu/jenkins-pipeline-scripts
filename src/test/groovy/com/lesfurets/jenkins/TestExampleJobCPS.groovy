@@ -10,6 +10,8 @@ import com.lesfurets.jenkins.unit.cps.BasePipelineTestCPS
 
 class TestExampleJobCPS extends BasePipelineTestCPS {
 
+	private static String JOB = "job/exampleJob.jenkins"
+	
     @Override
     @Before
     void setUp() throws Exception {
@@ -25,7 +27,7 @@ class TestExampleJobCPS extends BasePipelineTestCPS {
 
     @Test
     void should_execute_without_errors() throws Exception {
-        def script = runScript("job/exampleJob.jenkins")
+        def script = runScript(JOB)
         script.execute()
         printCallStack()
         assertJobStatusSuccess()
@@ -33,7 +35,7 @@ class TestExampleJobCPS extends BasePipelineTestCPS {
 
     @Test
     void should_print_property_value() {
-        def script = runScript('job/exampleJob.jenkins')
+        def script = runScript(JOB)
         script.execute()
 
         def value = 'value'
