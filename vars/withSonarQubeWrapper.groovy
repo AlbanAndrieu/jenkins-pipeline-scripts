@@ -30,7 +30,7 @@ def call(Map vars, Closure body=null) {
     vars.targetBranch = vars.get("targetBranch", "develop").trim()
     vars.isScannerHome = vars.get("isScannerHome", true).toBoolean()
     if (vars.isScannerHome == true) {
-        def scannerHome = tool name: "${SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        def scannerHome = tool name: "${vars.SONAR_SCANNER}", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
         vars.sonarExecutable = vars.get("sonarExecutable", "${scannerHome}/bin/sonar-scanner")
     } else {
         // docker
@@ -77,7 +77,7 @@ def call(Map vars, Closure body=null) {
                     vars.buildCmdParameters += " -X -Dsonar.verbose=true "
                 }
 
-                if ( BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
+                if ( env.BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
                     echo "[JPL] isReleaseBranch, so no check for `Sonar.getSonarInclusions`"
                 } else {
                     if (!vars.skipInclusion) {
@@ -153,7 +153,7 @@ def call(Map vars, Closure body=null) {
                     withSonarQubeCheck(vars)
                 }
 
-                archiveArtifacts artifacts: "${vars.shellOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+                archiveArtifacts artifacts: "${vars.shellOutputFile}, **/report-task.txt", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 
             } // tee
 

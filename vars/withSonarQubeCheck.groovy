@@ -16,7 +16,7 @@ def call(Map vars, Closure body=null) {
 
     getJenkinsOpts(vars)
 
-    vars.reportTaskFile = vars.get("reportTaskFile", ".scannerwork/report-task.txt").trim() // .scannerwork/report-task.txt or .sonar/report-task.txt
+    vars.reportTaskFile = vars.get("reportTaskFile", ".scannerwork/report-task.txt").trim() // .scannerwork/report-task.txt or .sonar/report-task.txt or ./target/sonar/report-task.txt
     vars.timeout = vars.get("timeout", 5)
     vars.sleep = vars.get("sleep", 1)
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
@@ -79,6 +79,9 @@ def call(Map vars, Closure body=null) {
                   def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
                   // Parse issues count from json response
                   ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
+                  
+                  echo " json response : " + ret_json
+                  
                   for (item in ret_json["facets"]) {
                     if (item["property"] == "severities")
                       severities = item["values"]
@@ -87,10 +90,24 @@ def call(Map vars, Closure body=null) {
                     results.put(item["val"], item["count"])
                   }
                 } // withCredentials
+                echo "Writing : ${vars.sonarCheckResultFile}"
                 writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
 Dashboard URL: ${dashboardUrl}
 Issue count: ${results}
 Quality Gate status: ${qg.status}"""
+
+                // Fail the build if any CRITICAL or BLOCKER issues and is not in the release branch
+                if (!isReleaseBranch() && (results["CRITICAL"] > 0 || results["BLOCKER"] > 0 )) {
+                  if (!vars.skipFailure) {
+                    echo "SONAR CHECK UNSTABLE Pipeline aborted because the number of CRITICAL and BLOCKER and MAJOR issues is more than 0"
+                    currentBuild.result = 'UNSTABLE'
+                  } else {
+                    echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
+                    //error 'There are errors in sonar check'
+                  }                
+                  
+                }
+
                 // Fail the build if not release branch and quality gate status is not OK
                 if (!isReleaseBranch() && qg.status != 'OK') {
                   echo "Quality gate status NOT met on short-lived branch"
@@ -98,19 +115,15 @@ Quality Gate status: ${qg.status}"""
                     echo "SONAR CHECK UNSTABLE on QUALITY GATE"
                     currentBuild.result = 'UNSTABLE'
                     //error "Pipeline aborted because of quality gate status on short-lived branch"
+                  } else {
+                    echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
+                    //error 'There are errors in sonar check'
                   }
                 }
 
             } // withSonarQubeEnv
 
         } catch (exc) {
-          if (!vars.skipFailure) {
-              echo "SONAR CHECK UNSTABLE"
-              currentBuild.result = 'UNSTABLE'
-          } else {
-              echo "SONAR CHECK FAILURE skipped"
-              //error 'There are errors in sonar check'
-          }
           echo "WARNING : There was a problem retrieving sonar scan results" + exc.toString()
         }
 

@@ -5,11 +5,14 @@ RUN mvn --batch-mode -f /usr/src/app/pom.xml clean package
 
 FROM jenkins/jenkins:lts-jdk11 as RUNTIME
 
-#RUN mkdir $JENKINS_HOME/configs
-#COPY ./jenkins.yaml $JENKINS_HOME/configs/jenkins.yaml
-#ENV CASC_JENKINS_CONFIG=$JENKINS_HOME/configs
+RUN mkdir $JENKINS_HOME/configs
+COPY src/test/jenkins/jenkins.yaml $JENKINS_HOME/configs/jenkins.yaml
+ENV CASC_JENKINS_CONFIG=$JENKINS_HOME/configs
 
 ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+
+ENV JENKINS_OPTS --httpPort=-1 --httpsPort=8686
+ENV JENKINS_SLAVE_AGENT_PORT 50000
 
 RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   && /usr/local/bin/install-plugins.sh \
@@ -22,8 +25,23 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   workflow-aggregator \
   pipeline-utility-steps \
   generic-webhook-trigger \
-  git-changelog
+  tasks \
+  pipeline-maven \
+  locale \
+  sonar \
+  ws-cleanup \
+  ansicolor \
+  timestamper \
+  groovy-postbuild \
+  git-changelog \
+  prometheus
 
-USER 0
+#RUN apt-get update && apt-get install -y ruby make 
 
-EXPOSE 8080 50000
+COPY src/test/groovy/executors.groovy /usr/share/jenkins/ref/init.groovy.d/executors.groovy
+
+#USER 0
+# drop back to the regular jenkins user - good practice
+USER jenkins
+
+EXPOSE 8686 50000

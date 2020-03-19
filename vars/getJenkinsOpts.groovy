@@ -61,7 +61,7 @@ def call(Map vars, Closure body=null) {
   vars.isLogParserPublisher = vars.get("isLogParserPublisher", true).toBoolean()
 
   //if (JENKINS_URL ==~ /.*almonde-jenkins.*|.*risk-jenkins.*|.*test-jenkins.*|.*localhost.*/ ) {
-  if (JENKINS_URL == "https://albandrieu.com:8686/jenkins/" || JENKINS_URL == "http://albandri:8686/jenkins/" ) {
+  if ( JENKINS_URL ==~ /http:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// ) {
     echo "JPL is supported"
   } else {
     echo "JPL is NOT supported"

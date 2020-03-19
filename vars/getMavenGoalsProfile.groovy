@@ -40,7 +40,7 @@ def call(Map vars, Closure body=null) {
             echo "integration test added"
             vars.profile += ",run-integration-test"
         }
-        if (!vars.skipDocker && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /release.*/)) ) {
+        if (!vars.skipDocker) {
             echo "docker profile added"
             vars.profile += ",docker"
         }

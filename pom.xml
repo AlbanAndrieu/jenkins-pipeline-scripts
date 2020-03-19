@@ -111,12 +111,11 @@
         <maven.fabric8.docker.plugin.version>0.26.1</maven.fabric8.docker.plugin.version>
         <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
         <maven.jenkinsfile.plugin.version>1.0.0</maven.jenkinsfile.plugin.version>
-        <maven.jenkins.pipeline.unit.plugin.version>1.1</maven.jenkins.pipeline.unit.plugin.version>
+        <maven.jenkins.pipeline.unit.plugin.version>1.3</maven.jenkins.pipeline.unit.plugin.version>
 
         <jdk.version>1.8.0</jdk.version>
         <jdk.level>1.8</jdk.level>
-
-        <!--<sun.jsf.version>2.2.7</sun.jsf.version>-->
+        <java.level>8</java.level>
 
         <javaagent></javaagent>
         <jacoco.version>0.8.2</jacoco.version>
@@ -136,11 +135,11 @@
         <asm.ow2.version>5.0.3</asm.ow2.version>
         <jmockit.version>1.19</jmockit.version>
         <junit.version>4.12</junit.version>
-        <hamcrest.all.version>1.3</hamcrest.all.version>
-        <groovy.version>2.5.7</groovy.version>
+        <hamcrest.version>2.1</hamcrest.version>
+        <groovy.version>2.4.12</groovy.version>
         <ivy.version>2.4.0</ivy.version>
-        <groovy.cps.version>1.12</groovy.cps.version>
-        <slf4j.version>1.6.6</slf4j.version>
+        <groovy.cps.version>1.28</groovy.cps.version>
+        <slf4j.version>1.7.26</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <log4j.core.version>2.13.0</log4j.core.version>
         <logback.version>1.0.13</logback.version>
@@ -149,15 +148,17 @@
         <guava.version>18.0</guava.version>
         <doxia.core.version>1.8</doxia.core.version>
         <doxia.version>1.8.1</doxia.version>
-        <commons.io.version>2.5</commons.io.version>
+        <commons.io.version>2.6</commons.io.version>
+        <commons.lang3.version>3.7</commons.lang3.version>
         <commons.math3.version>3.2</commons.math3.version>
         <org.assertj.version>3.4.1</org.assertj.version>
 
-        <jenkins.version>2.102</jenkins.version>
+        <jenkins.version>2.221</jenkins.version>
         <jenkins.core.version>${jenkins.version}</jenkins.core.version>
-        <jenkins.workflow.step.api.version>2.10</jenkins.workflow.step.api.version>
-        <jenkins.workflow.cps.version>2.36</jenkins.workflow.cps.version>
-        <jenkins.symbol.version>1.10</jenkins.symbol.version>
+        <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
+        <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
+        <jenkins.workflow.cps.version>2.71</jenkins.workflow.cps.version>
+        <jenkins.symbol.version>1.18</jenkins.symbol.version>
 
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 
@@ -182,6 +183,31 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -197,6 +223,12 @@
             <artifactId>jenkins-pipeline-unit</artifactId>
             <version>${maven.jenkins.pipeline.unit.plugin.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.codehaus.groovy</artifactId>
+                    <groupId>groovy-all</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
@@ -229,9 +261,22 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${org.assertj.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -241,6 +286,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-scm-step</artifactId>
+            <version>${jenkins.workflow.scm.step.plugin.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
@@ -301,14 +351,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--
-        <dependency>
-             <groupId>org.hamcrest</groupId>
-             <artifactId>hamcrest-all</artifactId>
-             <version>${hamcrest.all.version}</version>
-             <scope>test</scope>
-        </dependency>
-        -->
         <!-- jmockit musr be after junit in the classpath -->
         <!--
         <dependency>
@@ -369,6 +411,26 @@
                                     <action>
                                         <ignore></ignore>
                                     </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                	<pluginExecutionFilter>
+                                		<groupId>
+                                			org.apache.maven.plugins
+                                		</groupId>
+                                		<artifactId>
+                                			maven-compiler-plugin
+                                		</artifactId>
+                                		<versionRange>
+                                			[0.0,)
+                                		</versionRange>
+                                		<goals>
+                                			<goal>compile</goal>
+                                			<goal>testCompile</goal>
+                                		</goals>
+                                	</pluginExecutionFilter>
+                                	<action>
+                                		<ignore></ignore>
+                                	</action>
                                 </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>

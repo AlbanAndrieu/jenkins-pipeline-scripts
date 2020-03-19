@@ -110,6 +110,37 @@ pipeline {
 
           withShellCheckWrapper(pattern: "*.sh")
 
+          step([
+              $class: 'CoberturaPublisher',
+              autoUpdateHealth: false,
+              autoUpdateStability: false,
+              coberturaReportFile: '**/coverage.xml',
+              //coberturaReportFile: 'target/site/cobertura/coverage.xml'
+              failUnhealthy: false,
+              failUnstable: false,
+              failNoReports: false,
+              maxNumberOfBuilds: 0,
+              onlyStable: false,
+              sourceEncoding: 'ASCII',
+              zoomCoverageChart: false
+              ])
+
+          recordIssues enabledForFailure: true, tool: checkStyle()
+          recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
+          recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
+          //recordIssues enabledForFailure: true, tool: pit()
+          //taskScanner()
+          recordIssues enabledForFailure: true,
+                     aggregatingResults: true,
+                     id: "analysis-java",
+                     tools: [mavenConsole(), java(reportEncoding: 'UTF-8'), javaDoc(),
+                             spotBugs(),
+                     ],
+                     filters: [excludeFile('.*\\/target\\/.*'),
+                               excludeFile('node_modules\\/.*'),
+                               excludeFile('npm\\/.*'),
+                               excludeFile('bower_components\\/.*')]
+
           //jacoco buildOverBuild: false, changeBuildStatus: false, execPattern: '**/target/**-it.exec'
 
           //perfpublisher healthy: '', metrics: '', name: '**/target/surefire-reports/**/*.xml', threshold: '', unhealthy: ''

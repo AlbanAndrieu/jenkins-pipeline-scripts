@@ -13,7 +13,7 @@ if [ -n "${JENKINS_URL}" ]; then
   echo -e "${green} JENKINS_URL is defined ${happy_smiley} : ${JENKINS_URL} ${NC}"
 else
   echo -e "${red} ${double_arrow} Undefined build parameter ${head_skull} : JENKINS_URL, use the default one ${NC}"
-  JENKINS_URL="https://localhost/"
+  JENKINS_URL="http://localhost:8686/jenkins/"
   export JENKINS_URL
   echo -e "${magenta} JENKINS_URL : ${JENKINS_URL} ${NC}"
 fi

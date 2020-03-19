@@ -20,7 +20,7 @@ def call(Map vars, Closure body=null) {
     //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
     vars.excludeFolders = vars.get("excludeFolders", ", bm").trim()
-    vars.projectName = vars.get("projectName", ", TEST_Checkmarx").trim()
+    vars.projectName = vars.get("projectName", "NABLA_" + env.JOB_BASE_NAME ?: "TEST").trim().replaceAll(' ','-')
     vars.preset = vars.get("preset", '17')
 
     vars.groupId = vars.get("groupId", '000').trim()

@@ -9,6 +9,8 @@ def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/withChangelog.groovy`"
 
+    vars = vars ?: [:]
+
     vars.showSummary = vars.get("showSummary", true).toBoolean()
     vars.isPublishEnabled = vars.get("isPublishEnabled", false).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", false).toBoolean()
@@ -23,7 +25,8 @@ def call(Map vars, Closure body=null) {
 		sh 'rm CHANGELOG.html'
 	}
 
-	writeFile file: "git-changelog-settings.json", text: '''
+    try {
+        writeFile file: "git-changelog-settings.json", text: '''
 {
  "fromRepo": ".",
  "fromCommit": "0000000000000000000000000000000000000000",
@@ -52,7 +55,7 @@ def call(Map vars, Closure body=null) {
 }
 '''
 
-	def createFileTemplateContent = '''<h1> Git Changelog changelog </h1>
+    def createFileTemplateContent = '''<h1> Git Changelog changelog </h1>
 
 <p>
 Changelog of Git Changelog.
@@ -89,51 +92,25 @@ Changelog of Git Changelog.
 {{/tags}}
 '''
 
-	step([$class: 'GitChangelogRecorder',
-		config: [configFile: 'git-changelog-settings.json',
-		createFileTemplateContent: createFileTemplateContent,
-		createFileTemplateFile: '',
-		createFileUseTemplateContent: true,
-		createFileUseTemplateFile: true,
-		customIssues: [[link: '', name: '', pattern: '', title: ''], [link: '', name: '', pattern: '', title: '']],
-		dateFormat: 'YYYY-MM-dd HH:mm:ss',
-		file: 'CHANGELOG.html',
-		fromReference: '',
-		fromType: 'firstCommit',
-		gitHubApi: '',
-		gitHubApiTokenCredentialsId: '',
-		gitHubIssuePattern: '#([0-9]+)',
-		gitLabApiTokenCredentialsId: '',
-		gitLabProjectName: '',
-		gitLabServer: '',
-		ignoreCommitsIfMessageMatches: '^\\[maven-release-plugin\\].*|^\\[Gradle Release Plugin\\].*|^Merge.*',
-		ignoreTagsIfNameMatches: '',
-		jiraIssuePattern: '\\b[a-zA-Z]([a-zA-Z]+)-([0-9]+)\\b',
-		jiraServer: 'https://almtools/jira/',
-		jiraUsernamePasswordCredentialsId: '0c7d55cb-866d-4df5-9f92-bada66b5288d',
-		noIssueName: 'No issue',
-		readableTagName: '/([^/]+?)$',
-		showSummaryTemplateFile: 'changelog.mustache',
-		showSummaryUseTemplateFile: true,
-		showSummary: vars.showSummary,
-		subDirectory: '',
-		timeZone: 'UTC',
-		toReference: '',
-		toType: 'refs/remotes/origin/develop',
-		untaggedName: 'Unreleased',
-		useConfigFile: false,
-		useFile: true]])
+        def changelogString = gitChangelog returnType: 'STRING',
+            from: [type: 'REF', value: 'develop'],
+            to: [type: 'REF', value: 'master'],
+            template: createFileTemplateContent
+            
+        currentBuild.description = changelogString
 
-	archiveArtifacts artifacts: 'CHANGELOG.html', excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
+        archiveArtifacts artifacts: 'CHANGELOG.html', excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
 
-	if (vars.isPublishEnabled) {
-		publishHTML (target: [
-		  allowMissing: true,
-		  alwaysLinkToLastBuild: false,
-		  keepAll: true,
-		  reportFiles: 'CHANGELOG.html',
-		  reportName: "Changelog"
-		])
-	}
-
+        if (vars.isPublishEnabled) {
+            publishHTML (target: [
+              allowMissing: true,
+              alwaysLinkToLastBuild: false,
+              keepAll: true,
+              reportFiles: 'CHANGELOG.html',
+              reportName: "Changelog"
+            ])
+        }
+    } catch (exc) {
+        echo "Warn: There was a problem with withChangelog " + exc.toString()
+    }
 }

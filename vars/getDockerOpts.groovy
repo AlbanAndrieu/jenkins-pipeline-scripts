@@ -12,31 +12,7 @@ def call(Map vars, Closure body=null) {
 
   vars = vars ?: [:]
 
-  def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-  def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-  def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-
-  def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins/").trim()
-
-  vars.isVirtualHost = vars.get("isVirtualHost", false).toBoolean()
-  vars.isRoot = vars.get("isRoot", false).toBoolean()
-  //vars.isCredentialsMapping = vars.get("isCredentialsMapping", true).toBoolean()
-  vars.isNetworkMapping = vars.get("isNetworkMapping", false).toBoolean()
-  vars.isPidMapping = vars.get("isPidMapping", false).toBoolean()
-  vars.isDnsSearchMapping = vars.get("isDnsSearchMapping", true).toBoolean()
-
-  vars.isNpmConfigPrefix = vars.get("isNpmConfigPrefix", false).toBoolean()
-  vars.isHomeWorkspace = vars.get("isHomeWorkspace", false).toBoolean()
-  vars.isInit = vars.get("isInit", false).toBoolean()
-
-  vars.isLocalJenkinsUser = vars.get("isLocalJenkinsUser", false).toBoolean()
-  vars.isLocalMavenRepository = vars.get("isLocalMavenRepository", false).toBoolean()
-  vars.isDockerCompose = vars.get("isDockerCompose", false).toBoolean() // In order to get access to /var/run/docker.sock
-  vars.isJenkinsTools = vars.get("isJenkinsTools", false).toBoolean()
-
-  vars.jenkinsToolsDirectory = vars.get("jenkinsToolsDirectory", "/workspace/slave/tools/").trim()
-  vars.mavenHome = vars.get("mavenHome", "${JENKINS_USER_HOME}/.m2/").trim()
-  vars.isEntrypoint = vars.get("isEntrypoint", true).toBoolean()
+  getJenkinsOpts(vars)
 
   String DOCKER_OPTS_USER_ID = [
      '-v /etc/passwd:/etc/passwd:ro',
@@ -75,7 +51,7 @@ def call(Map vars, Closure body=null) {
       DOCKER_OPTS_BASIC = [
           DOCKER_OPTS_BASIC,
           //DOCKER_OPTS_USER_ID,
-          "-v ${JENKINS_USER_HOME}:/home/jenkins"
+          "-v ${vars.JENKINS_USER_HOME}:/home/jenkins"
       ].join(" ")
   } else if (vars.isLocalMavenRepository == true) {
       // Only mounting maven repository

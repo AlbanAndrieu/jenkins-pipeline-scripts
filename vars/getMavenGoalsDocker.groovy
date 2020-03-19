@@ -18,9 +18,9 @@ def call(Map vars, Closure body=null) {
     vars.skipDocker = vars.get("skipDocker", true).toBoolean()
     vars.mavenGoals = vars.get("mavenGoals", "")
 
-    if (!vars.skipDocker && ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME ==~ /release.*/))) {
+    if (!vars.skipDocker) {
         if (!DRY_RUN && !RELEASE) {
-            echo "obfuscation added"
+            echo "docker added"
             withCredentials([
               usernamePassword(credentialsId: 'jenkins-https', passwordVariable: 'PASSWORD', usernameVariable: 'USER')
             ]) {

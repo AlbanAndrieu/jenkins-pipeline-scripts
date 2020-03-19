@@ -27,6 +27,9 @@ def call(Map vars, Closure body=null) {
     //def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
     vars.JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8").trim() // java-latest
 
+    String MAVEN_SETTINGS_XML = ""
+    String MAVEN_SETTINGS_SECURITY_XML = ""
+
     if (vars.DEBUG_RUN) {
          echo "debug added"
          MAVEN_OPTS_DEFAULT = ["${MAVEN_OPTS_DEFAULT}",
@@ -63,8 +66,8 @@ def call(Map vars, Closure body=null) {
         tee("${vars.shellOutputFile}") {
 
             // TODO configFileProvider do not work on docker, it is working on VM only and might fail then when JENKINS_USER_HOME do not exist
-            configFileProvider([configFile(fileId: "${vars.MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: vars.SETTINGS_XML),
-                configFile(fileId: "${vars.MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: vars.MAVEN_SETTINGS_SECURITY_CONFIG)]) {
+            configFileProvider([configFile(fileId: "${vars.MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: MAVEN_SETTINGS_XML),
+                configFile(fileId: "${vars.MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: MAVEN_SETTINGS_SECURITY_XML)]) {
                 withMaven(
                     maven: "${vars.MAVEN_VERSION}",
                     jdk: "${vars.JDK_VERSION}",
@@ -119,19 +122,19 @@ def call(Map vars, Closure body=null) {
                         vars.mavenGoals += " -Dmaven.repo.local=./.repository "
 
                         if (!vars.skipMavenSettings) {
-                           vars.mavenGoals += " -s ${vars.SETTINGS_XML} "
+                           vars.mavenGoals += " -s ${vars.mavenHome}/settings.xml "
                         }
 
                         if (vars.CLEAN_RUN) {
-                          vars.mavenGoals += " -U clean"
+                          vars.mavenGoals += " -U clean "
                         }
 
                         if (!vars.DRY_RUN) {
                             if (vars.goal?.trim()) {
-                                vars.mavenGoals += " ${vars.goal}"
+                                vars.mavenGoals += " ${vars.goal} "
                             }
                         } else {
-                            vars.mavenGoals += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true"
+                            vars.mavenGoals += " validate -Dsonar.analysis.mode=preview -Denforcer.skip=true "
                         }
 
                         if (vars.buildCmdParameters?.trim()) {
@@ -236,6 +239,6 @@ def call(Map vars, Closure body=null) {
             stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
         }
 
-        archiveArtifacts artifacts: "*.log, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+        archiveArtifacts artifacts: "*.log, **/report-task.txt, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     }
 }

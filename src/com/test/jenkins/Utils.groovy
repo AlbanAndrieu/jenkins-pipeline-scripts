@@ -34,6 +34,16 @@ class Utils {
         }
     }
 
+    @NonCPS static def stashRestCall(def apiUrl, def login, def password, def method, def query=""){
+        def token = ("${login}:${password}").bytes.encodeBase64().toString()
+        def headers = [:]
+        headers["Content-Type"] = "application/json"
+        headers["X-Atlassian-Token"] = "no-check"
+        headers["Authorization"] = "Basic ${token}"
+	    
+        return Utils.callURL("${apiUrl}", "${query}", method, headers)
+    }
+
     @NonCPS static def callURL(def urlString) {
         Utils.callURL(urlString, "GET")
     }

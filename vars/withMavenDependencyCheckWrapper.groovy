@@ -44,8 +44,12 @@ def call(Map vars, Closure body=null) {
 
         }
 
-        dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/dependency-check-report.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
-
+        try {
+            dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/dependency-check-report.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+        } catch (exc) {
+            echo "Warn: There was a problem with dependencyCheckPublisher " + exc.toString()
+        }
+  
     } // if DRY_RUN
 
 }

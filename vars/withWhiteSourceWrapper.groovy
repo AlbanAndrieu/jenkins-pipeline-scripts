@@ -18,7 +18,7 @@ def call(Map vars, Closure body=null) {
   String WHITESOURCE_TOKEN = vars.get("WHITESOURCE_TOKEN", "27651afa-9e00-4c57-9f0e-7df9358e6750").trim()
   String WHITESOURCE_URL="https://saas.whitesourcesoftware.com/".trim()
 
-  vars.projectName = vars.get("projectName", "test").trim().replaceAll(' ','-')
+  vars.projectName = vars.get("projectName", "NABLA_" + env.JOB_BASE_NAME ?: "TEST").trim().replaceAll(' ','-')
   vars.projectVersion = vars.get("projectVersion", "").trim()
   vars.productVersion = vars.get("productVersion", "").trim()
   vars.product = vars.get("product", "nabla").trim().replaceAll(' ','-')

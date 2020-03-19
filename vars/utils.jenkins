@@ -13,6 +13,12 @@ private static String cleanName(String s) {
     return s.replaceAll(/\W/, '_').toUpperCase()
 }
 
+def getPomVersion(String pomFilePath) {
+    // PLUG-IN REQUIREMENT: pipeline-utility-steps
+    def mavenPom = readMavenPom file: pomFilePath
+    return mavenPom.getVersion()
+}
+
 /**
  * Returns the version of a property inside a maven pom.
  * To get the module version, use the "version" property name.
