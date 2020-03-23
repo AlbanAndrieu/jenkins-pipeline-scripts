@@ -16,7 +16,7 @@ ENV JENKINS_SLAVE_AGENT_PORT 50000
 
 RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   && /usr/local/bin/install-plugins.sh \
-#  groovy-events-listener-plugin:latest \ # warning about groovy version
+  groovy-events-listener-plugin:1.014 \
   configuration-as-code \
   configuration-as-code-support \
   blueocean \
@@ -34,13 +34,10 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   timestamper \
   groovy-postbuild \
   git-changelog \
-  prometheus
+  prometheus:latest
 
-#RUN apt-get update && apt-get install -y ruby make 
+COPY src/test/groovy/04-Executors.groovy /usr/share/jenkins/ref/init.groovy.d/04-Executors.groovy
 
-COPY src/test/groovy/executors.groovy /usr/share/jenkins/ref/init.groovy.d/executors.groovy
-
-#USER 0
 # drop back to the regular jenkins user - good practice
 USER jenkins
 
