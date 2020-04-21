@@ -34,11 +34,11 @@ def defineEnvironment() {
 
 	//createGlobalEnvironmentVariables('Var1','DummyValue')
 	// if you have Failed to run image Error: docker: invalid reference format.: repository name must be lowercase
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP','registry-tmp.nabla.mobi').toLowerCase().trim()
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY','registry.nabla.mobi').toLowerCase().trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP','registry-tmp.albandieu.com').toLowerCase().trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY','registry.albandieu.com').toLowerCase().trim()
 	createGlobalEnvironmentVariables('DOCKER_REGISTRY_TMP_URL',"https://${DOCKER_REGISTRY_TMP}").trim()
 	createGlobalEnvironmentVariables('DOCKER_REGISTRY_URL',"https://${DOCKER_REGISTRY}").trim()
-	createGlobalEnvironmentVariables('DOCKER_REGISTRY_CREDENTIAL','jenkins').trim()
+	createGlobalEnvironmentVariables('DOCKER_REGISTRY_CREDENTIAL','hub-docker-nabla').trim()
 	createGlobalEnvironmentVariables('DOCKER_ORGANISATION','nabla').trim()
 
 	createGlobalEnvironmentVariables('COMPOSE_HTTP_TIMEOUT','200')
