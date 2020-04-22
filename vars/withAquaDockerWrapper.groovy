@@ -110,8 +110,8 @@ def call(Map vars, Closure body=null) {
         if (body) { body() }
 
       } catch (exc) {
-        currentBuild.result = 'FAILURE'
-        error "There was a problem with aqua scan image \'${vars.imageName}\' " + exc.toString()
+        //currentBuild.result = 'FAILURE'
+        echo "WARNING : There was a problem with aqua scan image \'${vars.imageName}\' : " + exc.toString()
       }
 
     //}  // withRegistry
@@ -127,7 +127,7 @@ def call(Map vars, Closure body=null) {
 
     //} // tee
   } finally {
-    archiveArtifacts artifacts: "*.log, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+    archiveArtifacts artifacts: "${vars.shellOutputFile}, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
   }
 
 }

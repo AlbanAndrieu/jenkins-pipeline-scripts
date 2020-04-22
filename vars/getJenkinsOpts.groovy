@@ -23,10 +23,10 @@ def call(Map vars, Closure body=null) {
   vars.SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
   //vars.SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE").trim()
 
-  vars.STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", env.STASH_CREDENTIALS ?: "jenkins").trim()
-  vars.SONAR_CREDENTIALS = vars.get("SONAR_CREDENTIALS", env.SONAR_CREDENTIALS ?: "jenkins").trim()
+  vars.STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", env.STASH_CREDENTIALS ?: "stash-jenkins").trim()
+  vars.SONAR_CREDENTIALS = vars.get("SONAR_CREDENTIALS", env.SONAR_CREDENTIALS ?: "sonarcloud-nabla").trim()
 
-  vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_CREDENTIALS ?: "jenkins").trim()
+  vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_CREDENTIALS ?: "jenkins-ssh").trim()
 
   vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins/").trim()
 
@@ -66,8 +66,8 @@ def call(Map vars, Closure body=null) {
   } else {
     echo "JPL is NOT supported"
     vars.isLogParserPublisher = false
-    vars.SONAR_INSTANCE = "sonar".trim()
-    vars.SONAR_CREDENTIALS = "jenkins".trim()
+    //vars.SONAR_INSTANCE = "sonar".trim()
+    //vars.SONAR_CREDENTIALS = "jenkins".trim()
   }
 
   if (vars.SONAR_INSTANCE == "sonartest") {

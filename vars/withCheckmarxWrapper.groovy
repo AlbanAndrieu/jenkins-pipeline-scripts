@@ -50,6 +50,7 @@ def call(Map vars, Closure body=null) {
 
     if (!DRY_RUN && !RELEASE) {
 
+         try {
          def userInput = false
          def didTimeout = false
          def userAborted = false
@@ -156,6 +157,9 @@ def call(Map vars, Closure body=null) {
             echo "this was not successful"
             //currentBuild.result = 'FAILURE'
         } // if didTimeout
+       } catch (exc) {
+         echo "WARNING : There was a problem retrieving checkmarx scan" + exc.toString()
+       } 
     } // if DRY_RUN
 
 }

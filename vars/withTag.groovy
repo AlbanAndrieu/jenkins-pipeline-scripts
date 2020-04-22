@@ -35,7 +35,9 @@ def call(Map vars, Closure body=null) {
 
             try {
                 sh """
-                    git tag -l | xargs git tag -d # remove all local tags;
+                    #git tag -l | xargs git tag -d # remove all local tags;
+                    which git;
+                    git --version;
                     git push --delete ${remote} ${tagName} || echo "Could not delete remote tag: does not exist or no access rights" || true;
                     git fetch --tags --prune > /dev/null 2>&1 || true;
                     git tag -a ${tagName} -m '${message}'; # create new tag

@@ -22,6 +22,7 @@ def call(Map vars, Closure body=null) {
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.isAbortPipeline = vars.get("isAbortPipeline", false).toBoolean() // true = set pipeline to UNSTABLE, false = don't
     vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+    vars.skipWaitForQualityGate = vars.get("skipWaitForQualityGate", true).toBoolean()
     vars.sonarCheckOutputFile = vars.get("sonarCheckOutputFile", "sonar-check.log").trim()
     vars.sonarCheckResultFile = vars.get("sonarCheckResultFile", "sonar-result.log").trim()
 
@@ -34,22 +35,24 @@ def call(Map vars, Closure body=null) {
 
                 def qg = null
 
-                // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
-                retry(10) {
-                    sleep(time: vars.sleep, unit:"MINUTES")
-                    println "Wait for Quality Gate"
-
-                    timeout(time: vars.timeout, unit: 'MINUTES') {
-
-                      qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
-                      if (qg.status == 'OK')
-                        echo "Quality Gate status is OK"
-                      else
-                        echo "WARNING: Quality Gate status is ${qg.status}"
-
-                    } // timeout
-
-                } // retry
+                if (!vars.skipWaitForQualityGate) {
+                    // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
+                    retry(10) {
+                        sleep(time: vars.sleep, unit:"MINUTES")
+                        println "Wait for Quality Gate"
+			    
+                        timeout(time: vars.timeout, unit: 'MINUTES') {
+			    
+                          qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
+                          if (qg.status == 'OK')
+                            echo "Quality Gate status is OK"
+                          else
+                            echo "WARNING: Quality Gate status is ${qg.status}"
+			    
+                        } // timeout
+			    
+                    } // retry
+			    } // skipWaitForQualityGate
 
                 // Read branch and projectKey from report-task.txt
                 def report = readProperties file: vars.reportTaskFile
@@ -91,10 +94,14 @@ def call(Map vars, Closure body=null) {
                   }
                 } // withCredentials
                 echo "Writing : ${vars.sonarCheckResultFile}"
+                
+                if (null != qg) {
+					echo "Quality Gate status: ${qg.status}"
+			    }
+                
                 writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
 Dashboard URL: ${dashboardUrl}
-Issue count: ${results}
-Quality Gate status: ${qg.status}"""
+Issue count: ${results}"""
 
                 // Fail the build if any CRITICAL or BLOCKER issues and is not in the release branch
                 if (!isReleaseBranch() && (results["CRITICAL"] > 0 || results["BLOCKER"] > 0 )) {
@@ -109,7 +116,7 @@ Quality Gate status: ${qg.status}"""
                 }
 
                 // Fail the build if not release branch and quality gate status is not OK
-                if (!isReleaseBranch() && qg.status != 'OK') {
+                if (!isReleaseBranch() && null != qg && qg.status != 'OK') {
                   echo "Quality gate status NOT met on short-lived branch"
                   if (!vars.skipFailure) {
                     echo "SONAR CHECK UNSTABLE on QUALITY GATE"

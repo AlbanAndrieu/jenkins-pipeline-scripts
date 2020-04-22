@@ -73,9 +73,10 @@ def call(String shell, String targetDirectory) {
 			} // tee
 
 		} catch (e) {
-			currentBuild.result = 'FAILURE'
-			build = "FAIL" // make sure other exceptions are recorded as failure too
-			throw e
+			echo "SPHINX FAILURE"
+            currentBuild.result = 'FAILURE'
+            //build = "FAIL" // make sure other exceptions are recorded as failure too
+            echo "WARNING : There was a problem with sphinx " + exc.toString()
 		} finally {
 		    archiveArtifacts artifacts: "sphinx.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}

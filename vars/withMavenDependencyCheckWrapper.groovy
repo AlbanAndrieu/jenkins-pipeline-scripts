@@ -26,6 +26,7 @@ def call(Map vars, Closure body=null) {
     //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
     vars.skipSonar = vars.get("skipSonar", true).toBoolean()
     vars.skipPitest = vars.get("skipPitest", true).toBoolean()
+    vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.skipDocker = vars.get("skipDocker", true).toBoolean()
     vars.skipArtifacts = vars.get("skipArtifacts", true).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()

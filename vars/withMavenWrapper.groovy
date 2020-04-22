@@ -55,7 +55,7 @@ def call(Map vars, Closure body=null) {
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
     vars.skipDeploy = vars.get("skipDeploy", true).toBoolean()
     vars.skipMavenSettings = vars.get("skipMavenSettings", false).toBoolean()
-    vars.skipSonarCheck = vars.get("skipSonarCheck", false).toBoolean()
+    vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.pomFile = vars.get("pomFile", "pom.xml").trim()
     vars.mavenGoals = vars.get("mavenGoals", "").trim()
@@ -159,7 +159,8 @@ def call(Map vars, Closure body=null) {
                         vars.buildCmd += " ${vars.mavenGoals}"
 
                         // TODO Remove it when tee will be back
-                        //vars.buildCmd += " 2>&1 > ${vars.shellOutputFile} "
+                        //if (vars.skipSonar.toBoolean())
+                        //    vars.buildCmd += " 2>&1 > ${vars.shellOutputFile} "
 
                         //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                             // Run the maven build

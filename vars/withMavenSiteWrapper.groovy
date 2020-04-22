@@ -26,8 +26,10 @@ def call(Map vars, Closure body=null) {
     //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
     vars.skipSonar = vars.get("skipSonar", true).toBoolean()
     vars.skipPitest = vars.get("skipPitest", true).toBoolean()
+    vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "")
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
+    vars.shellOutputFile = vars.get("shellOutputFile", "maven-site.log").trim()
 
     if (!DRY_RUN) {
 

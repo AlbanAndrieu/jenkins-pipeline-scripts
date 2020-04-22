@@ -34,7 +34,7 @@ def call(Map vars, Closure body=null) {
       DOCKER_OPTS_BASIC += ' --pid=host'
   }
   if (vars.isDnsSearchMapping == true) {
-      DOCKER_OPTS_BASIC += " --dns-search=nabla.mobi"
+      DOCKER_OPTS_BASIC += " --dns-search=albandrieu.com"
   }
   if (vars.isInit == true) {
       DOCKER_OPTS_BASIC += ' --init'

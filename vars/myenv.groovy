@@ -47,6 +47,8 @@ def defineEnvironment() {
 	createGlobalEnvironmentVariables('SONAR_SCANNER_OPTS','-Xmx2g').trim()
 	createGlobalEnvironmentVariables('SONAR_USER_HOME',"$WORKSPACE").trim()
 	createGlobalEnvironmentVariables('JENKINS_CREDENTIALS','jenkins-ssh').trim()
+	createGlobalEnvironmentVariables('STASH_CREDENTIALS','stash-jenkins').trim()
+	createGlobalEnvironmentVariables('SONAR_CREDENTIALS','sonarcloud-nabla').trim()
 
 	createGlobalEnvironmentVariables('CLEAN_RUN',false)
 	createGlobalEnvironmentVariables('DRY_RUN',false)

@@ -66,10 +66,11 @@ def call(String shell) {
 				} // configFileProvider
 
 			} // tee
-		} catch (e) {
+		} catch (exc) {
+			echo "ANSIBLE CMDB FAILURE"
 			currentBuild.result = 'FAILURE'
-			build = "FAIL" // make sure other exceptions are recorded as failure too
-			throw e
+			//build = "FAIL" // make sure other exceptions are recorded as failure too
+			echo "WARNING : There was a problem with sphinx " + exc.toString()
 		} finally {
 		    archiveArtifacts artifacts: "overview.html, ansible-lint.*, ansible-cmdb.log", onlyIfSuccessful: false, allowEmptyArchive: true
 		}
