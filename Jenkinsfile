@@ -163,7 +163,7 @@ pipeline {
         } // script
       } // steps
     } // stage Maven
-    stage('SonarQube analysis') {
+    stage('\u2795 Quality - SonarQube analysis') {
       environment {
         SONAR_USER_HOME = "$WORKSPACE"
       }
@@ -183,7 +183,7 @@ pipeline {
         }
       } // steps
     } // stage SonarQube analysis
-    stage('Build - Docker') {
+    stage('\u27A1 Build - Docker') {
         //environment {
         //    CST_CONFIG = "docker/ubuntu18/config-BUILD.yaml"
         //}
@@ -229,7 +229,7 @@ pipeline {
             } // script
         } // steps
     } // Build - Docker
-    stage('E2E tests') {
+    stage('\u2795 Quality - E2E tests') {
       steps {
         script {
           try {
@@ -244,27 +244,28 @@ pipeline {
                  currentBuild.result = 'UNSTABLE'
                  //sh "exit 1" // this fails the stage
               }
-
             } // parallel
-          } catch (e) {
-             currentBuild.result = 'FAILURE'
-             result = "FAIL" // make sure other exceptions are recorded as failure too
+		  } catch (exc) {
+			echo "E2E FAILURE"
+			//currentBuild.result = 'FAILURE'
+			//build = "FAIL" // make sure other exceptions are recorded as failure too
+			echo "WARNING : There was a problem with e2e job test " + exc.toString()
           }
         }
       } // steps
     } // stage SonarQube analysis
-    stage('\u2795 Quality - Security - Checkmarx') {
-        steps {
-            script {
-		withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts',
-			preset: '1',
-			groupId: '1234',
-			lowThreshold: 10,
-			mediumThreshold: 0,
-			highThreshold: 0)
-            } // script
-        } // steps
-    } // stage Security
+    //stage('\u2795 Quality - Security - Checkmarx') {
+    //  steps {
+    //    script {
+	//       withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts',
+	//     	                    preset: '1',
+	//     	                    groupId: '1234',
+	//     	                    lowThreshold: 10,
+	//     	                    mediumThreshold: 0,
+	//     	                    highThreshold: 0)
+    //    } // script
+    //  } // steps
+    //} // stage Security
   } // stages
   post {
     always {
