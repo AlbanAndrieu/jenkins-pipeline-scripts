@@ -72,7 +72,7 @@ def call(String shell, String targetDirectory) {
 
 			} // tee
 
-		} catch (e) {
+		} catch (exc) {
 			echo "SPHINX FAILURE"
             currentBuild.result = 'FAILURE'
             //build = "FAIL" // make sure other exceptions are recorded as failure too
