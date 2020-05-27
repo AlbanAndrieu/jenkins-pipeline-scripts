@@ -27,11 +27,53 @@ def call(body) {
     parent = pom.getParent()
     if (parent != null) {
       parentVersion = parent.getVersion()
-      println("Current parent pom version is ${version}")
+      println("Current parent pom version is ${parentVersion}")
       if (parentVersion.contains("SNAPSHOT")) {
         parent.setVersion(config.newVersion)
         pom.setParent(parent)
         println("Changed parent pom version to ${config.newVersion}")
+      }
+    }
+    dependencies = pom.getDependencies()
+    if(dependencies != null){
+     for (dep in dependencies){
+        println("FOUND DEPENDENCY: ${dep.toString()}")
+        try{
+           dependencyVersion = dep.getVersion()
+           if(dependencyVersion != null){
+            if(dependencyVersion.contains("SNAPSHOT")){
+                dep.setVersion(config.newVersion)
+                pom.setDependency(dep)
+                println("Changed dependency version from ${dependencyVersion}")
+            }
+           }
+         }catch(Exception ex){
+            println("EXCEPTION CAUGHT! DEPENDENCY WAS NOT SWAPPED")
+            println(ex.toString())
+          }
+     }
+    }
+    depManagment = pom.getDependencyManagement()
+    if(depManagment != null){
+      dependencies = depManagment.getDependencies()
+      if(dependencies != null){
+       for (dep in dependencies){
+          println("FOUND DEPENDENCY: ${dep.toString()}")
+          try{
+             dependencyVersion = dep.getVersion()
+             if(dependencyVersion != null){
+              if(dependencyVersion.contains("SNAPSHOT")){
+                  dep.setVersion(config.newVersion)
+                   depManagment.addDependency(dep)
+                  println("Changed dependency version from ${dependencyVersion}")
+              }
+             }
+           }catch(Exception ex){
+              println("EXCEPTION CAUGHT! DEPENDENCY WAS NOT SWAPPED")
+              println(ex.toString())
+            }
+       }
+       pom.setDependencyManagement(depManagment)
       }
     }
     writeMavenPom(model: pom, file: fileName)

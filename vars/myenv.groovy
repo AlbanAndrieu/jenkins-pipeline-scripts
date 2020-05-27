@@ -43,12 +43,23 @@ def defineEnvironment() {
 
 	createGlobalEnvironmentVariables('COMPOSE_HTTP_TIMEOUT','200')
 
+    createGlobalEnvironmentVariables('HELM_PROJECT','nabla').trim()
+    createGlobalEnvironmentVariables('HELM_REGISTRY','registry.albandieu.com').trim()
+    createGlobalEnvironmentVariables('HELM_REGISTRY_URL',"https://${HELM_REGISTRY}/api/chartrepo/${HELM_PROJECT}/charts").trim()
+    createGlobalEnvironmentVariables('HELM_REGISTRY_TMP','registry-tmp.albandieu.com').trim()
+    createGlobalEnvironmentVariables('HELM_REGISTRY_TMP_URL',"https://${HELM_REGISTRY_TMP}/api/chartrepo/${HELM_PROJECT}/charts").trim()
+    createGlobalEnvironmentVariables('HELM_REGISTRY_CREDENTIAL',"devops.jenkins").trim()
+
 	createGlobalEnvironmentVariables('SONAR_INSTANCE','sonar').trim()
 	createGlobalEnvironmentVariables('SONAR_SCANNER_OPTS','-Xmx2g').trim()
 	createGlobalEnvironmentVariables('SONAR_USER_HOME',"$WORKSPACE").trim()
+	createGlobalEnvironmentVariables('SONAR_CREDENTIALS','devops.jenkins').trim()
+
 	createGlobalEnvironmentVariables('JENKINS_CREDENTIALS','jenkins-ssh').trim()
 	createGlobalEnvironmentVariables('STASH_CREDENTIALS','stash-jenkins').trim()
 	createGlobalEnvironmentVariables('SONAR_CREDENTIALS','sonarcloud-nabla').trim()
+
+	createGlobalEnvironmentVariables('CHECKMARX_CREDENTIALS',jenkins.checkmarx').trim()
 
 	createGlobalEnvironmentVariables('CLEAN_RUN',false)
 	createGlobalEnvironmentVariables('DRY_RUN',false)

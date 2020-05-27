@@ -13,9 +13,9 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     String MAVEN_OPTS_DEFAULT = ["-Djava.awt.headless=true",
+       "-Xmx2G",
         //"-Dsun.zip.disableMemoryMapping=true",
         //"-Dmaven.repo.local=./.repository",
-        "-Xmx2G",
         //"-Djava.io.tmpdir=./target/tmp",
         ].join(" ")
 
@@ -89,13 +89,13 @@ def call(Map vars, Closure body=null) {
 
                             if (!vars.RELEASE_VERSION) {
                                 echo 'No RELEASE_VERSION specified'
-                                vars.RELEASE_VERSION = getReleasedVersion(vars) ?: "LATEST"
+                                vars.RELEASE_VERSION = getReleasedVersion(vars) ?: "0.0.1"
                                 //if (!vars.RELEASE_VERSION) {
                                 //   error 'No RELEASE_VERSION found'
                                 //}
                             }
 
-                            TARGET_TAG = getShortReleasedVersion(vars) ?: "LATEST"
+                            TARGET_TAG = getShortReleasedVersion(vars) ?: "0.0.1"
                             echo "Maven RELEASE_VERSION: ${vars.RELEASE_VERSION} - ${TARGET_TAG}"
 
                             manager.addShortText("${TARGET_TAG}")
@@ -119,7 +119,7 @@ def call(Map vars, Closure body=null) {
                            }
                         }
 
-                        vars.mavenGoals += " -Dmaven.repo.local=./.repository "
+                        vars.mavenGoals += " ${vars.MAVEN_OPTS} -Dmaven.repo.local=./.repository "
 
                         if (!vars.skipMavenSettings) {
                            vars.mavenGoals += " -s ${vars.mavenHome}/settings.xml "
@@ -187,14 +187,13 @@ def call(Map vars, Closure body=null) {
                             }
                             if (body) { body() }
                         //} // Xvfb
+                        if (!vars.skipSonarCheck && !vars.skipSonar) {
+                            vars.sonarCheckOutputFile = "maven-sonar-check.log"
+                            withSonarQubeCheck(vars)
+                        }
                     } // withSonarQubeEnv
                 } // withMaven
             } // configFileProvider
-
-			if (!vars.skipSonarCheck && !vars.skipSonar) {
-				vars.sonarCheckOutputFile = "maven-sonar-check.log"
-				withSonarQubeCheck(vars)
-			}
 
             if (!vars.skipResults) {
                 if (!vars.DRY_RUN) {
@@ -205,10 +204,6 @@ def call(Map vars, Closure body=null) {
 
                     stash includes: "**/target/classes/**", name: 'classes'
                 }
-
-                if ((!vars.DRY_RUN && !vars.RELEASE) && !vars.skipTests) {
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                } // if DRY_RUN
 
             } // skipResults
 
@@ -234,12 +229,15 @@ def call(Map vars, Closure body=null) {
          //    useStableBuildAsReference: true
          //    ])
 
+        if ((!vars.DRY_RUN && !vars.RELEASE) && !vars.skipTests) {
+            junit '**/target/surefire-reports/TEST-*.xml, **/target/failsafe-reports-embedded/TEST-*.xml'
+        } // if DRY_RUN
         if (!vars.skipResults) {
             stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
 
             stash allowEmpty: true, includes: "${vars.artifacts}", name: 'app'
         }
 
-        archiveArtifacts artifacts: "*.log, **/report-task.txt, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+        archiveArtifacts artifacts: "*.log, **/report-task.txt, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT, ${vars.artifacts}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     }
 }

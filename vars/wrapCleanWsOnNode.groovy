@@ -10,7 +10,7 @@ def call(Map vars, Closure body=null) {
     echo "[JPL] Executing `vars/wrapCleanWsOnNode.groovy`"
 
     vars = vars ?: [:]
-    
+
     vars.nodeLabel = vars.get("nodeLabel", "any||flyweight").trim()
 
     if ( "${vars.nodeLabel}".trim() == "") {

@@ -12,7 +12,7 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    String RELEASE_VERSION_SEMVER = "LATEST"
+    String RELEASE_VERSION_SEMVER = "0.0.1"
 
     tokens = getReleasedVersion(vars).tokenize('.')
 

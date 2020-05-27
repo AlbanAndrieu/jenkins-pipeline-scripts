@@ -61,7 +61,7 @@ def call(Map vars, Closure body=null) {
                 def dashboardUrl = report["dashboardUrl"]
 
                 // Create REST call to SonarQube for issues count grouped by severity
-                def apiUrl = "https://${vars.SONAR_INSTANCE}/api/issues/search"
+                def apiUrl = "https://${vars.SONAR_HOST}/api/issues/search"
                 def severities = ""
                 def query = "branch=${branch}"
                 query += "&componentKeys=${projectKey}"
@@ -111,8 +111,7 @@ Issue count: ${results}"""
                   } else {
                     echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
                     //error 'There are errors in sonar check'
-                  }                
-                  
+                  }
                 }
 
                 // Fail the build if not release branch and quality gate status is not OK
@@ -131,7 +130,7 @@ Issue count: ${results}"""
             } // withSonarQubeEnv
 
         } catch (exc) {
-          echo "WARNING : There was a problem retrieving sonar scan results" + exc.toString()
+          echo "WARNING : There was a problem retrieving sonar scan results : " + exc.toString()
         }
 
         } // tee

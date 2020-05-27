@@ -65,7 +65,7 @@ def call(Map vars, Closure body=null) {
 
                 if (!vars.RELEASE_VERSION) {
                     echo 'No RELEASE_VERSION specified'
-                    vars.RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "LATEST"
+                    vars.RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "0.0.1"
                     vars.projectVersion = "${vars.RELEASE_VERSION}"
                 }
 
@@ -118,9 +118,15 @@ def call(Map vars, Closure body=null) {
 
                     echo "${vars.sonarExecutable} -Dsonar.branch.name=${env.BRANCH_NAME} " + vars.buildCmdParameters + " "
 
-                    if ( BRANCH_NAME ==~ /develop|master|master_.+/ ) {
+                    if ( BRANCH_NAME ==~ /master|master_.+/ ) {
                         build = sh (
+                                // The main branch must not have a target
                                 script: "${vars.sonarExecutable} -Dsonar.branch.name=${env.BRANCH_NAME} " + vars.buildCmdParameters + " ",
+                                returnStatus: true
+                                )
+                    } else if ( BRANCH_NAME ==~ /develop/ ) {
+                        build = sh (
+                                script: "${vars.sonarExecutable} -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.branch.target=develop " + vars.buildCmdParameters + " ",
                                 returnStatus: true
                                 )
                     } else if ( BRANCH_NAME ==~ /release\/.+/ ) {
@@ -140,18 +146,18 @@ def call(Map vars, Closure body=null) {
                         echo "SONAR SUCCESS"
                     } else {
                         echo "SONAR UNSTABLE"
-                        echo "WARNING : Scan failed, check output at \'${vars.shellOutputFile}\' "
+                        echo "WARNING : Sonar scan failed, check output at \'${vars.shellOutputFile}\' "
                         if (!vars.skipFailure) {
                             currentBuild.result = 'UNSTABLE'
                             echo 'WARNING : There are errors in sonar'
                         }
                     }
 
-                } // withSonarQubeEnv
+                    if (!vars.skipSonarCheck) {
+                        withSonarQubeCheck(vars)
+                    }
 
-                if (!vars.skipSonarCheck) {
-                    withSonarQubeCheck(vars)
-                }
+                } // withSonarQubeEnv
 
                 archiveArtifacts artifacts: "${vars.shellOutputFile}, **/report-task.txt", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 

@@ -19,6 +19,7 @@ def call(Map vars, Closure body=null) {
   vars.RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
 
   vars.SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim() // sonardev
+  vars.SONAR_HOST = vars.get("SONAR_HOST", env.SONAR_HOST ?: "sonar").trim() // sonardev
   vars.SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-4.2").trim()
   vars.SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
   //vars.SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: "$WORKSPACE").trim()
@@ -60,8 +61,15 @@ def call(Map vars, Closure body=null) {
 
   vars.isLogParserPublisher = vars.get("isLogParserPublisher", true).toBoolean()
 
+  if (vars.DEBUG_RUN) {
+    try {
+      echo "JENKINS_URL : ${JENKINS_URL}"
+    } catch(exc) {
+      echo 'Warn: There was a problem. '+exc.toString()
+    }
+  }
   //if (JENKINS_URL ==~ /.*almonde-jenkins.*|.*risk-jenkins.*|.*test-jenkins.*|.*localhost.*/ ) {
-  if ( JENKINS_URL ==~ /http:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// ) {
+  if ( JENKINS_URL ==~ /http:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// || JENKINS_URL ==~ /https:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// ) {
     echo "JPL is supported"
   } else {
     echo "JPL is NOT supported"
@@ -78,7 +86,7 @@ def call(Map vars, Closure body=null) {
     try {
       echo "JENKINS_URL : ${JENKINS_URL}"
 
-      echo "NODE_NAME : ${NODE_NAME}"
+      //echo "NODE_NAME : ${NODE_NAME}"
       echo "NODE_LABELS : ${NODE_LABELS}"
 
       echo "JOB_NAME : ${JOB_NAME}"

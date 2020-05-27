@@ -15,15 +15,15 @@ def call(Map vars, Closure body=null) {
     vars.isPublishEnabled = vars.get("isPublishEnabled", false).toBoolean()
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", false).toBoolean()
 
-	//def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-	//def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-	def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+    //def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
-	if (body) { body() }
+    if (body) { body() }
 
-	if (!DEBUG_RUN && vars.isCleaningEnabled) {
-		sh 'rm CHANGELOG.html'
-	}
+    if (!DEBUG_RUN && vars.isCleaningEnabled) {
+        sh 'rm CHANGELOG.html'
+    }
 
     try {
         writeFile file: "git-changelog-settings.json", text: '''
@@ -96,7 +96,7 @@ Changelog of Git Changelog.
             from: [type: 'REF', value: 'develop'],
             to: [type: 'REF', value: 'master'],
             template: createFileTemplateContent
-            
+
         currentBuild.description = changelogString
 
         archiveArtifacts artifacts: 'CHANGELOG.html', excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
