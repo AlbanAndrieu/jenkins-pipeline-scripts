@@ -40,7 +40,7 @@ class Utils {
         headers["Content-Type"] = "application/json"
         headers["X-Atlassian-Token"] = "no-check"
         headers["Authorization"] = "Basic ${token}"
-	    
+
         return Utils.callURL("${apiUrl}", "${query}", method, headers)
     }
 

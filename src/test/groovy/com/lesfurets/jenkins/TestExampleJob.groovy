@@ -9,7 +9,7 @@ import static com.lesfurets.jenkins.unit.MethodCall.callArgsToString
 import static org.junit.Assert.assertTrue
 
 class TestExampleJob extends BasePipelineTest {
-	
+
 	private static String JOB = "job/exampleJob.jenkins"
 
     @Override

@@ -7,7 +7,7 @@ import com.lesfurets.jenkins.unit.BasePipelineTest
 class TestHelperInitialization extends BasePipelineTest {
 
 	private static String JOB = "job/exampleJob.jenkins"
-	
+
     @Test(expected = IllegalStateException)
     void non_initialized_helper() throws Exception {
         runScript(JOB)

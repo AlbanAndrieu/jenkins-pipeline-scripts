@@ -49,7 +49,7 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 
 		helper.registerAllowedMethod("steps", [Closure.class], null)
 		helper.registerAllowedMethod("script", [Closure.class], null)
-		
+
 		helper.registerAllowedMethod("when", [Closure.class], null)
 		helper.registerAllowedMethod("expression", [Closure.class], null)
 
@@ -68,17 +68,17 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 		helper.registerAllowedMethod("junit", [Map.class], null)
 		helper.registerAllowedMethod("file", [Map.class], stringInterceptor)
 		helper.registerAllowedMethod("archiveArtifacts", [String.class], null)
-		
+
 		helper.registerAllowedMethod("tee", [String.class, Closure.class], null)
-		
+
 		binding.setVariable('docker', "")
 		//helper.registerAllowedMethod("build", [String.class, String.class], null)
 		//helper.registerAllowedMethod("build", [], null)
-		
-		
+
+
 		helper.registerAllowedMethod("publishHTML", [], null)
 		helper.registerAllowedMethod("publishHTML", [Map.class], null)
-		
+
 		helper.registerAllowedMethod("checkStyle", [], null)
 		helper.registerAllowedMethod("cpd", [], null)
 		helper.registerAllowedMethod("cpd", [Map.class], null)
@@ -91,9 +91,9 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 		helper.registerAllowedMethod("javaDoc", [], null)
 		helper.registerAllowedMethod("spotBugs", [], null)
 		helper.registerAllowedMethod("excludeFile", [String.class], null)
-		
+
 		helper.registerAllowedMethod("recordIssues", [Map.class], null)
-		
+
 	}
 
 }

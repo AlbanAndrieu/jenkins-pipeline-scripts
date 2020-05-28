@@ -11,7 +11,7 @@ import com.lesfurets.jenkins.unit.cps.BasePipelineTestCPS
 class TestExampleJobCPS extends BasePipelineTestCPS {
 
 	private static String JOB = "job/exampleJob.jenkins"
-	
+
     @Override
     @Before
     void setUp() throws Exception {

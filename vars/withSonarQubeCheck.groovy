@@ -40,17 +40,17 @@ def call(Map vars, Closure body=null) {
                     retry(10) {
                         sleep(time: vars.sleep, unit:"MINUTES")
                         println "Wait for Quality Gate"
-			    
+
                         timeout(time: vars.timeout, unit: 'MINUTES') {
-			    
+
                           qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
                           if (qg.status == 'OK')
                             echo "Quality Gate status is OK"
                           else
                             echo "WARNING: Quality Gate status is ${qg.status}"
-			    
+
                         } // timeout
-			    
+
                     } // retry
 			    } // skipWaitForQualityGate
 
@@ -82,9 +82,9 @@ def call(Map vars, Closure body=null) {
                   def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
                   // Parse issues count from json response
                   ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
-                  
+
                   echo " json response : " + ret_json
-                  
+
                   for (item in ret_json["facets"]) {
                     if (item["property"] == "severities")
                       severities = item["values"]
@@ -94,11 +94,11 @@ def call(Map vars, Closure body=null) {
                   }
                 } // withCredentials
                 echo "Writing : ${vars.sonarCheckResultFile}"
-                
+
                 if (null != qg) {
 					echo "Quality Gate status: ${qg.status}"
 			    }
-                
+
                 writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
 Dashboard URL: ${dashboardUrl}
 Issue count: ${results}"""

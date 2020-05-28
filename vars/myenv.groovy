@@ -59,7 +59,7 @@ def defineEnvironment() {
 	createGlobalEnvironmentVariables('STASH_CREDENTIALS','stash-jenkins').trim()
 	createGlobalEnvironmentVariables('SONAR_CREDENTIALS','sonarcloud-nabla').trim()
 
-	createGlobalEnvironmentVariables('CHECKMARX_CREDENTIALS',jenkins.checkmarx').trim()
+	createGlobalEnvironmentVariables('CHECKMARX_CREDENTIALS', 'jenkins.checkmarx').trim()
 
 	createGlobalEnvironmentVariables('CLEAN_RUN',false)
 	createGlobalEnvironmentVariables('DRY_RUN',false)

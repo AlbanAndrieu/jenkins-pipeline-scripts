@@ -50,7 +50,7 @@ def call(Map vars, Closure body=null) {
         } catch (exc) {
             echo "Warn: There was a problem with dependencyCheckPublisher " + exc.toString()
         }
-  
+
     } // if DRY_RUN
 
 }

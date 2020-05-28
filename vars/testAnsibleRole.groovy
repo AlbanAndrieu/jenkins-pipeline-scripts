@@ -35,7 +35,7 @@ def call(String roleName) {
                   script: "./scripts/test-with-ara.sh " + roleName,
                   returnStatus: true
                 )
-	            
+
                 echo "ARA RETURN CODE : ${build}"
                 if (build == 0) {
                   echo "ARA SUCCESS"
@@ -44,9 +44,9 @@ def call(String roleName) {
                   error 'There are errors in ara'
                   currentBuild.result = 'UNSTABLE'
                 }
-	            
+
                 junit testResults: "**/ara-" + roleName + ".xml", healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [[$class: 'ClaimTestDataPublisher']]
-	            
+
                 publishHTML([
                   allowMissing: false,
                   alwaysLinkToLastBuild: false,

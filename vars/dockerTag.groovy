@@ -11,15 +11,15 @@ def call(Map vars, Closure body=null) {
   echo "[JPL] Executing `vars/dockerTag.groovy`"
 
   vars = vars ?: [:]
-  
+
   vars.dockerTag = vars.get("dockerTag", env.DOCKER_TAG ?: "temp").trim()
   vars.commit = vars.get("commit", "").trim()
   vars.dbms = vars.get("dbms", "").trim()
-    
+
   call(vars.dockerTag, vars.commit, vars.dbms)
-  
-  if (body) { body() }  
-  
+
+  if (body) { body() }
+
 }
 
 def call(def DOCKER_TAG, def commit = "", def dbms = "") {

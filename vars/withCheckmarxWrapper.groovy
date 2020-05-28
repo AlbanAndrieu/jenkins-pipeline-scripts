@@ -159,7 +159,7 @@ def call(Map vars, Closure body=null) {
         } // if didTimeout
        } catch (exc) {
          echo "WARNING : There was a problem retrieving checkmarx scan" + exc.toString()
-       } 
+       }
     } // if DRY_RUN
 
 }
