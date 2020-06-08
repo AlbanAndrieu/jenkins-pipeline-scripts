@@ -157,6 +157,8 @@ pipeline {
           }
 
           sh "echo JAVA_HOME : $JAVA_HOME"
+          sh "ls -lrta /jenkins/ || true"
+          sh "ls -lrta /jenkins/.gradle || true"
           sh './gradlew build --stacktrace'
 
           publishHTML([reportDir: 'build/reports/tests/test', reportFiles: 'index.html', reportName: 'HTML Report'])
