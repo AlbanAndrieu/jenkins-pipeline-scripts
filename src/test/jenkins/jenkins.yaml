@@ -23,6 +23,17 @@ jenkins:
   agentProtocols:
   - "JNLP4-connect"
   - "Ping"
+  clouds:
+  - docker:
+      disabled:
+        disabledByChoice: true
+        enabledByChoice: false
+      dockerApi:
+        connectTimeout: 60
+        dockerHost:
+          uri: "tcp://localhost:2376"
+        readTimeout: 60
+      name: "docker"
   disableRememberMe: false
   globalNodeProperties:
   - envVars:
@@ -30,7 +41,7 @@ jenkins:
       - key: "JENKINS_CREDENTIALS"
         value: "stash-jenkins"
       - key: "SONAR_USER_HOME"
-        value: "^${WORKSPACE}/.sonar"
+        value: ".sonar"
   labelString: "any ubuntu ansible java molecule docker-compose"
   markupFormatter: "plainText"
   mode: NORMAL
@@ -66,7 +77,12 @@ security:
     port: -1
   scriptApproval:
     approvedSignatures:
+    - "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses"
     - "method org.jenkinsci.plugins.workflow.support.actions.EnvironmentAction getEnvironment"
+    - "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
+    - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
+      \ createSummary java.lang.String"
+    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods toBoolean java.lang.Boolean"
 unclassified:
   ansiColorBuildWrapper:
     colorMaps:
@@ -170,11 +186,6 @@ unclassified:
       \ please add a suitable Cause for it."
     nrOfScanThreads: 3
     testResultParsingEnabled: false
-  buildPublisher:
-    publicInstances: |-
-      FAILED TO EXPORT
-      hudson.plugins.build_publisher.BuildPublisher$BuildPublisherDescriptor#publicInstances: No configurator found for type class hudson.plugins.build_publisher.HudsonInstance
-    removeTriggers: false
   buildStepOperation:
     enabled: false
   chosenViewsTabbarGlobalConfiguration:
@@ -215,11 +226,6 @@ unclassified:
   descriptionSetterWrapper:
     charset: "UTF-8"
     disableTokens: false
-  diskUsageProjectActionFactory:
-    checkWorkspaceOnSlave: false
-    historyLength: 183
-    showGraph: false
-    timeoutWorkspace: 5
   extendedEmailPublisher:
     adminRequiredForTemplateTesting: false
     allowUnregisteredEnabled: false
@@ -703,7 +709,7 @@ unclassified:
       \    return docs\n}\n"
   globalLibraries:
     libraries:
-    - defaultVersion: "feature/BMT-20121"
+    - defaultVersion: "develop"
       name: "jenkins-pipeline-scripts"
       retriever:
         modernSCM:
@@ -781,8 +787,6 @@ unclassified:
     allPipelines: false
     elapsedTimeFormat: "'<b>'HH:mm:ss.S'</b> '"
     systemTimeFormat: "'<b>'HH:mm:ss'</b> '"
-  upstream:
-    globalUpstreamFilterStrategy: UseOldest
 tool:
   git:
     installations:
