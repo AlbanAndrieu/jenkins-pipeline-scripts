@@ -279,8 +279,8 @@ pipeline {
         runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
       }
     } // always
-    cleanup {
-      wrapCleanWsOnNode(isEmailEnabled: false)
-    } // cleanup
+    //cleanup {
+    //  wrapCleanWsOnNode(isEmailEnabled: false)
+    //} // cleanup
   } // post
 } // pipeline
