@@ -21,7 +21,7 @@ def call(Map vars, Closure body=null) {
 
     vars.relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT).trim()
     vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
-    vars.gitDefaultBranchName = vars.get("gitDefaultBranchName", "develop").trim()
+    vars.gitDefaultBranchName = vars.get("gitDefaultBranchName", "master").trim()
 
     vars.timeout = vars.get("timeout", 20)
     //vars.isCleaningEnabled = vars.get("isCleaningEnabled", false).toBoolean()

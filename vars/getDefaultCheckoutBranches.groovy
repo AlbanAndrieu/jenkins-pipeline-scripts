@@ -10,7 +10,7 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
-    vars.gitDefaultBranchName = vars.get("gitDefaultBranchName", "develop").trim()
+    vars.gitDefaultBranchName = vars.get("gitDefaultBranchName", "master").trim()
 
     def myBranches = null
 
