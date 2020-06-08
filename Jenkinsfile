@@ -162,8 +162,7 @@ pipeline {
 
           sh "ls -lrta /jenkins/ || true"
           sh "ls -lrta /jenkins/.gradle || true"
-          sh "export HOME=/jenkins/home"
-          sh './gradlew build --stacktrace'
+          sh "export HOME=/jenkins/home && ./gradlew build --stacktrace"
 
           publishHTML([reportDir: 'build/reports/tests/test', reportFiles: 'index.html', reportName: 'HTML Report'])
 

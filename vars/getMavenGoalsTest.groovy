@@ -15,7 +15,7 @@ def call(Map vars, Closure body=null) {
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
 
-    vars.skipTests = vars.get("skipTests", true).toBoolean()
+    vars.skipTests = vars.get("skipTests", false).toBoolean()
     vars.mavenGoals = vars.get("mavenGoals", "")
 
     // Force skipping tests
@@ -25,10 +25,10 @@ def call(Map vars, Closure body=null) {
 
     vars.mavenGoals += " -Dmaven.test.skip=${vars.skipTests}"
 
-    if (isReleaseBranch()) {
-        echo "skip test added"
-        vars.mavenGoals += " -Dmaven.test.failure.ignore=true -Dmaven.test.failure.skip=true"
-    }
+    //if (isReleaseBranch()) {
+    //    echo "skip test added"
+    //    vars.mavenGoals += " -Dmaven.test.failure.ignore=true -Dmaven.test.failure.skip=true"
+    //}
 
     if (body) { body() }
 
