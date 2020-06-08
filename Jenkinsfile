@@ -157,7 +157,7 @@ pipeline {
           }
 
           sh "echo JAVA_HOME : $JAVA_HOME"
-          sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
+          //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
           sh "echo HOME : $HOME"
 
           sh "ls -lrta /jenkins/ || true"
