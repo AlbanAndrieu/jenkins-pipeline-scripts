@@ -94,6 +94,9 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 
 		helper.registerAllowedMethod("recordIssues", [Map.class], null)
 
+		binding.setVariable('JAVA_HOME' , "")
+		binding.setVariable('HOME' , "")
+
 	}
 
 }
