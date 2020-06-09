@@ -160,8 +160,9 @@ pipeline {
           //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
           sh "echo HOME : $HOME"
 
-          sh "ls -lrta /jenkins/ || true"
+          sh "pwd && ls -lrta /jenkins/ || true"
           sh "ls -lrta /jenkins/.gradle || true"
+          sh "mkdir -p /jenkins/.gradle || true"
           sh "export HOME=/jenkins/home && ./gradlew build --stacktrace"
 
           publishHTML([reportDir: 'build/reports/tests/test', reportFiles: 'index.html', reportName: 'HTML Report'])
