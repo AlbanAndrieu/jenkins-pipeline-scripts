@@ -13,5 +13,7 @@ def call(def gitBranchName, def desc = "") {
     } else if (null != PULL_REQUEST_URL) {
         def description = "<a href='$PULL_REQUEST_URL'>PR #$PULL_REQUEST_ID</a>"
         currentBuild.setDescription(description)
+    } else {
+        currentBuild.setDescription("Executed @ ${NODE_NAME}")
     }
 }

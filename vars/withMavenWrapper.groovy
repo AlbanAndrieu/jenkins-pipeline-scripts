@@ -148,8 +148,6 @@ def call(Map vars, Closure body=null) {
 
                         vars.mavenGoals = getMavenGoalsTest(vars)
 
-                        //vars.mavenGoals = getMavenGoalsZkm(vars)
-
                         vars.mavenGoals = getMavenGoalsSigning(vars)
 
                         vars.mavenGoals = getMavenGoalsDocker(vars)

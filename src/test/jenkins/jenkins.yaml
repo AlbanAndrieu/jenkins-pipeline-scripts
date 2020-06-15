@@ -77,12 +77,18 @@ security:
     port: -1
   scriptApproval:
     approvedSignatures:
+    - "method groovy.lang.GString getBytes"
+    - "method java.net.HttpURLConnection setRequestMethod java.lang.String"
+    - "method java.net.URL openConnection"
     - "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses"
     - "method org.jenkinsci.plugins.workflow.support.actions.EnvironmentAction getEnvironment"
     - "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
     - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
       \ createSummary java.lang.String"
+    - "staticMethod hudson.model.Hudson getInstance"
     - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods toBoolean java.lang.Boolean"
+    - "staticMethod org.codehaus.groovy.runtime.EncodingGroovyMethods encodeBase64\
+      \ byte[]"
 unclassified:
   ansiColorBuildWrapper:
     colorMaps:
@@ -357,10 +363,10 @@ unclassified:
           \ and must be unique across the set of mirrors.\n     |\n    <mirror>\n\
           \      <id>mirrorId</id>\n      <mirrorOf>repositoryId</mirrorOf>\n    \
           \  <name>Human Readable Name for this Mirror.</name>\n      <url>http://my.repository.com/repo/path</url>\n\
-          \    </mirror>\n     -->\n    <mirror>\n      <id>nexus</id>\n      <url>http://alm-artifacts.misys.global.ad/nexus/content/groups/mgr-public</url>\n\
+          \    </mirror>\n     -->\n    <mirror>\n      <id>nexus</id>\n      <url>http://192.168.1.57:8081/nexus/content/groups/mgr-public</url>\n\
           \      <mirrorOf>*,!thirdparty</mirrorOf>\n    </mirror>\n    <mirror>\n\
           \      <id>nexus-thirdparty</id>\n      <name>Nexus thirdparty repository\
-          \ - all non-central dependencies</name>\n      <url>http://150.150.160.41:8081/nexus/content/repositories/thirdparty/</url>\n\
+          \ - all non-central dependencies</name>\n      <url>http://192.168.1.57:8081/nexus/content/repositories/thirdparty/</url>\n\
           \      <!-- Set to '*,!central' for non-fdev installations, and to 'nothing'\
           \ for fdev installations -->\n      <mirrorOf>*,!central</mirrorOf>\n  \
           \  </mirror>    \n  </mirrors>\n  \n  <!-- profiles\n   | This is a list\

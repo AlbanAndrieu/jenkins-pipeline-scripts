@@ -47,16 +47,16 @@ def call(String roleName) {
 
                 junit testResults: "**/ara-" + roleName + ".xml", healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [[$class: 'ClaimTestDataPublisher']]
 
-                publishHTML([
-                  allowMissing: false,
-                  alwaysLinkToLastBuild: false,
-                  keepAll: true,
-                  reportDir: "./ara-" + roleName + "/",
-                  reportFiles: 'index.html',
-                  includes: '**/*',
-                  reportName: "ARA " + roleName + " Report",
-                  reportTitles: "ARA " + roleName + " Report Index"
-                ])
+                //publishHTML([
+                //  allowMissing: true,
+                //  alwaysLinkToLastBuild: false,
+                //  keepAll: true,
+                //  reportDir: "./ara-" + roleName + "/",
+                //  reportFiles: 'index.html',
+                //  includes: '**/*',
+                //  reportName: "ARA " + roleName + " Report",
+                //  reportTitles: "ARA " + roleName + " Report Index"
+                //])
 
             } // tee
         } catch (e) {
