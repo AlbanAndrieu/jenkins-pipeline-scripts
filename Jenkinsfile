@@ -2,12 +2,12 @@
 @Library('jenkins-pipeline-scripts')
 import com.test.jenkins.*
 
-String DOCKER_REGISTRY="index.docker.io/v1".trim()
-String DOCKER_ORGANISATION="nabla".trim()
-String DOCKER_TAG="latest".trim()
+String DOCKER_REGISTRY=env.DOCKER_REGISTRY ?: "index.docker.io/v1".trim()
+String DOCKER_ORGANISATION=env.DOCKER_ORGANISATION ?: "nabla".trim()
+String DOCKER_TAG=env.DOCKER_TAG ?: "latest".trim()
 String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
 
-String DOCKER_REGISTRY_URL="https://${DOCKER_REGISTRY}".trim()
+String DOCKER_REGISTRY_URL=env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}".trim()
 String DOCKER_REGISTRY_CREDENTIAL=env.DOCKER_REGISTRY_CREDENTIAL ?: "hub-docker-nabla".trim()
 String DOCKER_IMAGE="${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}".trim()
 
