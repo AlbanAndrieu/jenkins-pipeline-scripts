@@ -4,6 +4,10 @@ import hudson.model.*
 import com.cloudbees.groovy.cps.NonCPS
 
 /**
+ * DO NOT USE in production. It is used by tests
+ */
+
+/**
  * Cleans a name and replaces all characters other than A-Za-z0-9 with "_", and all capitalizing all characters
  * @param s name to clean
  * @return clean name

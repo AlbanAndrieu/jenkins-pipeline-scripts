@@ -2,14 +2,16 @@
 @Library('jenkins-pipeline-scripts')
 import com.test.jenkins.*
 
-String DOCKER_REGISTRY=env.DOCKER_REGISTRY ?: "index.docker.io/v1".trim()
+String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: "index.docker.io/v1".trim()
 String DOCKER_ORGANISATION=env.DOCKER_ORGANISATION ?: "nabla".trim()
-String DOCKER_TAG=env.DOCKER_TAG ?: "latest".trim()
+
 String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
 
-String DOCKER_REGISTRY_URL=env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}".trim()
-String DOCKER_REGISTRY_CREDENTIAL=env.DOCKER_REGISTRY_CREDENTIAL ?: "hub-docker-nabla".trim()
-String DOCKER_IMAGE="${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}".trim()
+String DOCKER_REGISTRY_HUB_URL=env.DOCKER_REGISTRY_HUB_URL ?: "https://${DOCKER_REGISTRY_HUB}".trim()
+String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub-docker-nabla".trim()
+
+String DOCKER_IMAGE_TAG=env.DOCKER_IMAGE_TAG ?: "latest".trim()
+String DOCKER_IMAGE="${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
 
 String DOCKER_NAME_BUILD="jenkins-pipeline-scripts-test".trim()
 String DOCKER_BUILD_TAG=dockerTag("temp").trim()
@@ -26,8 +28,8 @@ pipeline {
       image DOCKER_IMAGE
       alwaysPull true
       reuseNode true
-      registryUrl DOCKER_REGISTRY_URL
-      registryCredentialsId DOCKER_REGISTRY_CREDENTIAL
+      registryUrl DOCKER_REGISTRY_HUB_URL
+      registryCredentialsId DOCKER_REGISTRY_HUB_CREDENTIAL
       args DOCKER_OPTS_COMPOSE
       label 'molecule'
     }
