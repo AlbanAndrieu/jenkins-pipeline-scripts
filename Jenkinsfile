@@ -3,7 +3,7 @@
 import com.test.jenkins.*
 
 String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: "index.docker.io/v1".trim()
-String DOCKER_ORGANISATION=env.DOCKER_ORGANISATION ?: "nabla".trim()
+String DOCKER_HUB_ORGANISATION=env.DOCKER_HUB_ORGANISATION ?: "nabla".trim()
 
 String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
 
@@ -11,11 +11,11 @@ String DOCKER_REGISTRY_HUB_URL=env.DOCKER_REGISTRY_HUB_URL ?: "https://${DOCKER_
 String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub-docker-nabla".trim()
 
 String DOCKER_IMAGE_TAG=env.DOCKER_IMAGE_TAG ?: "latest".trim()
-String DOCKER_IMAGE="${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
+String DOCKER_IMAGE="${DOCKER_HUB_ORGANISATION}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
 
 String DOCKER_NAME_BUILD="jenkins-pipeline-scripts-test".trim()
 String DOCKER_BUILD_TAG=dockerTag("temp").trim()
-String DOCKER_BUILD_IMG="${DOCKER_ORGANISATION}/${DOCKER_NAME_BUILD}:${DOCKER_BUILD_TAG}".trim()
+String DOCKER_BUILD_IMG="${DOCKER_HUB_ORGANISATION}/${DOCKER_NAME_BUILD}:${DOCKER_BUILD_TAG}".trim()
 
 def DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: true)
 
