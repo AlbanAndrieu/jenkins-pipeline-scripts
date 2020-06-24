@@ -24,7 +24,7 @@ def call(Map vars, Closure body=null) {
     def GIT_PROJECT_TEST = vars.get("GIT_PROJECT_TEST", "nabla-servers-bower-sample").trim()
     def GIT_BROWSE_URL_TEST = vars.get("GIT_BROWSE_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}/").trim()
     def GIT_URL_TEST = vars.get("GIT_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}.git").trim()
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'jenkins-https').trim()
+    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'stash-jenkins').trim()
     //def GIT_URL_TEST = vars.get("GIT_URL_TEST", "ssh://git@github.com:AlbanAndrieu/${GIT_REPO_PROJECT}/${GIT_PROJECT}.git").trim()
     //def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins-ssh")
 
