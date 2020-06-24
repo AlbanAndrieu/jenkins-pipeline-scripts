@@ -45,7 +45,7 @@ def call(Map vars, Closure body=null) {
             }
 
             // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-            withRegistryWrapper(DOCKER_REGISTRY: DOCKER_REGISTRY) {
+            //docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
                 def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} -f ${dockerFilePath}Dockerfile . ")
                 container.inside {
                     sh 'echo test'
@@ -56,7 +56,7 @@ def call(Map vars, Closure body=null) {
                     //image.push("${env.BUILD_NUMBER}")
                     //image.push('latest')
                 }
-            } // withRegistryWrapper
+            //} // withRegistry
 
             //dockerFingerprintFrom dockerfile: "${dockerFilePath}Dockerfile", image: "${DOCKER_BUILD_IMG}"
 

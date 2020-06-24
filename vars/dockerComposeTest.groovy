@@ -45,7 +45,7 @@ def call(Map vars, Closure body=null) {
 
             try {
 
-                //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
+                //docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
 
                     if (CLEAN_RUN) {
                         if (vars.dockerDownFile?.trim()) {

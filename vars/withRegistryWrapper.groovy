@@ -57,7 +57,7 @@ def call(Map vars, Closure body=null) {
                 echo "LOGIN FAILURE"
                 //currentBuild.result = 'FAILURE'
                 // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-                docker.withRegistry("${DOCKER_REGISTRY_TMP_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
+                docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
 
                     if (body) {
                         body()

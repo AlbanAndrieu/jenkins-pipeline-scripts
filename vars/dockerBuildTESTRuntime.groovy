@@ -51,7 +51,7 @@ def call(Map vars, Closure body=null) {
         }
         //DOCKER_BUILD_ARGS = [ "${DOCKER_BUILD_ARGS}"].join(" ")
 
-        //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
+        //docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
 
             //sh 'docker images'
             dockerLint(vars)

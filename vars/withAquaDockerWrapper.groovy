@@ -55,7 +55,7 @@ def call(Map vars, Closure body=null) {
   try {
     //tee("${vars.shellOutputFile}") {
 
-    //docker.withRegistry("${DOCKER_REGISTRY_URL}", "${DOCKER_REGISTRY_CREDENTIAL}") {
+    //docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
 
       try {
         sh "rm -f ${pwd()}/${AQUA_REPORT}* || true"
