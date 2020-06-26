@@ -13,7 +13,7 @@ def call(Map vars, Closure body=null) {
 
     def GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
     def GIT_PROJECT = vars.get("GIT_PROJECT", "nabla").trim()
-    def GIT_BROWSE_URL = vars.get("GIT_BROWSE_URL", "https://github.com/AlbanAndrieu//${GIT_PROJECT}/").trim()
+    def GIT_BROWSE_URL = vars.get("GIT_BROWSE_URL", "https://github.com/AlbanAndrieu/${GIT_PROJECT}/").trim()
     def GIT_URL = vars.get("GIT_URL", "https://github.com/AlbanAndrieu/${GIT_PROJECT}.git").trim()
     def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'stash-jenkins').trim()
     //def GIT_URL = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${GIT_PROJECT}.git").trim()

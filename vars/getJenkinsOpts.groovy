@@ -31,7 +31,7 @@ def call(Map vars, Closure body=null) {
   vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_CREDENTIALS ?: "jenkins-ssh").trim()
   vars.JENKINS_SSH_CREDENTIALS = vars.get("JENKINS_SSH_CREDENTIALS", env.JENKINS_SSH_CREDENTIALS ?: "jenkins-ssh").trim()
 
-  vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "mgr.jenkins.checkmarx").trim()
+  vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins/").trim()
 
   vars.DOCKER_REGISTRY_TMP = vars.get("DOCKER_REGISTRY_TMP", env.DOCKER_REGISTRY_TMP ?: "index.docker.io/v1").toLowerCase().trim()
   vars.DOCKER_REGISTRY_TMP_URL = vars.get("DOCKER_REGISTRY_TMP_URL", env.DOCKER_REGISTRY_TMP_URL ?: "https://${vars.DOCKER_REGISTRY_TMP}").trim()
@@ -41,7 +41,7 @@ def call(Map vars, Closure body=null) {
   vars.DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${vars.DOCKER_REGISTRY}").trim()
   vars.DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
 
-  vars.DOCKER_REGISTRY_HUB = vars.get("DOCKER_REGISTRY_HUB", env.DOCKER_REGISTRY_HUB ?: "index.docker.io/v1").toLowerCase().trim()
+  vars.DOCKER_REGISTRY_HUB = vars.get("DOCKER_REGISTRY_HUB", env.DOCKER_REGISTRY_HUB ?: "").toLowerCase().trim()
   vars.DOCKER_REGISTRY_HUB_URL = vars.get("DOCKER_REGISTRY_HUB_URL", env.DOCKER_REGISTRY_HUB_URL ?: "https://${vars.DOCKER_REGISTRY_HUB}").trim()
   vars.DOCKER_REGISTRY_HUB_CREDENTIAL = vars.get("DOCKER_REGISTRY_HUB_CREDENTIAL", env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub-docker-nabla").trim()
 
