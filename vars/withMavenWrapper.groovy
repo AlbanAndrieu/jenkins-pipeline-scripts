@@ -29,6 +29,8 @@ def call(Map vars, Closure body=null) {
     String MAVEN_SETTINGS_XML = ""
     String MAVEN_SETTINGS_SECURITY_XML = ""
 
+    String NPM_SETTINGS = ""
+    String BOWER_SETTINGS = ""
     if (vars.DEBUG_RUN) {
          echo "debug added"
          MAVEN_OPTS_DEFAULT = ["${MAVEN_OPTS_DEFAULT}",
@@ -45,7 +47,7 @@ def call(Map vars, Closure body=null) {
     vars.skipTests = vars.get("skipTests", false).toBoolean()
     vars.skipResults = vars.get("skipResults", false).toBoolean()
     //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
-    vars.buildCmd = vars.get("buildCmd", "-e").trim()
+    vars.buildCmd = vars.get("buildCmd", "-B -e").trim()
     vars.skipSonar = vars.get("skipSonar", false).toBoolean()
     vars.skipPitest = vars.get("skipPitest", false).toBoolean()
     vars.buildCmdParameters = vars.get("buildCmdParameters", "").trim()
@@ -53,7 +55,7 @@ def call(Map vars, Closure body=null) {
     vars.skipArtifacts = vars.get("skipArtifacts", false).toBoolean()
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
     vars.skipDeploy = vars.get("skipDeploy", true).toBoolean()
-    vars.skipMavenSettings = vars.get("skipMavenSettings", false).toBoolean()
+    vars.skipMavenSettings = vars.get("skipMavenSettings", true).toBoolean()
     vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.pomFile = vars.get("pomFile", "pom.xml").trim()
@@ -65,25 +67,28 @@ def call(Map vars, Closure body=null) {
         tee("${vars.shellOutputFile}") {
 
             // TODO configFileProvider do not work on docker, it is working on VM only and might fail then when JENKINS_USER_HOME do not exist
-            configFileProvider([configFile(fileId: "${vars.MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: MAVEN_SETTINGS_XML),
-                configFile(fileId: "${vars.MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: MAVEN_SETTINGS_SECURITY_XML)]) {
-                withMaven(
-                    maven: "${vars.MAVEN_VERSION}",
-                    jdk: "${vars.JDK_VERSION}",
-                    mavenSettingsConfig: "${vars.MAVEN_SETTINGS_CONFIG}",
-                    mavenLocalRepo: './.repository',
-                    mavenOpts: "${vars.MAVEN_OPTS}",
-                    options: [
-                        pipelineGraphPublisher(
-                            ignoreUpstreamTriggers: !isReleaseBranch(),
-                            skipDownstreamTriggers: !isReleaseBranch(),
-                            lifecycleThreshold: 'deploy'
-                        ),
-                        artifactsPublisher(disabled: true)
-                    ]
-                ) {
-                    withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
-
+            configFileProvider([
+                //configFile(fileId: "fr-npmrc-default",  targetLocation: "${vars.JENKINS_USER_HOME}/.npmrc", variable: NPM_SETTINGS),
+                //configFile(fileId: "fr-bowerrc-default",  targetLocation: ${vars.JENKINS_USER_HOME}/.bowerrc", variable: BOWER_SETTINGS),
+                configFile(fileId: "${vars.MAVEN_SETTINGS_CONFIG}",  targetLocation: "${vars.mavenHome}/settings.xml", variable: MAVEN_SETTINGS_XML),
+                configFile(fileId: "${vars.MAVEN_SETTINGS_SECURITY_CONFIG}",  targetLocation: "${vars.mavenHome}/settings-security.xml", variable: MAVEN_SETTINGS_SECURITY_XML)
+                ]) {
+                //withMaven(
+                //    maven: "${vars.MAVEN_VERSION}",
+                //    jdk: "${vars.JDK_VERSION}",
+                //    //mavenSettingsConfig: "${vars.MAVEN_SETTINGS_CONFIG}",
+                //    mavenLocalRepo: './.repository',
+                //    mavenOpts: "${vars.MAVEN_OPTS}",
+                //    options: [
+                //        pipelineGraphPublisher(
+                //            ignoreUpstreamTriggers: !isReleaseBranch(),
+                //            skipDownstreamTriggers: !isReleaseBranch(),
+                //            lifecycleThreshold: 'deploy'
+                //        ),
+                //        artifactsPublisher(disabled: true)
+                //    ]
+                //) {
+                    //withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
                         if (!vars.skipResults) {
 
                             if (!vars.RELEASE_VERSION) {
@@ -118,7 +123,7 @@ def call(Map vars, Closure body=null) {
                            }
                         }
 
-                        vars.mavenGoals += " ${vars.MAVEN_OPTS} -Dmaven.repo.local=./.repository "
+                        vars.mavenGoals += " -Dmaven.repo.local=./.repository "
 
                         if (!vars.skipMavenSettings) {
                            vars.mavenGoals += " -s ${vars.mavenHome}/settings.xml "
@@ -152,6 +157,7 @@ def call(Map vars, Closure body=null) {
 
                         vars.mavenGoals = getMavenGoalsDocker(vars)
 
+                        echo "Maven OPTS have been specified: ${vars.MAVEN_OPTS}"
                         echo "Maven GOALS have been specified: ${vars.mavenGoals}"
                         vars.buildCmd += " ${vars.mavenGoals}"
 
@@ -162,7 +168,11 @@ def call(Map vars, Closure body=null) {
                         //wrap([$class: 'Xvfb', autoDisplayName: false, additionalOptions: '-pixdepths 24 4 8 15 16 32', parallelBuild: true]) {
                             // Run the maven build
                             build = sh (
-                                    script: "export PATH=$MVN_CMD_DIR:/bin:$PATH && mvn ${vars.buildCmd}",
+                                    script: """#!/bin/bash -l
+                                    export NODE_PATH=${env.WORKSPACE}
+                                    export PATH=./node/npm/bin/:./node/:/bin:$PATH
+                                    export MAVEN_OPTS=\"${vars.MAVEN_OPTS}\"
+                                    mvn ${vars.buildCmd}""",
                                     returnStatus: true
                                     )
                             //if (DEBUG_RUN) {
@@ -172,15 +182,16 @@ def call(Map vars, Closure body=null) {
                             if (build == 0) {
                                 echo "MAVEN SUCCESS"
                             } else {
-								if (!vars.skipFailure) {
-									echo "MAVEN FAILURE"
-									//currentBuild.result = 'UNSTABLE'
-									currentBuild.result = 'FAILURE'
-									error 'There are errors in maven'
-								} else {
-									echo "MAVEN FAILURE skipped"
-									//error 'There are errors in maven'
-								}
+                                echo "WARNING : Maven failed, check output at \'${vars.shellOutputFile}\' "
+                                if (!vars.skipFailure) {
+                                    echo "MAVEN FAILURE"
+                                    //currentBuild.result = 'UNSTABLE'
+                                    currentBuild.result = 'FAILURE'
+                                    error 'There are errors in maven'
+                                } else {
+                                    echo "MAVEN FAILURE skipped"
+                                    //error 'There are errors in maven'
+                                }
                             }
                             if (body) { body() }
                         //} // Xvfb
@@ -188,8 +199,8 @@ def call(Map vars, Closure body=null) {
                             vars.sonarCheckOutputFile = "maven-sonar-check.log"
                             withSonarQubeCheck(vars)
                         }
-                    } // withSonarQubeEnv
-                } // withMaven
+                    //} // withSonarQubeEnv
+                //} // withMaven
             } // configFileProvider
 
             if (!vars.skipResults) {
@@ -199,7 +210,7 @@ def call(Map vars, Closure body=null) {
                         stash includes: "${vars.artifacts}", name: 'maven-artifacts'
                     }
 
-                    stash includes: "**/target/classes/**", name: 'classes'
+                    stash allowEmpty: true, includes: "**/target/classes/**", name: 'classes'
                 }
 
             } // skipResults
@@ -226,9 +237,6 @@ def call(Map vars, Closure body=null) {
          //    useStableBuildAsReference: true
          //    ])
 
-        if ((!vars.DRY_RUN && !vars.RELEASE) && !vars.skipTests) {
-            junit '**/target/surefire-reports/TEST-*.xml, **/target/failsafe-reports-embedded/TEST-*.xml'
-        } // if DRY_RUN
         if (!vars.skipResults) {
             stash allowEmpty: true, includes: 'target/jacoco*.exec, target/lcov*.info, karma-coverage/**/*', name: 'coverage'
 
@@ -236,5 +244,9 @@ def call(Map vars, Closure body=null) {
         }
 
         archiveArtifacts artifacts: "*.log, **/report-task.txt, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT, ${vars.artifacts}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+
+        if ((!vars.DRY_RUN && !vars.RELEASE) && !vars.skipTests && !vars.skipResults) {
+            junit '**/target/surefire-reports/TEST-*.xml, **/target/failsafe-reports-embedded/TEST-*.xml'
+        } // if DRY_RUN
     }
 }

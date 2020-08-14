@@ -11,15 +11,15 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
-    def GIT_PROJECT = vars.get("GIT_PROJECT", "nabla").trim()
-    def GIT_BROWSE_URL = vars.get("GIT_BROWSE_URL", "https://github.com/AlbanAndrieu/${GIT_PROJECT}/").trim()
-    def GIT_URL = vars.get("GIT_URL", "https://github.com/AlbanAndrieu/${GIT_PROJECT}.git").trim()
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'stash-jenkins').trim()
-    //def GIT_URL = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${GIT_PROJECT}.git").trim()
-    //def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'jenkins-ssh')
+    vars.GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
+    vars.GIT_PROJECT = vars.get("GIT_PROJECT", "nabla").trim()
+    vars.GIT_BROWSE_URL = vars.get("GIT_BROWSE_URL", "https://github.com/AlbanAndrieu/$vars.{GIT_PROJECT}/").trim()
+    vars.GIT_URL = vars.get("GIT_URL", "https://github.com/AlbanAndrieu/${vars.GIT_PROJECT}.git").trim()
+    vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_CREDENTIALS ?: "stash-jenkins").trim()
+    //vars.GIT_URL = vars.get("GIT_URL", "ssh://git@github.com:AlbanAndrieu/${vars.GIT_PROJECT}.git").trim()
+    //vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'jenkins-ssh')
 
-    vars.relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT).trim()
+    vars.relativeTargetDir = vars.get("relativeTargetDir", vars.GIT_PROJECT).trim()
     vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
     vars.gitDefaultBranchName = vars.get("gitDefaultBranchName", "master").trim()
 
@@ -30,7 +30,7 @@ def call(Map vars, Closure body=null) {
 
     vars.GIT_BRANCH_NAME_BUILDMASTER = vars.get("GIT_BRANCH_NAME_BUILDMASTER", "develop")
 
-    echo "GIT_URL : ${GIT_URL}"
+    echo "GIT_URL : ${vars.GIT_URL}"
 
     checkout([
         $class: 'GitSCM',
@@ -39,15 +39,15 @@ def call(Map vars, Closure body=null) {
         branches: getDefaultCheckoutBranches(vars),
         browser: [
             $class: 'Stash',
-            repoUrl: "${GIT_BROWSE_URL}"],
+            repoUrl: "${vars.GIT_BROWSE_URL}"],
         doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
         //doGenerateSubmoduleConfigurations: false,
         extensions: getDefaultCheckoutExtensions(vars),
         gitTool: 'git-latest',
         submoduleCfg: [],
         userRemoteConfigs: [[
-            credentialsId: "${JENKINS_CREDENTIALS}",
-            url: "${GIT_URL}"]
+            credentialsId: "${vars.JENKINS_CREDENTIALS}",
+            url: "${vars.GIT_URL}"]
         ]
     ])
 

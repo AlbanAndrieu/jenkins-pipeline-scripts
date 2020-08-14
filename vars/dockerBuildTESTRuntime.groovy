@@ -63,7 +63,8 @@ def call(Map vars, Closure body=null) {
 
             echo 'Test container'
             def image = docker.image("${DOCKER_RUNTIME_IMG}").withRun("", "--version") {c ->
-                sh(returnStdout: true, script: "docker logs ${c.id}").trim()
+                sh(returnStdout: true, script: """#!/bin/bash -l
+                docker logs ${c.id}""").trim()
                 //"org.eclipse.jetty.runner.Runner: 9.4.9.v20180320" == sh(returnStdout: true, script: "docker logs ${c.id}").trim()
             }
 

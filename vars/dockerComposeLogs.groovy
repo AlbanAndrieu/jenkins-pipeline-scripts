@@ -33,17 +33,19 @@ def call(Map vars, Closure body=null) {
             try {
 
                 //if (DEBUG_RUN) {
-                sh "rm -f ${pwd()}/logs/*"
-                sh "mkdir -p ${pwd()}/logs"
+                sh """#!/bin/bash -l
+                rm -f ${pwd()}/logs/*
+                mkdir -p ${pwd()}/logs
 
-                sh "docker images 2>&1 > ${pwd()}/logs/docker-images.log"
-                sh "docker volume ls 2>&1 > ${pwd()}/logs/docker-volumes.log"
-                sh "docker ps -a 2>&1 > ${pwd()}/logs/docker-ps.log"
+                docker images 2>&1 > ${pwd()}/logs/docker-images.log
+                docker volume ls 2>&1 > ${pwd()}/logs/docker-volumes.log
+                docker ps -a 2>&1 > ${pwd()}/logs/docker-ps.log
 
-                sh "docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps"
+                docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps
 
-                sh "for i in \$(docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps -q); do docker container logs --details \$i >& ${pwd()}/logs\$(docker inspect --format='{{.Name}}' \$i).docker.log; done"
-                sh "for i in \$(docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps -q); do docker container inspect \$i >& ${pwd()}/logs\$(docker inspect --format='{{.Name}}' \$i).docker.inspect; done"
+                for i in \$(docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps -q); do docker container logs --details \$i >& ${pwd()}/logs\$(docker inspect --format='{{.Name}}' \$i).docker.log; done
+                for i in \$(docker-compose -f ${vars.dockerFilePath}docker-compose.yml ${vars.DOCKER_COMPOSE_OPTIONS} ps -q); do docker container inspect \$i >& ${pwd()}/logs\$(docker inspect --format='{{.Name}}' \$i).docker.inspect; done
+                """
                 //} // DEBUG_RUN
 
                 if (body) { body() }

@@ -20,17 +20,17 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
-    def GIT_PROJECT_TEST = vars.get("GIT_PROJECT_TEST", "nabla-servers-bower-sample").trim()
-    def GIT_BROWSE_URL_TEST = vars.get("GIT_BROWSE_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}/").trim()
-    def GIT_URL_TEST = vars.get("GIT_URL_TEST", "https://github.com/AlbanAndrieu/${GIT_PROJECT_TEST}.git").trim()
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'stash-jenkins').trim()
-    //def GIT_URL_TEST = vars.get("GIT_URL_TEST", "ssh://git@github.com:AlbanAndrieu/${GIT_REPO_PROJECT}/${GIT_PROJECT}.git").trim()
-    //def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins-ssh")
+    vars.GIT_REPO_PROJECT = vars.get("GIT_PROJECT_TEST", "NABLA").trim()
+    vars.GIT_PROJECT_TEST = vars.get("GIT_PROJECT_TEST", "nabla-servers-bower-sample").trim()
+    vars.GIT_BROWSE_URL_TEST = vars.get("GIT_BROWSE_URL_TEST", "https://github.com/AlbanAndrieu/${vars.GIT_PROJECT_TEST}/").trim()
+    vars.GIT_URL_TEST = vars.get("GIT_URL_TEST", "https://github.com/AlbanAndrieu/${vars.GIT_PROJECT_TEST}.git").trim()
+    vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_SSH_CREDENTIALS ?: "stash-jenkins").trim()
+    //vars.GIT_URL_TEST = vars.get("GIT_URL_TEST", "ssh://git@github.com:AlbanAndrieu/${vars.GIT_REPO_PROJECT}/${vars.GIT_PROJECT}.git").trim()
+    //vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", "jenkins-ssh")
 
     vars.isScmEnabled = vars.get("isScmEnabled", true).toBoolean()
     vars.isDefaultBranch = vars.get("isDefaultBranch", false).toBoolean()
-    vars.relativeTargetDir = vars.get("relativeTargetDir", GIT_PROJECT_TEST).trim()
+    vars.relativeTargetDir = vars.get("relativeTargetDir", vars.GIT_PROJECT_TEST).trim()
     vars.timeout = vars.get("timeout", 20)
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
     vars.isShallowEnabled = vars.get("isShallowEnabled", true).toBoolean()
@@ -44,14 +44,14 @@ def call(Map vars, Closure body=null) {
            branches: getDefaultCheckoutBranches(vars),
            browser: [
                $class: 'Stash',
-               repoUrl: "${GIT_BROWSE_URL_TEST}"],
+               repoUrl: "${vars.GIT_BROWSE_URL_TEST}"],
            doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
            extensions: getDefaultCheckoutExtensions(vars),
            gitTool: 'git-latest',
            submoduleCfg: [],
            userRemoteConfigs: [[
-               credentialsId: "${JENKINS_CREDENTIALS}",
-               url: "${GIT_URL_TEST}"]
+               credentialsId: "${vars.JENKINS_CREDENTIALS}",
+               url: "${vars.GIT_URL_TEST}"]
            ]
        ])
 

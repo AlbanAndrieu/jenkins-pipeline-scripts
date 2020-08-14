@@ -31,7 +31,7 @@ def call(Map vars, Closure body=null) {
     vars.DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
     vars.DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
     vars.SCONS_OPTS = vars.get("SCONS_OPTS", env.SCONS_OPTS ?: "").trim()
-    vars.filePath = vars.get("filePath", "./Build/step-2-0-0-build-env.sh").trim()
+    vars.filePath = vars.get("filePath", "./bm/env/scripts/jenkins/step-2-0-0-build-env.sh").trim()
     RELEASE_VERSION      = getReleasedVersion(vars)
     env.RELEASE_VERSION  = RELEASE_VERSION
 

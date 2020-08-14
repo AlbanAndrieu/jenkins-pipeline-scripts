@@ -10,15 +10,17 @@ def call(def DOCKER_BUILD_IMG = "", def DOCKER_TAG = "latest") {
     echo 'Warn: There was a problem removing image from local docker repo. '+exc.toString()
   }
   try {
-    sh '''docker container prune -f --filter until=20m'''
-    sh '''docker image prune -f --filter until=20m'''
-    sh '''docker network prune -f --filter until=20m'''
+    sh """#!/bin/bash -l
+    docker container prune -f --filter until=20m
+    docker image prune -f --filter until=20m
+    docker network prune -f --filter until=20m"""
   }
   catch(exc) {
     echo 'Warn: There was a problem Cleaning local docker repo. '+exc.toString()
   }
   try {
-    sh '''docker system prune --volumes --force'''
+    sh """#!/bin/bash -l
+    docker system prune --volumes --force"""
   }
   catch(exc) {
     echo 'Warn: There was a problem Cleaning local docker volumes. '+exc.toString()

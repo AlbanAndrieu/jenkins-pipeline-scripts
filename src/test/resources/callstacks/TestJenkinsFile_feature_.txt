@@ -7,7 +7,7 @@
                Jenkinsfile.image(nabla/ansible-jenkins-slave-docker:latest)
                Jenkinsfile.alwaysPull(true)
                Jenkinsfile.reuseNode(true)
-               Jenkinsfile.registryUrl(https://index.docker.io/v1)
+               Jenkinsfile.registryUrl(https://registry.hub.docker.com)
                Jenkinsfile.registryCredentialsId(hub-docker-nabla)
                Jenkinsfile.args(-v /home/jenkins:/home/jenkins -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /var/run/docker.sock:/var/run/docker.sock)
                Jenkinsfile.label(molecule)

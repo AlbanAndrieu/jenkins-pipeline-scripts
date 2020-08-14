@@ -12,15 +12,12 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
-    //def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
-    def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
-    //def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
+    getJenkinsOpts(vars)
+
+    vars.CHECKMARX_CREDENTIALS = vars.get("CHECKMARX_CREDENTIALS", env.CHECKMARX_CREDENTIALS ?: "jenkins.checkmarx").trim()
+    vars.CHECKMARX_URL = vars.get("CHECKMARX_URL", env.CHECKMARX_URL ?: "https://checkmarx").trim()
 
     vars.excludeFolders = vars.get("excludeFolders", ", bm").trim()
-    vars.projectName = vars.get("projectName", "NABLA_" + env.JOB_BASE_NAME ?: "TEST").trim().replaceAll(' ','-')
     vars.preset = vars.get("preset", '17')
 
     vars.groupId = vars.get("groupId", '000').trim()
@@ -32,6 +29,14 @@ def call(Map vars, Closure body=null) {
     vars.avoidDuplicateProjectScans = vars.get("avoidDuplicateProjectScans", false).toBoolean()
     vars.incremental = vars.get("incremental", true).toBoolean()
 
+    RELEASE_VERSION = getSemVerReleasedVersion(vars)
+
+    String projectName = "MasterScan_RISK_" + env.JOB_BASE_NAME ?: "TEST" + "_[" + RELEASE_VERSION + "]"
+    vars.projectName = vars.get("projectName", projectName).trim().replaceAll(' ','-')
+    vars.skipCheckmarxFailure = vars.get("skipCheckmarxFailure", false).toBoolean()
+    vars.skipCheckmarx = vars.get("skipCheckmarx", false).toBoolean()
+
+    if (!vars.skipCheckmarx) {
     if ((env.BRANCH_NAME ==~ /PR-.*/) || (env.BRANCH_NAME ==~ /feature\/.*/) || (env.BRANCH_NAME ==~ /bugfix\/.*/)) {
         echo "Force incremental mode"
         vars.incremental = true
@@ -48,7 +53,7 @@ def call(Map vars, Closure body=null) {
         vars.avoidDuplicateProjectScans = true
     }
 
-    if (!DRY_RUN && !RELEASE) {
+      if (!vars.DRY_RUN && !vars.RELEASE) {
 
          try {
          def userInput = false
@@ -135,12 +140,12 @@ def call(Map vars, Closure body=null) {
                     osaMediumThreshold: 100,
                     osaHighThreshold: 10,
                     useOwnServerCredentials: true,
-                    credentialsId: 'nabla.checkmarx',
+                        credentialsId: vars.CHECKMARX_CREDENTIALS,
                     groupId: vars.groupId,
                     password: vars.password,
                     preset: vars.preset,
                     projectName: vars.projectName,
-                    serverUrl: 'https://nabla-checkmarx',
+                        serverUrl: vars.CHECKMARX_URL,
                     skipSCMTriggers: true,
                     sourceEncoding: '1',
                     username: '',
@@ -151,15 +156,24 @@ def call(Map vars, Closure body=null) {
 
         } else if (userInput == true) {
             // do something
-            echo "skip requested"
+                echo "Manual skip requested"
         } else {
-            // do something else
-            echo "this was not successful"
             //currentBuild.result = 'FAILURE'
+                if (!vars.skipCheckmarxFailure) {
+                  echo "CHECKMARX UNSTABLE"
+                  currentBuild.result = 'UNSTABLE'
+                } else {
+                  echo "CHECKMARX FAILURE skipped"
+                  //error 'There are errors in aqua' // not needed
+                }
+                echo "WARNING : Scan failed, check output."
         } // if didTimeout
        } catch (exc) {
          echo "WARNING : There was a problem retrieving checkmarx scan" + exc.toString()
        }
     } // if DRY_RUN
 
+  } else {
+    echo "Checkmarx scan skipped"
+  }
 }

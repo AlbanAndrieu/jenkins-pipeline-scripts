@@ -34,8 +34,7 @@ def call(Map vars, Closure body=null) {
             def remote="origin"
 
             try {
-                sh """
-                    #git tag -l | xargs git tag -d # remove all local tags;
+                sh """#!/bin/bash -l
                     which git;
                     git --version;
                     git push --delete ${remote} ${tagName} || echo "Could not delete remote tag: does not exist or no access rights" || true;

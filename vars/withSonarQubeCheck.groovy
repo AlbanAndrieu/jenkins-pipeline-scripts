@@ -22,10 +22,15 @@ def call(Map vars, Closure body=null) {
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.isAbortPipeline = vars.get("isAbortPipeline", false).toBoolean() // true = set pipeline to UNSTABLE, false = don't
     vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+    vars.blockerThreshold = vars.get("blockerThreshold", 0)
+    vars.criticalThreshold = vars.get("criticalThreshold", 0)
+    //vars.majorThreshold = vars.get("majorThreshold", 0)
+    //vars.minorThreshold = vars.get("minorThreshold", 0)
     vars.skipWaitForQualityGate = vars.get("skipWaitForQualityGate", true).toBoolean()
     vars.sonarCheckOutputFile = vars.get("sonarCheckOutputFile", "sonar-check.log").trim()
     vars.sonarCheckResultFile = vars.get("sonarCheckResultFile", "sonar-result.log").trim()
 
+    vars.SONAR_CREDENTIALS = vars.get("SONAR_CREDENTIALS", env.SONAR_CREDENTIALS ?: "devops.jenkins").trim()
     script {
         tee("${vars.sonarCheckOutputFile}") {
 
@@ -61,7 +66,7 @@ def call(Map vars, Closure body=null) {
                 def dashboardUrl = report["dashboardUrl"]
 
                 // Create REST call to SonarQube for issues count grouped by severity
-                def apiUrl = "https://${vars.SONAR_HOST}/api/issues/search"
+                def apiUrl = "${vars.SONAR_URL}/api/issues/search"
                 def severities = ""
                 def query = "branch=${branch}"
                 query += "&componentKeys=${projectKey}"
@@ -73,7 +78,7 @@ def call(Map vars, Closure body=null) {
 
                 def results = [:]
                 // Make REST call
-                withCredentials([usernamePassword(credentialsId: "${vars.SONAR_CREDENTIALS}", passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+                withCredentials([usernamePassword(credentialsId: vars.SONAR_CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
 
                    if (body) {
                      body()
@@ -103,8 +108,12 @@ def call(Map vars, Closure body=null) {
 Dashboard URL: ${dashboardUrl}
 Issue count: ${results}"""
 
+                echo """---Sonar scan summary---
+Dashboard URL: ${dashboardUrl}
+Issue count: ${results}"""
+
                 // Fail the build if any CRITICAL or BLOCKER issues and is not in the release branch
-                if (!isReleaseBranch() && (results["CRITICAL"] > 0 || results["BLOCKER"] > 0 )) {
+                if (!isReleaseBranch() && (results["CRITICAL"] > vars.criticalThreshold || results["BLOCKER"] > vars.blockerThreshold )) {
                   if (!vars.skipFailure) {
                     echo "SONAR CHECK UNSTABLE Pipeline aborted because the number of CRITICAL and BLOCKER and MAJOR issues is more than 0"
                     currentBuild.result = 'UNSTABLE'

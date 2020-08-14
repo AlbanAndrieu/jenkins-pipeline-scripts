@@ -15,15 +15,16 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     vars.releaseVersion = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: "1.0.1")
-    vars.filename = vars.get("filename", "TEST_VERSION.TXT").trim()
-    vars.description = vars.get("description", "TEST").trim()
+    vars.projectName = vars.get("projectName", env.JOB_NAME.split("/")[1] ?: "TEST").trim()
+    vars.fileName = vars.get("fileName", "${vars.projectName}_VERSION.TXT").trim()
+    vars.description = vars.get("description", "${vars.projectName}").trim()
 
     vars.build = currentBuild.number.toString()
     vars.commitSHA1 = getCommitId()
 
     vars.commitRevision = getCommitRevision()
 
-    //def fileContents = readFile file: "${filename}", encoding: "UTF-8"
+    //def fileContents = readFile file: "${fileName}", encoding: "UTF-8"
     //fileContents = fileContents.replace("hello", "world")
     //echo fileContents
 
@@ -39,7 +40,7 @@ def call(Map vars, Closure body=null) {
 
     if (body) { body() }
 
-    writeFile file: "${vars.filename}", text: vars.fileContents, encoding: "UTF-8"
+    writeFile file: "${vars.fileName}", text: vars.fileContents, encoding: "UTF-8"
 
     return vars.fileContents
 

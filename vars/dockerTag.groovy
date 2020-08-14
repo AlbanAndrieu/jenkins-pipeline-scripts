@@ -24,8 +24,9 @@ def call(Map vars, Closure body=null) {
 
 def call(def DOCKER_TAG, def commit = "", def dbms = "") {
 
+  echo "[JPL] Executing `vars/dockerTag.groovy`"
     // create safe tag for docker image from given parameters
-    def branchSafeName = env.BRANCH_NAME.replaceAll("/", "-").replaceAll("%2F", "-").replaceAll("[^a-zA-Z0-9]", "-")
+    def branchSafeName = env.BRANCH_NAME.replaceAll("/", "-").replaceAll("%2F", "-")
 
     if (env.BRANCH_NAME ==~ /PR-.*|feature\/.*|bugfix\/.*/ ) {
         DOCKER_TAG = ("temp-${branchSafeName}-${env.BUILD_ID}").toLowerCase()
@@ -37,7 +38,7 @@ def call(def DOCKER_TAG, def commit = "", def dbms = "") {
         DOCKER_TAG = ("${branchSafeName}").toLowerCase()
     }
 
-    if (commit != null && commit.trim() != "" ) {
+  if (commit != null && commit.trim() != "" && commit.trim() != "null" ) {
         def commitShortSHA1 = commit.take(7)
         if (dbms == null || dbms.trim() == "" ) {
             DOCKER_TAG += "-${commitShortSHA1}"
@@ -46,6 +47,6 @@ def call(def DOCKER_TAG, def commit = "", def dbms = "") {
         }
     }
 
-    return DOCKER_TAG.toLowerCase()
+  return DOCKER_TAG.toLowerCase() ?: "latest"
 
 }

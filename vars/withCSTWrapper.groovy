@@ -21,8 +21,10 @@ def call(Map vars, Closure body=null) {
   vars.buildCmd = vars.get("buildCmd", "").trim()
   vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
   vars.shellOutputFile = vars.get("shellOutputFile", "cst.log").trim()
-  vars.skipFailure = vars.get("skipFailure", false).toBoolean()
+  vars.skipCSTFailure = vars.get("skipCSTFailure", false).toBoolean()
+  vars.skipCST = vars.get("skipCST", false).toBoolean()
 
+  if (!vars.skipCST) {
   try {
     tee("${vars.shellOutputFile}") {
 
@@ -38,6 +40,8 @@ def call(Map vars, Closure body=null) {
         vars.buildCmdParameters+=        " test "
         vars.buildCmdParameters+=        " --image ${vars.imageName} "
         vars.buildCmdParameters+=        " --config /data/${vars.configFile}"
+        // TODO Remove it when tee will be back
+        vars.buildCmdParameters+= " 2>&1 > ${vars.shellOutputFile} "
 
         vars.buildCmdParameters+= " && docker run --rm --volume ${pwd()}:/ws --workdir /ws --volume /etc/passwd:/etc/passwd --volume /etc/group:/etc/group ubuntu chown -R \$(id -u):\$(id -g) ."
 
@@ -45,8 +49,6 @@ def call(Map vars, Closure body=null) {
             vars.buildCmd += " ${vars.buildCmdParameters}"
         }
 
-        // TODO Remove it when tee will be back
-        vars.buildCmd += " 2>&1 > ${vars.shellOutputFile} "
         //vars.buildCmd +=        " > /dev/null"
 
         // Run the cst build
@@ -58,7 +60,7 @@ def call(Map vars, Closure body=null) {
         if (build == 0) {
             echo "CST SUCCESS"
         } else {
-            if (!vars.skipFailure) {
+            if (!vars.skipCSTFailure) {
                 echo "CST UNSTABLE"
                 currentBuild.result = 'UNSTABLE'
                 echo "WARNING : Scan failed, check output at \'${vars.shellOutputFile}\' "
@@ -77,6 +79,9 @@ def call(Map vars, Closure body=null) {
     } // tee
   } finally {
     archiveArtifacts artifacts: "${vars.shellOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+    }
+  } else {
+    echo "CST scan skipped"
   }
 
 }

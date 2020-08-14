@@ -19,7 +19,7 @@ def call(Map vars, Closure body=null) {
         vars.releasedVersion = (readFile("${vars.pomFile}") =~ '<version>(.+)-SNAPSHOT</version>')[0][1]
     }
     catch(exc) {
-        echo 'Error: There were errors in getReleasedVersion. '+exc.toString()
+        echo 'Warning: There were errors in getReleasedVersion. '+exc.toString()
     }
 
     return vars.releasedVersion ?: "LATEST"

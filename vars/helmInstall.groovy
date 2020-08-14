@@ -36,7 +36,7 @@ def call(Map vars, Closure body=null) {
   vars.stableRepoName = vars.get("stableRepoName", "stable").trim()
   vars.skipCustomRepo = vars.get("skipCustomRepo", false).toBoolean()
   vars.customRepoName = vars.get("customRepoName", "custom").trim()
-  vars.isHelm2 = vars.get("isHelm2", true).toBoolean()
+  vars.isHelm2 = vars.get("isHelm2", false).toBoolean()
   vars.isInstall = vars.get("isInstall", false).toBoolean()
   vars.isHarbor = vars.get("isHarbor", true).toBoolean()
   vars.isSign = vars.get("isSign", false).toBoolean()
@@ -57,7 +57,8 @@ def call(Map vars, Closure body=null) {
         if (body) { body() }
 
         if (vars.isDryRun.toBoolean()) {
-          sh "helm install ${vars.helmChart} --dry-run --debug 2>&1 > ${vars.helmDryRunOutputFile}"
+          sh """#!/bin/bash -l
+          helm install ${vars.helmChart} --dry-run --debug 2>&1 > ${vars.helmDryRunOutputFile}"""
           //sh "helm install $${vars.customRepoName}/${vars.helmRelease} --dry-run --debug 2>&1 > ${vars.helmDryRunOutputFile}"
         }
 

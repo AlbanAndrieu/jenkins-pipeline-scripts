@@ -17,7 +17,7 @@ def call(Map vars, Closure body=null) {
         if (vars.isCleaningStashEnabled == true || CLEAN_RUN == true) {
             sh "sudo /sbin/sysctl -w vm.drop_caches=3 || true"
         }
-    }
+    } // isUnix
 
     if (body) { body() }
 

@@ -54,9 +54,10 @@ def call(Map vars, Closure body=null) {
                     }
 
                     if (DEBUG_RUN) {
-                        sh "docker images"
-                        sh "docker volume ls"
-                        sh "docker ps -a"
+                        sh """#!/bin/bash -l
+                        docker images
+                        docker volume ls
+                        docker ps -a"""
                     }
 
                     if (!DRY_RUN) {
@@ -98,7 +99,8 @@ def call(Map vars, Closure body=null) {
                     echo 'Warn: There was a problem taking down the docker-compose. '+exc.toString()
                 } finally {
                     if (vars.dockerDownFile?.trim()) {
-                        sh "${vars.dockerDownFile}"
+                        sh """#!/bin/bash -l
+                        ${vars.dockerDownFile}"""
                     }
                 }
             } // finally

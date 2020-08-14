@@ -23,9 +23,12 @@ def call(Map vars, Closure body=null) {
     vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 1)
 
     tee("${vars.shellOutputFile}") {
+        if (isUnix()) {
 
         shellcheckExitCode = sh(
-            script: "export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\" && shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml",
+              script: """#!/bin/bash -l
+              export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\"
+              shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml""",
             returnStdout: true,
             returnStatus: true
         )
@@ -45,6 +48,8 @@ def call(Map vars, Closure body=null) {
 			//currentBuild.result = 'FAILURE'
 			error 'There are other errors'
 		}
+
+	  } // isUnix
 
     } // tee
 

@@ -28,6 +28,9 @@ def call(Map vars, Closure body=null) {
   //productToken 2dcf60630aca4d3fb29fe59ad731d488747f2f6b0ba04b8b8664ae3629a1c3ae
   vars.jobUserKey = vars.get("jobUserKey", "cf5b762ee7ab4f2cb9fdab9728e59c2a3ccc2d77cb9b4718986dfe90fac671bb").trim()
   vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+  vars.skipWhitesource = vars.get("skipWhitesource", false).toBoolean()
+
+  if (!vars.skipWhitesource) {
 
   if (vars.projectName?.trim()) {
       vars.productVersion += vars.projectName
@@ -70,6 +73,9 @@ def call(Map vars, Closure body=null) {
 
   } else {
       echo "WARNING : There was a problem with whitesource scan, projectName cannot be empty"
+    }
+  } else {
+    echo "Whitesource scan skipped"
   }
 
 }

@@ -9,7 +9,7 @@ def call(Map params) {
       usernameVariable: 'RSYNC_USER'
     )
   ]) {
-    sh """
+    sh """#!/bin/bash -l
       rsync --temp-dir=/tmp --archive --dirs --verbose --compress --checksum=sha1 --rsh="sshpass -p ${RSYNC_PASSWORD} ssh -o StrictHostKeyChecking=no -l ${RSYNC_USER}" -- ${params.source} ${params.destination} >&2
     """
   }

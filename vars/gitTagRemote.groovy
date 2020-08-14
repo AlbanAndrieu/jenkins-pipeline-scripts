@@ -8,7 +8,7 @@ def call(def tagName="LATEST_SUCCESSFULL", def remote="origin") {
     // Push empty reference ( :tag) to delete remote tag
     // Assumes that remote is consistently named to origin
     try {
-        sh """
+        sh """#!/bin/bash -l
             git push --delete ${remote} ${tagName} || echo "Could not delete remote tag: does not exist or no access rights" || true;
             git tag --delete ${tagName}
             git fetch --tags --prune > /dev/null 2>&1;

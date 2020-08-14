@@ -1,5 +1,9 @@
 #!/usr/bin/groovy
+import hudson.model.*
 
+//@Deprecated please do not use directly, instead use dockerPush
+
+@Deprecated
 def pushAndRemoveDockerImage(def container, def image, def tag, def remove=true) {
     // Push docker image to DTR and clean local docker images
     // Assumes that tag is in the safe format (i.e. it is unique by using git sha1)
@@ -22,23 +26,29 @@ def pushAndRemoveDockerImage(def container, def image, def tag, def remove=true)
         currentBuild.result = 'UNSTABLE'
         echo "Issue: ${exception.getMessage()}"
         echo "Trace: ${exception.getStackTrace()}"
-        error 'There was a problem Pushing / Deleting local docker image.'
+        echo 'Error: There was a problem Pushing / Deleting local docker image.'
     }
 }
 
+@Deprecated
 def call(def container, def image, def tag) {
-    pushAndRemoveDockerImage(container, image, tag, false)
+
+	if (null != container) {
+        pushAndRemoveDockerImage(container, image, tag, false)
+    }
 }
 
+@Deprecated
 def call(container, image, tag, date, buildNumber, releaseBranch)
 {
-  if (releaseBranch) {
-    doDockerImagePush(container, image, tag)
-  }
-  if (env.BRANCH_NAME ==~ /develop/)
-  {
-    doDockerImagePush(container, image, "develop")
-    doDockerImagePush(container, image, "latest")
-    doDockerImagePush(container, image, date+"_"+buildNumber)
-  }
+    if (null != container) {
+        if (releaseBranch) {
+            doDockerImagePush(container, image, tag)
+        }
+        if (env.BRANCH_NAME ==~ /develop/) {
+            doDockerImagePush(container, image, "develop")
+            doDockerImagePush(container, image, "latest")
+            //doDockerImagePush(container, image, date+"_"+buildNumber)
+        }
+    }
 }

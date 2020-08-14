@@ -16,7 +16,7 @@ def call(Map vars, Closure body=null) {
   vars.helmChartName = vars.get("helmChartName", "charts").trim()
   vars.helmLintCmd = vars.get("helmLintCmd", "helm lint ${vars.helmDir}/${vars.helmChartName}").trim()
 
-  vars.skipFailure = vars.get("skipFailure", false).toBoolean()
+  vars.skipHelmLintFailure = vars.get("skipHelmLintFailure", false).toBoolean()
   vars.helmLintOutputFile = vars.get("helmLintOutputFile", "helm-lint.log").trim()
 
   try {
@@ -31,7 +31,7 @@ def call(Map vars, Closure body=null) {
       echo "HELM LINT SUCCESS"
     } else {
 	  echo "WARNING : Helm lint failed, check output at \'${vars.helmLintOutputFile}\' "
-      if (!vars.skipFailure) {
+      if (!vars.skipHelmLintFailure) {
         echo "HELM LINT FAILURE"
         //currentBuild.result = 'UNSTABLE'
         currentBuild.result = 'FAILURE'

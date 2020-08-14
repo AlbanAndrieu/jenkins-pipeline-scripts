@@ -15,7 +15,7 @@ def call(Map vars) {
     def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
     try {
-      if ( BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
+      if ( env.BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
         if (DEBUG_RUN) {
           echo 'Release branch detected'
         }

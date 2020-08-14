@@ -33,11 +33,11 @@ def call(Map vars, Closure body=null) {
 
   vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins/").trim()
 
-  vars.DOCKER_REGISTRY_TMP = vars.get("DOCKER_REGISTRY_TMP", env.DOCKER_REGISTRY_TMP ?: "index.docker.io/v1").toLowerCase().trim()
+  vars.DOCKER_REGISTRY_TMP = vars.get("DOCKER_REGISTRY_TMP", env.DOCKER_REGISTRY_TMP ?: "registry.hub.docker.com").toLowerCase().trim()
   vars.DOCKER_REGISTRY_TMP_URL = vars.get("DOCKER_REGISTRY_TMP_URL", env.DOCKER_REGISTRY_TMP_URL ?: "https://${vars.DOCKER_REGISTRY_TMP}").trim()
   vars.DOCKER_REGISTRY_TMP_CREDENTIAL = vars.get("DOCKER_REGISTRY_TMP_CREDENTIAL", env.DOCKER_REGISTRY_TMP_CREDENTIAL ?: "jenkins").trim()
 
-  vars.DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "index.docker.io/v1").toLowerCase().trim()
+  vars.DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.hub.docker.com").toLowerCase().trim()
   vars.DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${vars.DOCKER_REGISTRY}").trim()
   vars.DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
 
@@ -50,9 +50,9 @@ def call(Map vars, Closure body=null) {
   vars.COMPOSE_HTTP_TIMEOUT = vars.get("COMPOSE_HTTP_TIMEOUT", env.COMPOSE_HTTP_TIMEOUT ?: "200").trim()
 
   vars.HELM_PROJECT = vars.get("HELM_PROJECT", env.HELM_PROJECT ?: "nabla").trim()
-  vars.HELM_REGISTRY = vars.get("HELM_REGISTRY", env.HELM_REGISTRY ?: "index.docker.io/v1").toLowerCase().trim()
+  vars.HELM_REGISTRY = vars.get("HELM_REGISTRY", env.HELM_REGISTRY ?: "registry.hub.docker.com").toLowerCase().trim()
   vars.HELM_REGISTRY_URL = vars.get("HELM_REGISTRY_URL", env.HELM_REGISTRY_URL ?: "https://${vars.HELM_REGISTRY}/api/chartrepo/${vars.HELM_PROJECT}/charts").trim()
-  vars.HELM_REGISTRY_TMP = vars.get("HELM_REGISTRY_TMP", env.HELM_REGISTRY_TMP ?: "index.docker.io/v1").toLowerCase().trim()
+  vars.HELM_REGISTRY_TMP = vars.get("HELM_REGISTRY_TMP", env.HELM_REGISTRY_TMP ?: "registry.hub.docker.com").toLowerCase().trim()
 
   vars.HELM_REGISTRY_TMP_URL = vars.get("HELM_REGISTRY_TMP_URL", env.HELM_REGISTRY_TMP_URL ?: "https://${vars.HELM_REGISTRY_TMP}/api/chartrepo/${vars.HELM_PROJECT}/charts").trim()
   vars.HELM_REGISTRY_CREDENTIAL = vars.get("HELM_REGISTRY_CREDENTIAL", env.HELM_REGISTRY_CREDENTIAL ?: "jenkins").trim()
@@ -86,6 +86,8 @@ def call(Map vars, Closure body=null) {
   vars.isEntrypoint = vars.get("isEntrypoint", true).toBoolean()
 
   vars.isLogParserPublisher = vars.get("isLogParserPublisher", true).toBoolean()
+  vars.skipAqua = vars.get("skipAqua", true).toBoolean()
+  vars.skipCheckmarx = vars.get("skipCheckmarx", true).toBoolean()
 
   if (vars.DEBUG_RUN) {
     try {
@@ -130,6 +132,14 @@ def call(Map vars, Closure body=null) {
 
   if (vars.isProperties ==~ /LogParserPublisher/ ) {
     return vars.isLogParserPublisher
+  }
+
+  if (vars.isProperties ==~ /Aqua|skipAqua/ ) {
+    return vars.skipAqua
+  }
+
+  if (vars.isProperties ==~ /Checkmarx|skipCheckmarx/ ) {
+    return vars.skipCheckmarx
   }
 
   return true

@@ -42,7 +42,7 @@ def call(Map vars, Closure body=null) {
   vars.stableRepoName = vars.get("stableRepoName", "stable").trim()
   vars.skipCustomRepo = vars.get("skipCustomRepo", false).toBoolean()
   vars.customRepoName = vars.get("customRepoName", "custom").trim()
-  vars.isHelm2 = vars.get("isHelm2", true).toBoolean()
+  vars.isHelm2 = vars.get("isHelm2", false).toBoolean()
   vars.isDelete = vars.get("isDelete", false).toBoolean()
   vars.isInstall = vars.get("isInstall", false).toBoolean()
   vars.isHarbor = vars.get("isHarbor", true).toBoolean()
@@ -51,7 +51,6 @@ def call(Map vars, Closure body=null) {
   vars.isHelmPush = vars.get("isHelmPush", false).toBoolean()
   vars.isTemplate = vars.get("isTemplate", true).toBoolean()
   vars.isDependencyUpdate = vars.get("isDependencyUpdate", true).toBoolean()
-  vars.isDependencyBuild = vars.get("isDependencyBuild", false).toBoolean()
 
   //vars.helmCaFile = vars.get("helmCaFile", "/usr/local/share/ca-certificates/UK1VSWCERT01-CA-5.crt").trim()
   //vars.helmCaFile = vars.get("helmCaFile", "/root/pki/ca-old.pem").trim()
@@ -60,7 +59,7 @@ def call(Map vars, Closure body=null) {
   vars.helmPackageOutputFile = vars.get("helmPackageOutputFile", "helm-package.log").trim()
   vars.helmPushOutputFile = vars.get("helmPushOutputFile", "helm-push.log").trim()
   vars.helmTemplateOutputFile = vars.get("helmTemplateOutputFile", "helm-template.log").trim()
-  vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+  vars.skipHelmPushFailure = vars.get("skipHelmPushFailure", false).toBoolean()
 
   try {
     echo "Using api : ${HELM_REGISTRY_API_URL} from : ${vars.buildDir}"
@@ -78,14 +77,16 @@ def call(Map vars, Closure body=null) {
           sh "helm init --client-only || true"
 		}
 
-        sh "helm version || true"
-        sh "helm repo list || true"
+        sh """#!/bin/bash -l
+        helm version || true
+        helm repo list || true"""
 
         if (!vars.isHelm2.toBoolean()) {
 		// For local http://127.0.0.1:8879/charts
-		sh "helm serve || true &"
-		sh "curl 127.0.0.1:8879 || true"
-		sh "ls -lrta /home/jenkins/.helm/ /home/jenkins/.helm/repository/ || true"
+		  sh """#!/bin/bash -l
+          helm serve || true &
+		  curl 127.0.0.1:8879 || true
+		  ls -lrta /home/jenkins/.helm/ /home/jenkins/.helm/repository/ || true"""
         }
         // Remove https://kubernetes-charts.storage.googleapis.com/ if any
         sh "helm repo remove ${vars.stableRepoName} || true"
@@ -96,11 +97,10 @@ def call(Map vars, Closure body=null) {
         sh "helm repo remove ${vars.customRepoName} || true"
         if (!vars.skipCustomRepo) {
           // --insecure-skip-tls-verify
-          sh "helm repo add ${vars.customRepoName} --username ${HELM_USERNAME} --password ${HELM_PASSWORD} ${HELM_REGISTRY_REPO_URL} --ca-file=${vars.helmCaFile} || true"
-
-          sh "helm repo list || true"
-          //sh "helm search repo ${vars.customRepoName}/${vars.helmChartName} || true"
-          sh "helm search repo ${vars.helmChartName} || true"
+          sh """#!/bin/bash -l
+          helm repo add ${vars.customRepoName} --username ${HELM_USERNAME} --password ${HELM_PASSWORD} ${HELM_REGISTRY_REPO_URL} --ca-file=${vars.helmCaFile} || true
+          helm repo list || true
+          helm search repo ${vars.helmChartName} || true"""
         }
 
         helmLint(vars, body)
@@ -123,8 +123,9 @@ def call(Map vars, Closure body=null) {
 		} else {
 		  sh "helm dependency build ${vars.helmDir}/${vars.helmChartName} || true"
 		}
-		sh "cat requirements.lock || true"
-		sh "helm dependency list ${vars.helmDir}/${vars.helmChartName} || true"
+		sh """#!/bin/bash -l
+		cat requirements.lock || true
+		helm dependency list ${vars.helmDir}/${vars.helmChartName} || true"""
 
         //sh "helm dep build ${vars.helmDir}/${vars.helmChartName} || true"
         //
@@ -148,7 +149,7 @@ def call(Map vars, Closure body=null) {
           echo "HELM PACKAGE SUCCESS"
         } else {
           echo "WARNING : Helm package failed, check output at \'${vars.helmPackageOutputFile}\' "
-          if (!vars.skipFailure) {
+          if (!vars.skipHelmPushFailure) {
             echo "HELM PACKAGE FAILURE"
             //currentBuild.result = 'UNSTABLE'
             currentBuild.result = 'FAILURE'
@@ -159,11 +160,11 @@ def call(Map vars, Closure body=null) {
           }
         }
 
-		sh "ls ~/.helm/repository/local/ || true"
-
-		sh "helm verify ${vars.helmDir}/${vars.helmChartName} || true"
-		sh "helm repo index . || true"
-		sh "cat index.yaml || true"
+		sh """#!/bin/bash -l
+		ls ~/.helm/repository/local/ || true
+		helm verify ${vars.helmDir}/${vars.helmChartName} || true
+		helm repo index . || true
+		cat index.yaml || true"""
 
         String chart="-F chart=@${vars.helmChartArchive}".trim()
         String provenance=""
@@ -192,7 +193,7 @@ def call(Map vars, Closure body=null) {
           echo "HELM PUSH SUCCESS"
         } else {
           echo "WARNING : Helm push failed, check output at \'${vars.helmPushOutputFile}\' "
-          if (!vars.skipFailure) {
+          if (!vars.skipHelmPushFailure) {
             echo "HELM PUSH FAILURE"
             //currentBuild.result = 'UNSTABLE'
             currentBuild.result = 'FAILURE'
