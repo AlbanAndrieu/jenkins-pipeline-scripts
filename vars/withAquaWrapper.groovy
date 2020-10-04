@@ -36,33 +36,32 @@ def call(Map vars, Closure body=null) {
   vars.skipAqua = vars.get("skipAqua", false).toBoolean()
 
   if (!vars.skipAqua) {
+    try {
+      //tee("${vars.aquaOutputFile}") {
 
-  try {
-    //tee("${vars.aquaOutputFile}") {
+      if (vars.locationType.trim() == "local") {
+         vars.register = false // needed when is empty registry
+         vars.hostedImage = ""
+      }
 
-    if (vars.locationType.trim() == "local") {
-       vars.register = false // needed when is empty registry
-       vars.hostedImage = ""
-    }
+      aqua customFlags: '', hideBase: true, hostedImage: vars.hostedImage, localImage: vars.localImage, locationType: vars.locationType, notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: vars.register, registry: vars.registry, showNegligible: true
 
-	aqua customFlags: '', hideBase: true, hostedImage: vars.hostedImage, localImage: vars.localImage, locationType: vars.locationType, notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: vars.register, registry: vars.registry, showNegligible: true
+      if (body) { body() }
 
-	if (body) { body() }
-
-    //} // tee
-  } catch (exc) {
-	if (!vars.skipAquaFailure) {
-		echo "AQUA UNSTABLE"
-		currentBuild.result = 'UNSTABLE'
-	} else {
-		echo "AQUA FAILURE skipped"
-		//error 'There are errors in aqua' // not needed
-	}
-	echo "WARNING : Scan failed, check output at \'${vars.aquaOutputFile}\' "
-	echo "WARNING : There was a problem with aqua scan : " + exc.toString()
-	echo "Check on : ${vars.AQUA_URL}"
-  } finally {
-    archiveArtifacts artifacts: "${vars.aquaOutputFile}, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+      //} // tee
+    } catch (exc) {
+      if (!vars.skipAquaFailure) {
+          echo "AQUA UNSTABLE"
+          currentBuild.result = 'UNSTABLE'
+      } else {
+          echo "AQUA FAILURE skipped"
+          //error 'There are errors in aqua' // not needed
+      }
+      echo "WARNING : Scan failed, check output at \'${vars.aquaOutputFile}\' "
+      echo "WARNING : There was a problem with aqua scan : " + exc.toString()
+      echo "Check on : ${vars.AQUA_URL}"
+    } finally {
+      archiveArtifacts artifacts: "${vars.aquaOutputFile}, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     }
   } else {
     echo "Aqua scan skipped"
