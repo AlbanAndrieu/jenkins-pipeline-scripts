@@ -53,6 +53,7 @@ git fetch -t                  # fetch remote tags
 
 #git tag --delete v1.0.0
 #git push --delete origin v1.0.0
+echo -e "${green} git tag --delete v1.1.0 ${NC}"
 echo -e "${green} git tag v1.1.0 ${NC}"
 echo -e "${green} git push origin --tags ${NC}"
 

@@ -68,6 +68,7 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   prometheus:latest \
   envinject \
   artifactdeployer \
+  jenkinslint \
   nodenamecolumn \
   summary_report \
   docker-commons \
@@ -114,6 +115,7 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   fitnesse \
   dashboard-view \
   gatling \
+  saferestart \
   job-node-stalker favorite exclusive-execution build-pipeline-plugin postbuild-task skip-certificate-check maven-info \
   node-iterator-api \
   ssh publish-over-ssh ssh-slaves ssh-credentials \

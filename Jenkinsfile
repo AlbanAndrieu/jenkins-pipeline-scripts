@@ -92,10 +92,7 @@ pipeline {
               sh "$WORKSPACE/clean.sh"
           }
 
-          //profile: "sonar,run-integration-test"
-
           sh "echo TEST : $branchName"
-          //buildCmdParameters: "-Dserver=jetty9x -Dmaven.repo.local=./.repository"
 
           withMavenWrapper(goal: "install",
               profile: "jacoco",
@@ -104,6 +101,7 @@ pipeline {
               skipArtifacts: true,
               buildCmdParameters: "-Dserver=jetty9x -Dsonar.findbugs.allowuncompiledcode=true",
               mavenHome: "/home/jenkins/.m2/",
+              skipMavenSettings: false,
               artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip") {
 
                 //sh 'chown -R jenkins:docker .[^.]* *'
@@ -127,7 +125,7 @@ pipeline {
               zoomCoverageChart: false
               ])
 
-          //recordIssues enabledForFailure: true, tool: checkStyle()
+          recordIssues enabledForFailure: true, tool: checkStyle()
           recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
           recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
           //recordIssues enabledForFailure: true, tool: pit()
@@ -205,7 +203,6 @@ pipeline {
                 tee("docker-build.log") {
 
                     // this give the registry
-                    // sh(returnStdout: true, script: "echo ${DOCKER_BUILD_IMG} | cut -d'/' -f -1").trim()
                     DOCKER_BUILD_ARGS = ["--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz"].join(" ")
                     if (env.CLEAN_RUN) {
                         DOCKER_BUILD_ARGS = ["--no-cache",

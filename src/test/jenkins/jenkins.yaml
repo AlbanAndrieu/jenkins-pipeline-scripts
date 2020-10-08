@@ -80,6 +80,8 @@ security:
     - "method groovy.lang.GString getBytes"
     - "method java.net.HttpURLConnection setRequestMethod java.lang.String"
     - "method java.net.URL openConnection"
+    - "method java.net.URLConnection connect"
+    - "method java.net.URLConnection setRequestProperty java.lang.String java.lang.String"
     - "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses"
     - "method org.jenkinsci.plugins.workflow.support.actions.EnvironmentAction getEnvironment"
     - "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
@@ -467,7 +469,7 @@ unclassified:
         name: "mgr-settings-nexus"
         providerId: "org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig"
     - globalMavenSettings:
-        comment: "Global settings"
+        comment: "Global Public settings"
         content: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<settings xmlns=\"\
           http://maven.apache.org/SETTINGS/1.0.0\"\n          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\
           \n          xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0\
@@ -537,6 +539,13 @@ unclassified:
         isReplaceAll: true
         name: "mgr-settings-security-nexus"
         providerId: "org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig"
+    - custom:
+        comment: "vault.passwd"
+        content: |
+          misys123
+        id: "vault.passwd"
+        name: "vault.passwd"
+        providerId: "org.jenkinsci.plugins.configfiles.custom.CustomConfig"
   globalConfigurationImpl:
     allResults: true
     enabled: true
@@ -736,9 +745,40 @@ unclassified:
     soundArchive: "classpath:sound-archive.zip"
   ivyBuildTrigger:
     extendedVersionMatching: false
+  jenkinsLintGlobalConfiguration:
+    artifactCheckerEnabled: true
+    bfaCheckerEnabled: true
+    cleanupWorkspaceCheckerEnabled: true
+    gitRefCheckerEnabled: true
+    gitRefSubmoduleCheckerEnabled: true
+    gitShallowCheckerEnabled: true
+    globalEnabled: true
+    gradleWrapperCheckerEnabled: true
+    groovySystemExitCheckerEnabled: true
+    hardcodedScriptCheckerEnabled: true
+    hardcodedScriptIgnoredComment: false
+    hardcodedScriptThreshold: 2
+    javadocCheckerEnabled: true
+    jobActionEnabled: true
+    jobAssignedLabelCheckerEnabled: true
+    jobDescriptionCheckerEnabled: true
+    jobLogRotatorCheckerEnabled: true
+    jobNameCheckerEnabled: true
+    lintDisabledJobEnabled: true
+    masterLabelCheckerEnabled: true
+    mavenJobTypeCheckerEnabled: true
+    multibranchJobTypeCheckerEnabled: true
+    nullSCMCheckerEnabled: true
+    pollingSCMTriggerCheckerEnabled: true
+    slaveDescriptionCheckerEnabled: true
+    slaveLabelCheckerEnabled: true
+    slaveVersionCheckerEnabled: true
+    timeoutCheckerEnabled: true
+    timerTriggerCheckerEnabled: true
+    windowsSlaveLaunchCheckerEnabled: true
   jiraGlobalConfiguration:
     sites:
-    - url: "https://almtools.misys.global.ad/jira/"
+    - url: "https://albandrieu.com/jira/"
   location:
     adminAddress: "Adresse pas encore configurée <nobody@nowhere>"
     url: "http://albandrieu:8686/jenkins/"
@@ -781,7 +821,7 @@ unclassified:
     installations:
     - credentialsId: "alm-sonar2-token"
       name: "alm-sonar2"
-      serverUrl: "https://sonardev.misys.global.ad/"
+      serverUrl: "https://sonarcloud.io"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false

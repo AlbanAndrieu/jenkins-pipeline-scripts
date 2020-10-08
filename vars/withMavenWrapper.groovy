@@ -120,6 +120,7 @@ def call(Map vars, Closure body=null) {
                         if (!vars.skipDeploy) {
                            if ( BRANCH_NAME ==~ /develop|master|master_.+|release\/.+/ ) {
                               vars.goal = "deploy"
+                              vars.mavenGoals += " --fail-never "
                            }
                         }
 

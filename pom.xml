@@ -136,8 +136,8 @@
         <jmockit.version>1.19</jmockit.version>
         <junit.version>4.13</junit.version>
         <hamcrest.version>2.1</hamcrest.version>
-        <groovy.version>2.4.12</groovy.version>
-        <!--<groovy.version>2.5.13</groovy.version>-->
+        <!--<groovy.version>2.4.12</groovy.version>-->
+        <groovy.version>2.5.13</groovy.version>
         <!--<groovy.version>3.0.6</groovy.version>-->
         <ivy.version>2.4.0</ivy.version>
         <!--<groovy.cps.version>1.28</groovy.cps.version> jenkins 2.221 -->
@@ -156,19 +156,17 @@
         <commons.math3.version>3.2</commons.math3.version>
         <org.assertj.version>3.4.1</org.assertj.version>
 
-        <!--<jenkins.version>2.221</jenkins.version>-->
         <jenkins.version>2.249</jenkins.version>
         <jenkins.core.version>${jenkins.version}</jenkins.core.version>
         <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
         <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
-        <!--<jenkins.workflow.cps.version>2.71</jenkins.workflow.cps.version>-->
         <jenkins.workflow.cps.version>2.83</jenkins.workflow.cps.version>
         <jenkins.symbol.version>1.18</jenkins.symbol.version>
 
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 
-        <sonar.host.url>https://sonardev.misys.global.ad/</sonar.host.url>
-        <sonar.login>c71b002ba25ba981183379e2ae9baa272a8eb79a</sonar.login>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>818224bf27cc74d98389c3d5c567e58ea7e058eb</sonar.login>
         <sonar.links.ci>${env.BUILD_URL}</sonar.links.ci>
         <sonar.cpd.cross_project>true</sonar.cpd.cross_project>
         <sonar.pitest.mode>reuseReport</sonar.pitest.mode>
