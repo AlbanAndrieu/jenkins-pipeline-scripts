@@ -1,6 +1,11 @@
 #!/bin/bash
 #set -xv
 
+if [ "$0" = "${BAHS_SOURCE[0]}" ]; then
+    echo "This script has to be sourced and not executed..."
+    exit 1
+fi
+
 export bold="\033[01m"
 export underline="\033[04m"
 export blink="\033[05m"

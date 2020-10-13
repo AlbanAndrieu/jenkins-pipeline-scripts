@@ -111,7 +111,7 @@
         <maven.fabric8.docker.plugin.version>0.26.1</maven.fabric8.docker.plugin.version>
         <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
         <maven.jenkinsfile.plugin.version>1.0.0</maven.jenkinsfile.plugin.version>
-        <maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>
+        <maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>
 
         <jdk.version>1.8.0</jdk.version>
         <jdk.level>1.8</jdk.level>
@@ -141,7 +141,7 @@
         <!--<groovy.version>3.0.6</groovy.version>-->
         <ivy.version>2.4.0</ivy.version>
         <!--<groovy.cps.version>1.28</groovy.cps.version> jenkins 2.221 -->
-        <groovy.cps.version>1.31</groovy.cps.version> <!-- jenkins 2.249.1 -->
+        <groovy.cps.version>1.32</groovy.cps.version> <!-- jenkins 2.249.1 -->
         <slf4j.version>1.7.26</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <log4j.core.version>2.13.0</log4j.core.version>
@@ -160,6 +160,7 @@
         <jenkins.core.version>${jenkins.version}</jenkins.core.version>
         <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
         <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
+        <!-- See http://localhost:8686/pluginManager/plugin/workflow-cps/thirdPartyLicenses -->
         <jenkins.workflow.cps.version>2.83</jenkins.workflow.cps.version>
         <jenkins.symbol.version>1.18</jenkins.symbol.version>
 
@@ -226,12 +227,14 @@
             <artifactId>jenkins-pipeline-unit</artifactId>
             <version>${maven.jenkins.pipeline.unit.plugin.version}</version>
             <scope>test</scope>
+            <!--
             <exclusions>
                 <exclusion>
                     <artifactId>org.codehaus.groovy</artifactId>
                     <groupId>groovy-all</groupId>
                 </exclusion>
             </exclusions>
+            -->
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
