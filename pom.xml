@@ -134,7 +134,7 @@
         <cobertura.format>xml</cobertura.format>
         <asm.ow2.version>5.0.3</asm.ow2.version>
         <jmockit.version>1.19</jmockit.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <hamcrest.version>2.1</hamcrest.version>
         <!--<groovy.version>2.4.12</groovy.version>-->
         <groovy.version>2.5.13</groovy.version>
