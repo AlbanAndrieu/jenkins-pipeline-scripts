@@ -18,6 +18,7 @@ def call(Map vars, Closure body=null) {
 
     def arch = vars.get("arch", "TEST").trim()
     def script = vars.get("script", "build.sh").trim()
+    def command = vars.get("command", "cd \"${pwd()}\" && bash -c \"${script}\"").trim()
     def artifacts = vars.get("artifacts", ['*_VERSION.TXT',
                    '*.md5',
                    '*.tar.gz',
@@ -51,11 +52,14 @@ def call(Map vars, Closure body=null) {
 			    	unstash 'app'
 			    }
 
+                echo "CLEAN_RUN : ${CLEAN_RUN}"
 			    if (CLEAN_RUN) {
 			    	SCONS_OPTS += "--cache-disable"
-			    	sh "rm -Rf ./bw-outputs || true"
-			    	sh "rm -Rf ../bw-outputs || true"
-			    	sh "rm -f *_VERSION.TXT"
+                    sh """#!/bin/bash -l
+                    rm -Rf ./bw-outputs || true
+                    rm -Rf ../bw-outputs || true
+                    rm -f *_VERSION.TXT
+                    """
 			    }
 
 			    if (DEBUG_RUN) {
@@ -64,9 +68,15 @@ def call(Map vars, Closure body=null) {
 
 			    if (body) { body() }
 
+                // See https://stackoverflow.com/questions/38143485/how-do-i-make-jenkins-2-0-execute-a-sh-command-in-the-same-directory-as-the-chec/38166106
+
+                //if (isUnix()) {
 			    build = sh (
-                  script: "${script}",
-			      returnStatus: true
+                    script: """#!/bin/bash -l
+                    ${command} 2>&1 > ${vars.shellOutputFile}
+                    """,
+                    //returnStdout: true,
+			        returnStatus: true
 			    )
 
 			    echo "BUILD RETURN CODE : ${build}"
