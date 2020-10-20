@@ -173,6 +173,7 @@ def call(Map vars, Closure body=null) {
                                     export NODE_PATH=${env.WORKSPACE}
                                     export PATH=./node/npm/bin/:./node/:/bin:$PATH
                                     export MAVEN_OPTS=\"${vars.MAVEN_OPTS}\"
+                                    mvn --version
                                     mvn ${vars.buildCmd}""",
                                     returnStatus: true
                                     )

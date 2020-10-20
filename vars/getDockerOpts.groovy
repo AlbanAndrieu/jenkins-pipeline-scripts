@@ -46,6 +46,11 @@ def call(Map vars, Closure body=null) {
   if (vars.isHomeWorkspace == true) {
       DOCKER_OPTS_BASIC += " -e HOME=${WORKSPACE}"
   }
+  if (vars.isProxy == true) {
+      DOCKER_OPTS_BASIC += " " + [ "-e http_proxy=${env.HTTP_PROXY}",
+                                   "-e https_proxy=${env.HTTPS_PROXY}",
+                                   "-e no_proxy='${env.NO_PROXY}'"].join(" ") + " "
+  }
 
   if (vars.isLocalJenkinsUser == true) {
       DOCKER_OPTS_BASIC = [

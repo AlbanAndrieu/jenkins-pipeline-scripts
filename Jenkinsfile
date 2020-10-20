@@ -251,11 +251,11 @@ pipeline {
                  //sh "exit 1" // this fails the stage
               }
             } // parallel
-		  } catch (exc) {
-			echo "E2E FAILURE"
-			//currentBuild.result = 'FAILURE'
-			//build = "FAIL" // make sure other exceptions are recorded as failure too
-			echo "WARNING : There was a problem with e2e job test " + exc.toString()
+          } catch (exc) {
+            echo "E2E FAILURE"
+            //currentBuild.result = 'FAILURE'
+            //build = "FAIL" // make sure other exceptions are recorded as failure too
+            echo "WARNING : There was a problem with e2e job test " + exc.toString()
           }
         }
       } // steps
@@ -263,12 +263,12 @@ pipeline {
     //stage('\u2795 Quality - Security - Checkmarx') {
     //  steps {
     //    script {
-	//       withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts',
-	//     	                    preset: '1',
-	//     	                    groupId: '1234',
-	//     	                    lowThreshold: 10,
-	//     	                    mediumThreshold: 0,
-	//     	                    highThreshold: 0)
+    //       withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts',
+    //                          preset: '1',
+    //                          groupId: '1234',
+    //                          lowThreshold: 10,
+    //                          mediumThreshold: 0,
+    //                          highThreshold: 0)
     //    } // script
     //  } // steps
     //} // stage Security

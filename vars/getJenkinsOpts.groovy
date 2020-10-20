@@ -57,6 +57,10 @@ def call(Map vars, Closure body=null) {
   vars.HELM_REGISTRY_TMP_URL = vars.get("HELM_REGISTRY_TMP_URL", env.HELM_REGISTRY_TMP_URL ?: "https://${vars.HELM_REGISTRY_TMP}/api/chartrepo/${vars.HELM_PROJECT}/charts").trim()
   vars.HELM_REGISTRY_CREDENTIAL = vars.get("HELM_REGISTRY_CREDENTIAL", env.HELM_REGISTRY_CREDENTIAL ?: "jenkins").trim()
 
+  vars.HTTP_PROXY = vars.get("HTTP_PROXY", env.HTTP_PROXY ?: "http://192.168.1.57:3128").trim()
+  vars.HTTPS_PROXY = vars.get("HTTPS_PROXY", env.HTTPS_PROXY ?: "http://192.168.1.57:3128").trim()
+  vars.NO_PROXY = vars.get("NO_PROXY", env.NO_PROXY ?: "localhost,127.0.0.1,.finastra.com,.misys.global.ad,.finastra.global,.azurecr.io,verdaccio,10.199.52.11").trim()
+  
   // See https://opensource.triology.de/jenkins/pipeline-syntax/globals
 
   //def JENKINS_URL = vars.get("JENKINS_URL", env.JENKINS_URL ?: "TODO").trim()
@@ -71,6 +75,7 @@ def call(Map vars, Closure body=null) {
   vars.isNetworkMapping = vars.get("isNetworkMapping", false).toBoolean()
   vars.isPidMapping = vars.get("isPidMapping", false).toBoolean()
   vars.isDnsSearchMapping = vars.get("isDnsSearchMapping", true).toBoolean()
+  vars.isProxy = vars.get("isProxy", false).toBoolean()
 
   vars.isNpmConfigPrefix = vars.get("isNpmConfigPrefix", false).toBoolean()
   vars.isHomeWorkspace = vars.get("isHomeWorkspace", false).toBoolean()
