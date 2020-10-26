@@ -8,7 +8,7 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
-  echo "[JPL] Executing `vars/dockerlint.groovy"
+  echo "[JPL] Executing `vars/dockerLint.groovy"
 
   vars = vars ?: [:]
 

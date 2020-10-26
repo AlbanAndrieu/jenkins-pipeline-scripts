@@ -95,7 +95,7 @@ pipeline {
           sh "echo TEST : $branchName"
 
           withMavenWrapper(goal: "install",
-              profile: "jacoco",
+              //profile: "jacoco",
               skipSonar: true,
               skipPitest: true,
               skipArtifacts: true,
