@@ -6,9 +6,10 @@ def call(Closure body=null) {
     call(vars, body)
 }
 
+// Warning dockerLint.groovy may override https://github.com/jenkinsci/analysis-model/blob/master/src/main/java/edu/hm/hafner/analysis/parser/DockerLintParser.java
 def call(Map vars, Closure body=null) {
 
-  echo "[JPL] Executing `vars/dockerLint.groovy"
+  echo "[JPL] Executing `vars/dockerHadoLint.groovy"
 
   vars = vars ?: [:]
 
@@ -24,7 +25,7 @@ def call(Map vars, Closure body=null) {
   // hadolint Dockerfile -f checkstyle > checkstyle-hadolint.xml
 
   vars.skipDockerLintFailure = vars.get("skipDockerLintFailure", true).toBoolean()
-  vars.dockerLintOutputFile = vars.get("dockerLintOutputFile", "docker-lint-${vars.dockerFileId}.log").trim()
+  vars.dockerLintOutputFile = vars.get("dockerLintOutputFile", "docker-hadolint-${vars.dockerFileId}.log").trim()
 
   try {
     if (body) { body() }

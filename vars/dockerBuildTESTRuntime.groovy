@@ -54,7 +54,7 @@ def call(Map vars, Closure body=null) {
         //docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
 
             //sh 'docker images'
-            dockerLint(vars)
+            dockerHadoLint(vars)
 
             def container = docker.build("${DOCKER_RUNTIME_IMG}", "${DOCKER_BUILD_ARGS} -f ${vars.dockerFilePath}${vars.dockerFileName} ${vars.dockerTargetPath} ")
             //container.inside("") {
