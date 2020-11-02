@@ -99,7 +99,7 @@ pipeline {
               skipSonar: true,
               skipPitest: true,
               skipArtifacts: true,
-              buildCmdParameters: "-Dserver=jetty9x -Dsonar.findbugs.allowuncompiledcode=true",
+              buildCmdParameters: "-Dserver=jetty9x",
               mavenHome: "/home/jenkins/.m2/",
               skipMavenSettings: false,
               artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip") {
@@ -180,7 +180,6 @@ pipeline {
               skipFailure: false,
               skipSonarCheck: false,
               skipMaven: true,
-              buildCmdParameters: "-Dsonar.findbugs.allowuncompiledcode=true",
               isScannerHome: false,
               sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
               reportTaskFile: ".scannerwork/report-task.txt",

@@ -13,6 +13,7 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     String MAVEN_OPTS_DEFAULT = ["-Djava.awt.headless=true",
+        " -Dsonar.findbugs.allowuncompiledcode=true",
         //"-Dsun.zip.disableMemoryMapping=true",
         //"-Dmaven.repo.local=./.repository",
         //"-Djava.io.tmpdir=./target/tmp",

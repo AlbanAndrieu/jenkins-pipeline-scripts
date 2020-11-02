@@ -222,20 +222,17 @@
             <version>${javax.servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>com.lesfurets</groupId>
             <artifactId>jenkins-pipeline-unit</artifactId>
             <version>${maven.jenkins.pipeline.unit.plugin.version}</version>
             <scope>test</scope>
-            <!--
             <exclusions>
                 <exclusion>
                     <artifactId>org.codehaus.groovy</artifactId>
                     <groupId>groovy-all</groupId>
                 </exclusion>
             </exclusions>
-            -->
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
