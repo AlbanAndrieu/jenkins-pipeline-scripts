@@ -13,7 +13,7 @@ def call(Map vars, Closure body=null) {
 
   vars = vars ?: [:]
 
-  vars.dockerFilePath = vars.get("dockerFilePath", "./docker/ubuntu18/").trim()
+  vars.dockerFilePath = vars.get("dockerFilePath", "./docker/ubuntu18").trim()
   vars.dockerFileName = vars.get("dockerFileName", "Dockerfile").trim()
   vars.dockerFileId = vars.get("dockerFileId", "0").trim()
   //vars.dockerTargetPath = vars.get("dockerTargetPath", vars.get("dockerFilePath", "./docker/ubuntu18//")).trim()

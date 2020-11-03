@@ -89,12 +89,12 @@ abstract class BasePipelineExtendedTest extends BasePipelineTest {
 
 		helper.registerAllowedMethod("recordIssues", [Map.class], null)
 
-		#helper.registerAllowedMethod("dockerFingerprintFrom", [Map.class], null)
-		
-		#binding.setVariable('docker',[:])
-		#helper.registerAllowedMethod("container", [Map.class], {c -> "container"})
-		#helper.registerAllowedMethod("docker", [], {c -> []})
-		#helper.registerAllowedMethod("build", [], {c -> []})
+		//helper.registerAllowedMethod("dockerFingerprintFrom", [Map.class], null)
+
+		//binding.setVariable('docker',[:])
+		//helper.registerAllowedMethod("container", [Map.class], {c -> "container"})
+		//helper.registerAllowedMethod("docker", [], {c -> []})
+		//helper.registerAllowedMethod("build", [], {c -> []})
 
 		binding.setVariable('JAVA_HOME' , "")
 		binding.setVariable('HOME' , "")
