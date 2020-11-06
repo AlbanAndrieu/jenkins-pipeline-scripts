@@ -1,6 +1,5 @@
 #!/usr/bin/env groovy
-@Library('jenkins-pipeline-scripts')
-import com.test.jenkins.*
+@Library('jenkins-pipeline-scripts@master')
 
 String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: "registry.hub.docker.com".trim()
 String DOCKER_ORGANISATION_HUB=env.DOCKER_ORGANISATION_HUB ?: "nabla".trim()

@@ -32,6 +32,7 @@ OR (if jenkins is managing the version, the prefered way)
 ```groovy
 @Library('jenkins-pipeline-scripts') _
 ```
+In jenkins use Load implicitly
 
 See [Extending with Shared Libraries](https://jenkins.io/doc/book/pipeline/shared-libraries/) for more
 information on Jenkins pipeline extensions.

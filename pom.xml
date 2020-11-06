@@ -625,11 +625,13 @@
     <profiles>
         <profile>
             <id>jacoco</id>
+            <!--
             <activation>
                 <property>
                     <name>!profile.activation</name>
                 </property>
             </activation>
+            -->
             <build>
                 <plugins>
                     <plugin>

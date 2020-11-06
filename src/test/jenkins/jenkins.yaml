@@ -181,7 +181,7 @@ unclassified:
     - bitbucketServerEndpoint:
         displayName: "STASH"
         manageHooks: false
-        serverUrl: "https://scm-git-eur.misys.global.ad"
+        serverUrl: "https://home.nabla.mobi"
   buildFailureAnalyzer:
     doNotAnalyzeAbortedJob: false
     gerritTriggerEnabled: true
@@ -253,7 +253,7 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "http://albandrieu:8686/jenkins/github-webhook/"
+    hookUrl: "http://albandrieu.com:8686/jenkins/github-webhook/"
   gitSCM:
     createAccountBasedOnEmail: false
     showEntireCommitSummaryInChanges: false
@@ -732,7 +732,7 @@ unclassified:
             git:
               credentialsId: "stash-jenkins"
               id: "4441289d-7238-4170-b32f-a35d3b86ae4c"
-              remote: "https://scm-git-eur.misys.global.ad/scm/rktmp/jenkins-pipeline-scripts.git"
+              remote: "git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git"
               traits:
               - "gitBranchDiscovery"
   globalSettings:
