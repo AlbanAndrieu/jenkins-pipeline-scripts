@@ -43,6 +43,7 @@ pipeline {
     string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
     booleanParam(defaultValue: false, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
     booleanParam(defaultValue: true, description: 'Run acceptance tests', name: 'BUILD_TEST')
+    booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_GRADLE')
   }
   environment {
     DRY_RUN = "${params.DRY_RUN}".toBoolean()
@@ -86,6 +87,10 @@ pipeline {
       }
     } // stage setup
     stage('\u27A1 Build - Maven') {
+	  when {
+		expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+		//expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+	  }
       steps {
         script {
 
@@ -149,36 +154,44 @@ pipeline {
         } // script
       } // steps
     } // stage Maven
-    //stage('\u27A1 Build - Gradle') {
-    //  steps {
-    //    script {
-	//
-    //      if (env.CLEAN_RUN) {
-    //          sh "$WORKSPACE/clean.sh"
-    //      }
-	//
-    //      sh "echo JAVA_HOME : $JAVA_HOME"
-    //      //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
-    //      sh "echo HOME : $HOME"
-	//
-    //      sh "pwd && ls -lrta /jenkins/ || true"
-    //      sh "ls -lrta /jenkins/.gradle || true"
-    //      sh "mkdir -p /jenkins/.gradle || true"
-    //      sh "export HOME=/jenkins/home && ./gradlew build --stacktrace || true"
-	//
-    //      publishHTML (target: [
-    //        allowMissing: true,
-    //        alwaysLinkToLastBuild: false,
-    //        keepAll: true,
-    //        reportDir: 'build/reports/tests/test/',
-    //        reportFiles: 'index.html',
-    //        reportName: "Gradle Report"
-    //      ])
-	//
-    //    } // script
-    //  } // steps
-    //} // stage Maven
+    stage('\u27A1 Build - Gradle') {
+	  when {
+		expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+		expression { params.BUILD_GRADLE.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+	  }
+      steps {
+        script {
+
+          if (env.CLEAN_RUN) {
+              sh "$WORKSPACE/clean.sh"
+          }
+
+          sh "echo JAVA_HOME : $JAVA_HOME"
+          //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
+          sh "echo HOME : $HOME"
+
+          sh "pwd && ls -lrta /jenkins/ || true"
+          sh "ls -lrta /jenkins/.gradle || true"
+          sh "mkdir -p /jenkins/.gradle || true"
+          sh "export HOME=/jenkins/home && ./gradlew build --stacktrace || true"
+
+          publishHTML (target: [
+            allowMissing: true,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: 'build/reports/tests/test/',
+            reportFiles: 'index.html',
+            reportName: "Gradle Report"
+          ])
+
+        } // script
+      } // steps
+    } // stage Maven
     stage('\u2795 Quality - SonarQube analysis') {
+	  when {
+		expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+		expression { params.BUILD_ONLY.toBoolean() == false }
+	  }
       environment {
         SONAR_USER_HOME = "$WORKSPACE"
       }
@@ -203,6 +216,7 @@ pipeline {
         //}
         when {
             expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+		    expression { params.BUILD_ONLY.toBoolean() == false }
         }
         steps {
             script {
