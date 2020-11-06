@@ -111,8 +111,8 @@
         <maven.fabric8.docker.plugin.version>0.26.1</maven.fabric8.docker.plugin.version>
         <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
         <maven.jenkinsfile.plugin.version>1.0.0</maven.jenkinsfile.plugin.version>
-        <maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>
-        <!--<maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>-->
+        <!--<maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>-->
+        <maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>
 
         <jdk.version>1.8.0</jdk.version>
         <jdk.level>1.8</jdk.level>
@@ -127,12 +127,14 @@
         <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=destfile=${sonar.jacoco.itReportPath}</jacoco.agent>-->
         <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=output=tcpserver</jacoco.agent>-->
         <jacoco.agent></jacoco.agent>
+        <!--
         <cobertura.maven.plugin.version>2.7</cobertura.maven.plugin.version>
         <maven.codenarc.plugin.version>0.22-1</maven.codenarc.plugin.version>
 
         <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
         <sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>
         <cobertura.format>xml</cobertura.format>
+        -->
         <asm.ow2.version>5.0.3</asm.ow2.version>
         <jmockit.version>1.19</jmockit.version>
         <junit.version>4.13</junit.version>
@@ -213,6 +215,12 @@
                 <artifactId>jcl-over-slf4j</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+	        <dependency>
+	            <groupId>com.cloudbees</groupId>
+	            <artifactId>groovy-cps</artifactId>
+	            <version>${groovy.cps.version}</version>
+	            <scope>test</scope>
+	        </dependency>            
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -227,18 +235,22 @@
             <artifactId>jenkins-pipeline-unit</artifactId>
             <version>${maven.jenkins.pipeline.unit.plugin.version}</version>
             <scope>test</scope>
+            <!--
             <exclusions>
                 <exclusion>
                     <artifactId>org.codehaus.groovy</artifactId>
                     <groupId>groovy-all</groupId>
                 </exclusion>
             </exclusions>
+            -->
         </dependency>
+        <!-- 
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovy.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-test</artifactId>
@@ -250,7 +262,7 @@
             <groupId>com.cloudbees</groupId>
             <artifactId>groovy-cps</artifactId>
             <version>${groovy.cps.version}</version>
-            <scope>provided</scope>
+            <scope>provided</scope> <!-- in jenkins already and in jenkins-pipeline-unit for test -->
         </dependency>
 
         <dependency>
@@ -512,6 +524,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
+                <!-- 
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.groovy</groupId>
@@ -524,10 +537,11 @@
                         <version>${groovy.eclipse.batch.version}</version>
                     </dependency>
                 </dependencies>
+                 -->
                 <configuration>
                     <source>${jdk.level}</source>
                     <target>${jdk.level}</target>
-                    <compilerId>groovy-eclipse-compiler</compilerId>
+                    <!-- <compilerId>groovy-eclipse-compiler</compilerId> -->
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
@@ -641,7 +655,6 @@
                         <inherited>true</inherited>
                         <configuration>
                             <encoding>${project.build.sourceEncoding}</encoding>
-                            <!--<argLine>${jacoco.agent.ut.arg} -Xms64m -Xmx256m -XX:MaxPermSize=256m -Djava.awt.headless=true -XX:-UseSplitVerifier -XX:ReservedCodeCacheSize=128m</argLine>-->
                             <argLine>${jacoco.agent.ut.arg} -Xms64m -Xmx256m -Djava.awt.headless=true -XX:ReservedCodeCacheSize=128m -Dfile.encoding=UTF-8</argLine>
                             <skipTests>${maven.test.ut.skip}</skipTests>
                             <!-- Enable or disable Stop maven -->
