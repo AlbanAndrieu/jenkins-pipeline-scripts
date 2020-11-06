@@ -327,7 +327,7 @@ pipeline {
         fingerprint: true
       )
 
-      runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
+      //runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
 
     } // always
     //cleanup {
