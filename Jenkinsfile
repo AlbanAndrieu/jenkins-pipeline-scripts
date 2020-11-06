@@ -41,6 +41,8 @@ pipeline {
     booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")
     string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
     string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
+    booleanParam(defaultValue: false, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
+    booleanParam(defaultValue: true, description: 'Run acceptance tests', name: 'BUILD_TEST')
   }
   environment {
     DRY_RUN = "${params.DRY_RUN}".toBoolean()
@@ -147,28 +149,35 @@ pipeline {
         } // script
       } // steps
     } // stage Maven
-    stage('\u27A1 Build - Gradle') {
-      steps {
-        script {
-
-          if (env.CLEAN_RUN) {
-              sh "$WORKSPACE/clean.sh"
-          }
-
-          sh "echo JAVA_HOME : $JAVA_HOME"
-          //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
-          sh "echo HOME : $HOME"
-
-          sh "pwd && ls -lrta /jenkins/ || true"
-          sh "ls -lrta /jenkins/.gradle || true"
-          sh "mkdir -p /jenkins/.gradle || true"
-          sh "export HOME=/jenkins/home && ./gradlew build --stacktrace"
-
-          publishHTML([reportDir: 'build/reports/tests/test', reportFiles: 'index.html', reportName: 'HTML Report'])
-
-        } // script
-      } // steps
-    } // stage Maven
+    //stage('\u27A1 Build - Gradle') {
+    //  steps {
+    //    script {
+	//
+    //      if (env.CLEAN_RUN) {
+    //          sh "$WORKSPACE/clean.sh"
+    //      }
+	//
+    //      sh "echo JAVA_HOME : $JAVA_HOME"
+    //      //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
+    //      sh "echo HOME : $HOME"
+	//
+    //      sh "pwd && ls -lrta /jenkins/ || true"
+    //      sh "ls -lrta /jenkins/.gradle || true"
+    //      sh "mkdir -p /jenkins/.gradle || true"
+    //      sh "export HOME=/jenkins/home && ./gradlew build --stacktrace || true"
+	//
+    //      publishHTML (target: [
+    //        allowMissing: true,
+    //        alwaysLinkToLastBuild: false,
+    //        keepAll: true,
+    //        reportDir: 'build/reports/tests/test/',
+    //        reportFiles: 'index.html',
+    //        reportName: "Gradle Report"
+    //      ])
+	//
+    //    } // script
+    //  } // steps
+    //} // stage Maven
     stage('\u2795 Quality - SonarQube analysis') {
       environment {
         SONAR_USER_HOME = "$WORKSPACE"
@@ -228,12 +237,18 @@ pipeline {
 
                     //dockerFingerprintFrom dockerfile: 'docker/ubuntu16/Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
+                    dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: false, dockerFileId: "1")
+
                 } // tee
 
             } // script
         } // steps
     } // Build - Docker
     stage('\u2795 Quality - E2E tests') {
+	  when {
+	  	expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+	  	expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+	  }
       steps {
         script {
           try {
@@ -273,9 +288,33 @@ pipeline {
   } // stages
   post {
     always {
-      node('any') {
-        runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
-      }
+      recordIssues enabledForFailure: true,
+        tools: [cppCheck(pattern: 'reports/cppcheck-result.xml'),
+              junitParser(pattern: 'sample/build-linux/Testing/JUnitTestResults.xml'),
+              //sonarQube(pattern: '**/sonar-report.json'),
+              sonarQube(pattern: '.scannerwork/report-task.txt'),
+              gcc(),
+              cmake(),
+              doxygen(),
+              //clang(),
+              //clangAnalyzer(),
+              clangTidy(), //**/clang-tidy-result.txt
+              //dockerLint(),
+              hadoLint(),
+              flawfinder(),
+              taskScanner()
+        ]
+
+      archiveArtifacts artifacts: '**/conaninfo.txt, , *.log, sample/build*/CMakeFiles/CMakeOutput.log, sample/build*/CMakeFiles/CMakeError.log, bw-outputs/build-wrapper.log, bw-outputs/build-wrapper-dump.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
+
+      // Archive the CTest xml output
+      archiveArtifacts (
+        artifacts: 'sample/build-linux/Testing/**/*.xml, sample/build-linux/Testing/Temporary/*',
+        fingerprint: true
+      )
+
+      runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
+
     } // always
     //cleanup {
     //  wrapCleanWsOnNode(isEmailEnabled: false)

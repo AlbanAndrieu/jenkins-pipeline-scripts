@@ -59,6 +59,7 @@ def call(Map vars, Closure body=null) {
   } finally {
     archiveArtifacts artifacts: "${vars.dockerLintOutputFile}, target/checkstyle-hadolint.xml", onlyIfSuccessful: false, allowEmptyArchive: true
     recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'target/checkstyle-hadolint.xml', id: "checkstyle-hadolint-${vars.dockerFileId}")
+    recordIssues enabledForFailure: true, tool: hadoLint()
   }
 
 }
