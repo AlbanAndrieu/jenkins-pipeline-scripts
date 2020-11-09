@@ -249,7 +249,7 @@ pipeline {
                     //    archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
                     //}
 
-                    //dockerFingerprintFrom dockerfile: 'docker/ubuntu16/Dockerfile', image: "${DOCKER_BUILD_IMG}"
+                    dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
                     dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
 
@@ -309,7 +309,7 @@ pipeline {
 
       archiveArtifacts allowEmptyArchive: true, artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
 
-      //runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
+      runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
 
     } // always
     //cleanup {
