@@ -57,22 +57,20 @@ def call(String shell, String targetDirectory) {
                         reportTitles: "Sphinx Docs Index"
                     ])
 
-                    if (isReleaseBranch()) {
-                        // Initially, we will want to publish only one version,
-                        // i.e. the latest one from develop branch.
-                        dir("_build") {
-                            try {
-                                rsync([
-                                    source: "*",
-                                    destination: "jenkins@albandrieu:/release/docs/" + targetDirectory,
-                                    credentialsId: "jenkins_unix_slaves"
-                                ])
-                            } catch (exc) {
-                                currentBuild.result = 'UNSTABLE'
-                                echo "WARNING : There was a problem copying results " + exc.toString()
-                            }
-                        }
-                    }
+                    //if (isReleaseBranch()) {
+                    //    dir("_build") {
+                    //        try {
+                    //            rsync([
+                    //                source: "*",
+                    //                destination: "jenkins@albandrieu:/release/docs/" + targetDirectory,
+                    //                credentialsId: "jenkins_unix_slaves"
+                    //            ])
+                    //        } catch (exc) {
+                    //            currentBuild.result = 'UNSTABLE'
+                    //            echo "WARNING : There was a problem copying results " + exc.toString()
+                    //        }
+                    //    }
+                    //}
                 } // dir docs
 
             } // tee

@@ -32,7 +32,7 @@ def call(Map vars, Closure body=null) {
 
             shellCheckExitCode = sh(
                   script: """#!/bin/bash -l
-                  export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\ ;"
+                  export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\"
                   shellcheck ${vars.shellCheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > ${vars.shellCheckOutputFile}""",
                 returnStdout: true,
                 returnStatus: true
