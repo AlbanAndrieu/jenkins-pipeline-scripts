@@ -19,6 +19,7 @@ def call(Map vars, Closure body=null) {
   //vars.dockerTargetPath = vars.get("dockerTargetPath", vars.get("dockerFilePath", "./docker/ubuntu18")).trim()
 
   // Docker linter : hadolint, dockerfilelint, dive
+  // See https://medium.com/@renatomefi/writing-dockerfile-like-a-software-developer-linting-9fd8c620174
   vars.dockerLintCmd = vars.get("dockerLintCmd", "docker run --rm -i -v ${pwd()}:/project:ro --workdir=/project hadolint/hadolint hadolint --format json - < \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()
   //hadolint "${vars.dockerFilePath}/${vars.dockerFileName}"
   //vars.dockerLintCmd = vars.get("dockerLintCmd", "dockerfile_lint --json --verbose --dockerfile \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()

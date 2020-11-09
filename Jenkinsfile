@@ -251,7 +251,7 @@ pipeline {
 
                     //dockerFingerprintFrom dockerfile: 'docker/ubuntu16/Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
-                    dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: false, dockerFileId: "1")
+                    dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
 
                 } // tee
 
