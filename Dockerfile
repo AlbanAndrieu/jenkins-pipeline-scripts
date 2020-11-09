@@ -10,7 +10,8 @@ ENV JENKINS_OPTS --httpPort=8686
 # Install dependencies
 USER root
 
-RUN apk add --update make openjdk8-jre
+# hadolint ignore=DL3018
+RUN apk add --no-cache make openjdk8-jre
 
 ARG CERT_NAME=${CERT_NAME:-"UK1VSWCERT01-CA-5.crt"}
 ARG CERT_URL=${CERT_URL:-"http://FR1CSLFRBM0059.misys.global.ad/download/certs/"}
@@ -21,8 +22,8 @@ RUN echo ${JAVA_HOME}
 #RUN ls -lrta /opt/java/openjdk
 #RUN which java
 
-ADD ${CERT_URL}/FINASTRA-FR1VSWFINCERT01-CA-1.crt /usr/local/share/ca-certificates/FINASTRA-FR1VSWFINCERT01-CA-1.crt
-ADD ${CERT_URL}/${CERT_NAME} /usr/local/share/ca-certificates/${CERT_NAME}
+COPY ${CERT_URL}/FINASTRA-FR1VSWFINCERT01-CA-1.crt /usr/local/share/ca-certificates/FINASTRA-FR1VSWFINCERT01-CA-1.crt
+COPY ${CERT_URL}/${CERT_NAME} /usr/local/share/ca-certificates/${CERT_NAME}
 RUN update-ca-certificates
 #RUN apk add --no-cache ca-certificates && \
 #    update-ca-certificates
@@ -42,7 +43,7 @@ RUN keytool -v -noprompt \
 USER jenkins
 
 # Install plugins
-#RUN /usr/local/bin/install-plugins.sh ws-cleanup envinject artifactdeployer nodenamecolumn summary_report docker-commons publish-over-cifs progress-bar-column-plugin thinBackup token-macro jobConfigHistory scons downstream-buildview clamav scm-sync-configuration deploy naginator build-publisher sonar xvfb windows-slaves m2release git scm-api maven-repo-cleaner ssh-agent robot environment-script stepcounter plugin-usage-plugin jenkins-cloudformation-plugin cvs jira fail-the-build-plugin workflow-step-api checkmarx selenium matrix-combinations-parameter jobtype-column findbugs batch-task warnings violation-columns configurationslicing parameterized-trigger sounds job-exporter preSCMbuildstep fitnesse dashboard-view jquery-ui gatling job-node-stalker favorite exclusive-execution build-pipeline-plugin postbuild-task skip-certificate-check maven-info disk-usage node-iterator-api ssh stashNotifier publish-over-ssh sitemonitor build-metrics distfork promoted-builds flexible-publish selenium-builder tasks computer-queue-plugin saferestart throttle-concurrents read-only-configurations ant countjobs-viewstabbar email-ext credentials cobertura nodejs audit-trail text-finder-run-condition versioncolumn global-build-stats mapdb-api plot jquery show-build-parameters conditional-buildstep maven-plugin view-job-filters rebuild matrix-project performance copyartifact groovy claim docker-build-step join tap nodelabelparameter custom-tools-plugin ansicolor translation sidebar-link bulk-builder checkstyle mttr ssh-slaves ssh-credentials Exclusion subversion antisamy-markup-formatter covcomplplot testng-plugin greenballs dropdown-viewstabbar-plugin nested-view test-stability external-monitor-job docker-build-publish any-buildstep project-stats-plugin timestamper build-name-setter build-timeout prereq-buildstep caliper-ci pmd lastsuccessversioncolumn dry dependencyanalyzer analysis-collector analysis-core chosen-views-tabbar port-allocator description-setter publish-over-ftp groovy-postbuild build-environment seleniumrc-plugin git-client authentication-tokens monitoring text-finder extended-choice-parameter ftppublisher built-on-column run-condition lastfailureversioncolumn mask-passwords htmlpublisher hp-application-automation-tools-plugin project-description-setter build-with-parameters git-parameter javadoc build-failure-analyzer confluence-publisher script-security html5-notifier-plugin violations next-executions jenkins-multijob-plugin matrix-auth testInProgress copy-data-to-workspace-plugin mailer next-build-number qc multiple-scms job-import-plugin junit files-found-trigger compact-columns build-keeper-plugin dependency-check-jenkins-plugin pam-auth log-parser locale all-changes slave-status groovy-events-listener-plugin:1.014 configuration-as-code pipeline-utility-steps pipeline-maven git-changelog prometheus:latest warnings-ng 
+#RUN /usr/local/bin/install-plugins.sh ws-cleanup envinject artifactdeployer nodenamecolumn summary_report docker-commons publish-over-cifs progress-bar-column-plugin thinBackup token-macro jobConfigHistory scons downstream-buildview clamav scm-sync-configuration deploy naginator build-publisher sonar xvfb windows-slaves m2release git scm-api maven-repo-cleaner ssh-agent robot environment-script stepcounter plugin-usage-plugin jenkins-cloudformation-plugin cvs jira fail-the-build-plugin workflow-step-api checkmarx selenium matrix-combinations-parameter jobtype-column findbugs batch-task warnings violation-columns configurationslicing parameterized-trigger sounds job-exporter preSCMbuildstep fitnesse dashboard-view jquery-ui gatling job-node-stalker favorite exclusive-execution build-pipeline-plugin postbuild-task skip-certificate-check maven-info disk-usage node-iterator-api ssh stashNotifier publish-over-ssh sitemonitor build-metrics distfork promoted-builds flexible-publish selenium-builder tasks computer-queue-plugin saferestart throttle-concurrents read-only-configurations ant countjobs-viewstabbar email-ext credentials cobertura nodejs audit-trail text-finder-run-condition versioncolumn global-build-stats mapdb-api plot jquery show-build-parameters conditional-buildstep maven-plugin view-job-filters rebuild matrix-project performance copyartifact groovy claim docker-build-step join tap nodelabelparameter custom-tools-plugin ansicolor translation sidebar-link bulk-builder checkstyle mttr ssh-slaves ssh-credentials Exclusion subversion antisamy-markup-formatter covcomplplot testng-plugin greenballs dropdown-viewstabbar-plugin nested-view test-stability external-monitor-job docker-build-publish any-buildstep project-stats-plugin timestamper build-name-setter build-timeout prereq-buildstep caliper-ci pmd lastsuccessversioncolumn dry dependencyanalyzer analysis-collector analysis-core chosen-views-tabbar port-allocator description-setter publish-over-ftp groovy-postbuild build-environment seleniumrc-plugin git-client authentication-tokens monitoring text-finder extended-choice-parameter ftppublisher built-on-column run-condition lastfailureversioncolumn mask-passwords htmlpublisher hp-application-automation-tools-plugin project-description-setter build-with-parameters git-parameter javadoc build-failure-analyzer confluence-publisher script-security html5-notifier-plugin violations next-executions jenkins-multijob-plugin matrix-auth testInProgress copy-data-to-workspace-plugin mailer next-build-number qc multiple-scms job-import-plugin junit files-found-trigger compact-columns build-keeper-plugin dependency-check-jenkins-plugin pam-auth log-parser locale all-changes slave-status groovy-events-listener-plugin:1.014 configuration-as-code pipeline-utility-steps pipeline-maven git-changelog prometheus:latest warnings-ng
 #jacoco
 
 RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
@@ -162,6 +163,6 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
 #findbugs
 #multi-branch-project -> workflow-multibranch
 #tasks
-#jquery-ui 
+#jquery-ui
 
 EXPOSE 8686
