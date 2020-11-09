@@ -42,7 +42,7 @@ pipeline {
     string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
     string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
     booleanParam(defaultValue: false, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
-    booleanParam(defaultValue: true, description: 'Run acceptance tests', name: 'BUILD_TEST')
+    booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_TEST')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_GRADLE')
   }
   environment {
@@ -135,7 +135,7 @@ pipeline {
           recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
           recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
           //recordIssues enabledForFailure: true, tool: pit()
-          //taskScanner()
+
           recordIssues enabledForFailure: true,
                      aggregatingResults: true,
                      id: "analysis-java",
@@ -303,28 +303,11 @@ pipeline {
   post {
     always {
       recordIssues enabledForFailure: true,
-        tools: [cppCheck(pattern: 'reports/cppcheck-result.xml'),
-              junitParser(pattern: 'sample/build-linux/Testing/JUnitTestResults.xml'),
-              //sonarQube(pattern: '**/sonar-report.json'),
-              sonarQube(pattern: '.scannerwork/report-task.txt'),
-              gcc(),
-              cmake(),
-              doxygen(),
-              //clang(),
-              //clangAnalyzer(),
-              clangTidy(), //**/clang-tidy-result.txt
-              //dockerLint(),
-              flawfinder(),
-              taskScanner()
+        tools: [taskScanner(),
+                tagList()
         ]
 
-      archiveArtifacts artifacts: '**/conaninfo.txt, , *.log, sample/build*/CMakeFiles/CMakeOutput.log, sample/build*/CMakeFiles/CMakeError.log, bw-outputs/build-wrapper.log, bw-outputs/build-wrapper-dump.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
-
-      // Archive the CTest xml output
-      archiveArtifacts (
-        artifacts: 'sample/build-linux/Testing/**/*.xml, sample/build-linux/Testing/Temporary/*',
-        fingerprint: true
-      )
+      archiveArtifacts artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
 
       //runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
 

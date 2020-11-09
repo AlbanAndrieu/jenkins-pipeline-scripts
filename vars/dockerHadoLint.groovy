@@ -38,28 +38,27 @@ def call(Map vars, Closure body=null) {
     vars.dockerLintCmd += " 2>&1 > ${vars.dockerLintOutputFile} "
 
     docker = sh (script: vars.dockerLintCmd, returnStatus: true)
-    echo "DOCKER LINT RETURN CODE : ${docker}"
+    echo "DOCKER HADOLINT RETURN CODE : ${docker}"
     if (docker == 0) {
-      echo "DOCKER LINT SUCCESS"
-      sh "hadolint Dockerfile -f checkstyle > target/checkstyle-hadolint.xml \"${vars.dockerFilePath}/${vars.dockerFileName}\""
+      echo "DOCKER HADOLINT SUCCESS"
+      //sh "hadolint Dockerfile -f checkstyle > target/checkstyle-hadolint.xml \"${vars.dockerFilePath}/${vars.dockerFileName}\""
     } else {
-      echo "WARNING : Docker lint failed, check output at \'${vars.dockerLintOutputFile}\' "
+      echo "WARNING : Docker HadoLint failed, check output at \'${vars.dockerLintOutputFile}\' "
       if (!vars.skipDockerLintFailure) {
-        echo "DOCKER LINT FAILURE"
-        //currentBuild.result = 'UNSTABLE'
+        echo "DOCKER HADOLINT FAILURE"
         currentBuild.result = 'FAILURE'
-        error 'There are errors in docker lint'
+        error 'There are errors in docker HadoLint'
       } else {
-        echo "DOCKER LINT FAILURE skipped"
+        echo "DOCKER HADOLINT FAILURE skipped"
         //error 'There are errors in docker'
       }
     }
 
   } catch (exc) {
-    echo "Warn: There was a problem with docker lint " + exc.toString()
+    echo "Warn: There was a problem with docker HadoLint " + exc.toString()
   } finally {
     archiveArtifacts artifacts: "${vars.dockerLintOutputFile}, target/checkstyle-hadolint.xml", onlyIfSuccessful: false, allowEmptyArchive: true
-    recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'target/checkstyle-hadolint.xml', id: "checkstyle-hadolint-${vars.dockerFileId}")
+    //recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'target/checkstyle-hadolint.xml', id: "checkstyle-hadolint-${vars.dockerFileId}")
     recordIssues enabledForFailure: true, tool: hadoLint(pattern: "${vars.dockerLintOutputFile}")
   }
 
