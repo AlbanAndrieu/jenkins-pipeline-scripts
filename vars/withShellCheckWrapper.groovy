@@ -15,45 +15,58 @@ def call(Map vars, Closure body=null) {
     def SHELLCHECK_OPTS = vars.get("SHELLCHECK_OPTS", env.SHELLCHECK_OPTS ?: "-e SC2154 -e SC2086").trim()
 
     vars.pattern = vars.get("pattern", "*.sh")
-    vars.shellcheckCmdParameters = vars.get("shellcheckCmdParameters", "")
-    vars.shellOutputFile = vars.get("shellOutputFile", "shellcheck.log").trim()
+    vars.shellCheckCmdParameters = vars.get("shellCheckCmdParameters", "")
+    vars.shellOutputFile = vars.get("shellOutputFile", "shellCheck.log").trim()
+
+    vars.skipShellCheckFailure = vars.get("skipShellCheckFailure", true).toBoolean()
+    vars.skipShellCheck = vars.get("skipShellCheck", false).toBoolean()
+    vars.shellCheckOutputFile = vars.get("shellCheckOutputFile", "shellcheck-checkstyle-${vars.dockerFileId}.xml").trim()
 
     vars.isSuccessReturnCode = vars.get("isSuccessReturnCode", 0)
     vars.isFailReturnCode = vars.get("isFailReturnCode", 255)
     vars.isUnstableReturnCode = vars.get("isUnstableReturnCode", 1)
 
-    tee("${vars.shellOutputFile}") {
-        if (isUnix()) {
+    if (!vars.skipShellCheck) {
+        tee("${vars.shellOutputFile}") {
+            if (isUnix()) {
 
-        shellcheckExitCode = sh(
-              script: """#!/bin/bash -l
-              export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\"
-              shellcheck ${vars.shellcheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > checkstyle.xml""",
-            returnStdout: true,
-            returnStatus: true
-        )
+            shellCheckExitCode = sh(
+                  script: """#!/bin/bash -l
+                  export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\ ;"
+                  shellcheck ${vars.shellCheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > ${vars.shellCheckOutputFile}""",
+                returnStdout: true,
+                returnStatus: true
+            )
 
-        echo "SHELLCHECK RETURN CODE : ${shellcheckExitCode}"
-        if (shellcheckExitCode == vars.isSuccessReturnCode) {
-            echo "SHELLCHECK SUCCESS"
-        } else if (shellcheckExitCode == vars.isFailReturnCode) {
-           echo "SHELLCHECK FAILURE"
-           currentBuild.result = 'FAILURE'
-           error 'There are errors in shellcheck'
-		} else if (shellcheckExitCode <= vars.isUnstableReturnCode) {
-			echo "SHELLCHECK UNSTABLE"
-			currentBuild.result = 'UNSTABLE'
-		} else {
-			echo "SHELLCHECK FAILURE"
-			//currentBuild.result = 'FAILURE'
-			error 'There are other errors'
-		}
+            echo "SHELLCHECK RETURN CODE : ${shellCheckExitCode}"
+            if (shellCheckExitCode == vars.isSuccessReturnCode) {
+                echo "SHELLCHECK SUCCESS"
+            } else if (!vars.skipShellCheckFailure) {
+                if (shellCheckExitCode == vars.isFailReturnCode) {
+                   echo "SHELLCHECK FAILURE"
+                   currentBuild.result = 'FAILURE'
+                   error 'There are errors in shellCheck'
+                } else if (shellCheckExitCode <= vars.isUnstableReturnCode) {
+                    echo "SHELLCHECK UNSTABLE"
+                    currentBuild.result = 'UNSTABLE'
+                } else {
+                    echo "SHELLCHECK FAILURE"
+                    //currentBuild.result = 'FAILURE'
+                    error 'There are other errors'
+                }
+            } else {
+              echo "SHELLCHECK FAILURE skipped"
+              //error 'There are errors in shellCheck'
+            }
 
-	  } // isUnix
+          } // isUnix
 
-    } // tee
+        } // tee
 
-    checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: '**/checkstyle.xml', shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+        checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: "${vars.shellCheckOutputFile}", shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
 
-    return shellcheckExitCode
+        return shellCheckExitCode
+    } else {
+        echo "ShellCheck skipped"
+    }
 }
