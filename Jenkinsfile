@@ -87,10 +87,10 @@ pipeline {
       }
     } // stage setup
     stage('\u27A1 Build - Maven') {
-	  when {
-		expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-		//expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
-	  }
+      when {
+        expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        //expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+      }
       steps {
         script {
 
@@ -155,10 +155,10 @@ pipeline {
       } // steps
     } // stage Maven
     stage('\u27A1 Build - Gradle') {
-	  when {
-		expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-		expression { params.BUILD_GRADLE.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
-	  }
+      when {
+        expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        expression { params.BUILD_GRADLE.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+      }
       steps {
         script {
 
@@ -187,36 +187,36 @@ pipeline {
         } // script
       } // steps
     } // stage Maven
-    stage('\u2795 Quality - SonarQube analysis') {
-	  when {
-		expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-		expression { params.BUILD_ONLY.toBoolean() == false }
-	  }
-      environment {
-        SONAR_USER_HOME = "$WORKSPACE"
-      }
-      steps {
-        script {
-          withSonarQubeWrapper(verbose: true,
-              skipFailure: false,
-              skipSonarCheck: false,
-              skipMaven: true,
-              isScannerHome: false,
-              sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
-              reportTaskFile: ".scannerwork/report-task.txt",
-              project: "NABLA",
-              repository: "jenkins-pipeline-scripts") {
-          }
-        }
-      } // steps
-    } // stage SonarQube analysis
+    //stage('\u2795 Quality - SonarQube analysis') {
+    //  when {
+    //  expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+    //  expression { params.BUILD_ONLY.toBoolean() == false }
+    //  }
+    //  environment {
+    //    SONAR_USER_HOME = "$WORKSPACE"
+    //  }
+    //  steps {
+    //    script {
+    //      withSonarQubeWrapper(verbose: true,
+    //          skipFailure: false,
+    //          skipSonarCheck: false,
+    //          skipMaven: true,
+    //          isScannerHome: false,
+    //          sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
+    //          reportTaskFile: ".scannerwork/report-task.txt",
+    //          project: "NABLA",
+    //          repository: "jenkins-pipeline-scripts") {
+    //      }
+    //    }
+    //  } // steps
+    //} // stage SonarQube analysis
     stage('\u27A1 Build - Docker') {
         //environment {
         //    CST_CONFIG = "docker/ubuntu18/config-BUILD.yaml"
         //}
         when {
             expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-		    expression { params.BUILD_ONLY.toBoolean() == false }
+            expression { params.BUILD_ONLY.toBoolean() == false }
         }
         steps {
             script {
@@ -259,10 +259,10 @@ pipeline {
         } // steps
     } // Build - Docker
     stage('\u2795 Quality - E2E tests') {
-	  when {
-	  	expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-	  	expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
-	  }
+      when {
+        expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+      }
       steps {
         script {
           try {
