@@ -235,19 +235,19 @@ pipeline {
                                           "--label 'version=1.0.0'",
                                         ].join(" ")
 
-                    //def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
-                    //container.inside {
-                    //    sh 'echo DEBUGING image : $PATH'
-                    //    sh 'git --version || true'
-                    //    sh 'java -version || true'
-                    //    sh 'id jenkins || true'
-                    //    sh 'ls -lrta'
-                    //    //sh 'ls -lrta /home/jenkins/ || true'
-                    //    sh 'date > /tmp/test.txt'
-                    //    sh "cp /tmp/test.txt ${WORKSPACE}"
-                    //    sh "cp ${HOME}/microscanner.log ${WORKSPACE} || true"
-                    //    archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
-                    //}
+                    def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
+                    container.inside {
+                        sh 'echo DEBUGING image : $PATH'
+                        sh 'git --version || true'
+                        sh 'java -version || true'
+                        sh 'id jenkins || true'
+                        sh 'ls -lrta'
+                        //sh 'ls -lrta /home/jenkins/ || true'
+                        sh 'date > /tmp/test.txt'
+                        sh "cp /tmp/test.txt ${WORKSPACE}"
+                        sh "cp ${HOME}/microscanner.log ${WORKSPACE} || true"
+                        archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
+                    }
 
                     dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
 

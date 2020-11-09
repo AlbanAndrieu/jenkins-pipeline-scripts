@@ -17,10 +17,11 @@ def call(Map vars, Closure body=null) {
     vars.pattern = vars.get("pattern", "*.sh")
     vars.shellCheckCmdParameters = vars.get("shellCheckCmdParameters", "")
     vars.shellOutputFile = vars.get("shellOutputFile", "shellCheck.log").trim()
+    vars.shellCheckFileId = vars.get("shellCheckFileId", "0").trim()
 
     vars.skipShellCheckFailure = vars.get("skipShellCheckFailure", true).toBoolean()
     vars.skipShellCheck = vars.get("skipShellCheck", false).toBoolean()
-    vars.shellCheckOutputFile = vars.get("shellCheckOutputFile", "shellcheck-checkstyle-${vars.dockerFileId}.xml").trim()
+    vars.shellCheckOutputFile = vars.get("shellCheckOutputFile", "shellcheck-checkstyle-${vars.shellCheckFileId}.xml").trim()
 
     vars.isSuccessReturnCode = vars.get("isSuccessReturnCode", 0)
     vars.isFailReturnCode = vars.get("isFailReturnCode", 255)
