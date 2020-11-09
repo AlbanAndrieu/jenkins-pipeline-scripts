@@ -231,7 +231,7 @@ pipeline {
                                              ].join(" ")
                     }
                     DOCKER_BUILD_ARGS = [ "${DOCKER_BUILD_ARGS}",
-                                          "--target build", // See issue https://issues.jenkins-ci.org/browse/JENKINS-44609?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&showAll=true
+                                          "--target BUILD", // See issue https://issues.jenkins-ci.org/browse/JENKINS-44609?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&showAll=true
                                           "--label 'version=1.0.0'",
                                         ].join(" ")
 
