@@ -13,8 +13,8 @@ USER root
 # hadolint ignore=DL3018
 RUN apk add --no-cache make openjdk8-jre
 
-ARG CERT_NAME=${CERT_NAME:-"UK1VSWCERT01-CA-5.crt"}
-ARG CERT_URL=${CERT_URL:-"http://FR1CSLFRBM0059.misys.global.ad/download/certs/"}
+#ARG CERT_NAME=${CERT_NAME:-"NABLA.crt"}
+#ARG CERT_URL=${CERT_URL:-"http://albandrieu.com/download/certs/"}
 ENV JAVA_HOME /opt/java/openjdk/
 
 RUN echo ${JAVA_HOME}
@@ -22,23 +22,23 @@ RUN echo ${JAVA_HOME}
 #RUN ls -lrta /opt/java/openjdk
 #RUN which java
 
-COPY ${CERT_URL}/FINASTRA-FR1VSWFINCERT01-CA-1.crt /usr/local/share/ca-certificates/FINASTRA-FR1VSWFINCERT01-CA-1.crt
-COPY ${CERT_URL}/${CERT_NAME} /usr/local/share/ca-certificates/${CERT_NAME}
-RUN update-ca-certificates
+#COPY ${CERT_URL}/NABLA.crt /usr/local/share/ca-certificates/NABLA.crt
+#COPY ${CERT_URL}/${CERT_NAME} /usr/local/share/ca-certificates/${CERT_NAME}
+#RUN update-ca-certificates
 #RUN apk add --no-cache ca-certificates && \
 #    update-ca-certificates
 
-RUN ln -sf /etc/ssl/certs/java/cacerts ${JAVA_HOME}/jre/lib/security/cacerts
+#RUN ln -sf /etc/ssl/certs/java/cacerts ${JAVA_HOME}/jre/lib/security/cacerts
 
 # Update Java certs
-RUN keytool -v -noprompt \
-    -keystore ${JAVA_HOME}/jre/lib/security/cacerts \
-    -importcert \
-    -trustcacerts \
-    -file /usr/local/share/ca-certificates/${CERT_NAME} \
-    -alias test \
-    -keypass changeit \
-    -storepass changeit
+#RUN keytool -v -noprompt \
+#    -keystore ${JAVA_HOME}/jre/lib/security/cacerts \
+#    -importcert \
+#    -trustcacerts \
+#    -file /usr/local/share/ca-certificates/${CERT_NAME} \
+#    -alias test \
+#    -keypass changeit \
+#    -storepass changeit
 
 USER jenkins
 
