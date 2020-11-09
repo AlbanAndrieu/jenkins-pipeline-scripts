@@ -41,7 +41,7 @@ pipeline {
     booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")
     string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
     string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
-    booleanParam(defaultValue: false, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
+    booleanParam(defaultValue: true, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_TEST')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_GRADLE')
   }
@@ -157,7 +157,7 @@ pipeline {
     stage('\u27A1 Build - Gradle') {
       when {
         expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-        expression { params.BUILD_GRADLE.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+        expression { params.BUILD_GRADLE.toBoolean() == true }
       }
       steps {
         script {

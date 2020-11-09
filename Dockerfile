@@ -116,7 +116,7 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   fitnesse \
   dashboard-view \
   gatling \
-  saferestart \
+#  saferestart \
   job-node-stalker favorite exclusive-execution build-pipeline-plugin postbuild-task skip-certificate-check maven-info \
   node-iterator-api \
   ssh publish-over-ssh ssh-slaves ssh-credentials \
@@ -135,7 +135,8 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   nested-view test-stability external-monitor-job docker-build-publish \
   project-stats-plugin \
   build-name-setter build-timeout \
-  prereq-buildstep jacoco caliper-ci lastsuccessversioncolumn dependencyanalyzer analysis-collector analysis-core \
+  prereq-buildstep jacoco caliper-ci lastsuccessversioncolumn dependencyanalyzer \
+#  analysis-collector analysis-core \
   chosen-views-tabbar port-allocator description-setter publish-over-ftp \
   build-environment \
   git-client authentication-tokens monitoring text-finder extended-choice-parameter ftppublisher built-on-column run-condition \
