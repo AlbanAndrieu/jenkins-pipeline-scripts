@@ -19,13 +19,13 @@ def call(Map vars, Closure body=null) {
   //vars.dockerTargetPath = vars.get("dockerTargetPath", vars.get("dockerFilePath", "./docker/ubuntu18//")).trim()
 
   // Docker linter : hadolint, dockerfilelint, dive
-  vars.dockerLintCmd = vars.get("dockerLintCmd", "docker run --rm -i hadolint/hadolint < \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()
+  vars.dockerLintCmd = vars.get("dockerLintCmd", "docker run --rm -i hadolint/hadolint -f json - < \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()
   //hadolint "${vars.dockerFilePath}/${vars.dockerFileName}"
   //vars.dockerLintCmd = vars.get("dockerLintCmd", "dockerfile_lint --json --verbose --dockerfile \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()
   // hadolint Dockerfile -f checkstyle > checkstyle-hadolint.xml
 
   vars.skipDockerLintFailure = vars.get("skipDockerLintFailure", true).toBoolean()
-  vars.dockerLintOutputFile = vars.get("dockerLintOutputFile", "docker-hadolint-${vars.dockerFileId}.log").trim()
+  vars.dockerLintOutputFile = vars.get("dockerLintOutputFile", "docker-hadolint-${vars.dockerFileId}.json").trim()
 
   try {
     if (body) { body() }
