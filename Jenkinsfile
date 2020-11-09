@@ -307,7 +307,7 @@ pipeline {
                 tagList()
         ]
 
-      archiveArtifacts artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
+      archiveArtifacts allowEmptyArchive: true, artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
 
       //runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
 
