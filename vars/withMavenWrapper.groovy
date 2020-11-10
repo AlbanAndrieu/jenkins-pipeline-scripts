@@ -62,7 +62,7 @@ def call(Map vars, Closure body=null) {
     vars.pomFile = vars.get("pomFile", "pom.xml").trim()
     vars.mavenGoals = vars.get("mavenGoals", "").trim()
     vars.shellOutputFile = vars.get("shellOutputFile", "maven.log").trim()
-    vars.mavenHome = vars.get("mavenHome", "${vars.JENKINS_USER_HOME}/.m2/").trim()
+    vars.mavenHome = vars.get("mavenHome", "${vars.JENKINS_USER_HOME}/.m2").trim()
 
     try {
         tee("${vars.shellOutputFile}") {

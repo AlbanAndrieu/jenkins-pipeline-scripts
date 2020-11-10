@@ -249,7 +249,7 @@ pipeline {
                         archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
                     }
 
-                    dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
+                    //dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
                     dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
 

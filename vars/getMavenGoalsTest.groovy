@@ -17,6 +17,7 @@ def call(Map vars, Closure body=null) {
 
     vars.skipTests = vars.get("skipTests", false).toBoolean()
     vars.skipReleaseTests = vars.get("skipReleaseTests", true).toBoolean()
+    vars.skipRetryTests = vars.get("skipRetryTests", true).toBoolean()
     vars.mavenGoals = vars.get("mavenGoals", "")
 
     // Force skipping tests
@@ -31,9 +32,11 @@ def call(Map vars, Closure body=null) {
     }
 
     if (isReleaseBranch()) {
-        echo "skip test added"
+        //echo "skip test added"
         //vars.mavenGoals += " -Dmaven.test.failure.ignore=true -Dmaven.test.failure.skip=true"
-        vars.mavenGoals += " -Dsurefire.skipAfterFailureCount=2 -Dsurefire.rerunFailingTestsCount=3 "
+        if (!vars.skipRetryTests.toBoolean()) {
+            vars.mavenGoals += " -Dsurefire.skipAfterFailureCount=2 -Dsurefire.rerunFailingTestsCount=3 "
+	    }
     }
 
     if (body) { body() }
