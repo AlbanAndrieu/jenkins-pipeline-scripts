@@ -89,7 +89,6 @@ pipeline {
     stage('\u27A1 Build - Maven') {
       when {
         expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-        //expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
       }
       steps {
         script {
@@ -157,7 +156,7 @@ pipeline {
     stage('\u27A1 Build - Gradle') {
       when {
         expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-        expression { params.BUILD_GRADLE.toBoolean() == true }
+        expression { params.BUILD_GRADLE == true }
       }
       steps {
         script {
@@ -216,7 +215,7 @@ pipeline {
         //}
         when {
             expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-            expression { params.BUILD_ONLY.toBoolean() == false }
+            expression { params.BUILD_ONLY == false }
         }
         steps {
             script {
@@ -261,7 +260,7 @@ pipeline {
     stage('\u2795 Quality - E2E tests') {
       when {
         expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-        expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
+        expression { params.BUILD_TEST == true && params.BUILD_ONLY == false }
       }
       steps {
         script {

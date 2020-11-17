@@ -177,4 +177,12 @@ class Sonar implements Serializable {
 
 	}
 
+    static def sonarRestCall(def apiUrl, def login, def password, def method, def query="") {
+      def token = ("${login}:${password}").bytes.encodeBase64().toString()
+      def headers = [:]
+      headers["Content-Type"] = "application/json"
+      headers["Authorization"] = "Basic ${token}"
+
+      return callURL("${apiUrl}", "${query}", method, headers)
+    }
 }

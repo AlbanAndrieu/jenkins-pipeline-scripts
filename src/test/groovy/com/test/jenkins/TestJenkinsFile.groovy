@@ -92,6 +92,9 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		//helper.registerAllowedMethod(method("getEnvironment",  Map.class),  { map ->
 		//    return "0"
 		//})
+		//binding.setVariable('BUILD_TEST', true)
+		//binding.setVariable('BUILD_ONLY', true)
+		//binding.setVariable('BUILD_GRADLE', true)
 		binding.setVariable('env', [getEnvironment: [COMPOSE_HTTP_TIMEOUT: '200']])
 		binding.getVariable('env').getEnvironment = [COMPOSE_HTTP_TIMEOUT: '200']
 
@@ -145,6 +148,17 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("cleanStash", [Map.class, Closure.class], null)
 
 		helper.registerAllowedMethod("dockerTag", [String.class], {c ->"test"})
+
+		helper.registerAllowedMethod("dockerHadoLint", [], null)
+		helper.registerAllowedMethod("dockerHadoLint", [Map.class], null)
+
+		helper.registerAllowedMethod("dockerLint", [], null)
+		helper.registerAllowedMethod("dockerLint", [Map.class], null)
+
+		helper.registerAllowedMethod("taskScanner", [], null)
+		helper.registerAllowedMethod("taskScanner", [Map.class], null)
+		helper.registerAllowedMethod("tagList", [], null)
+		helper.registerAllowedMethod("tagList", [Map.class], null)
 
 	}
 
