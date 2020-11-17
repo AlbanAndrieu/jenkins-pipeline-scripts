@@ -111,8 +111,8 @@
         <maven.fabric8.docker.plugin.version>0.26.1</maven.fabric8.docker.plugin.version>
         <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
         <maven.jenkinsfile.plugin.version>1.0.0</maven.jenkinsfile.plugin.version>
-        <!--<maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>-->
-        <maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>
+        <maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>
+        <!--<maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>-->
 
         <jdk.version>1.8.0</jdk.version>
         <jdk.level>1.8</jdk.level>
