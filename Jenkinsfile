@@ -88,7 +88,7 @@ pipeline {
     } // stage setup
     stage('\u27A1 Build - Maven') {
       when {
-        expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
         //expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
       }
       steps {
@@ -156,7 +156,7 @@ pipeline {
     } // stage Maven
     stage('\u27A1 Build - Gradle') {
       when {
-        expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
         expression { params.BUILD_GRADLE.toBoolean() == true }
       }
       steps {
@@ -189,7 +189,7 @@ pipeline {
     } // stage Maven
     //stage('\u2795 Quality - SonarQube analysis') {
     //  when {
-    //  expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+    //  expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
     //  expression { params.BUILD_ONLY.toBoolean() == false }
     //  }
     //  environment {
@@ -260,7 +260,7 @@ pipeline {
     } // Build - Docker
     stage('\u2795 Quality - E2E tests') {
       when {
-        expression { BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
         expression { params.BUILD_TEST.toBoolean() == true && params.BUILD_ONLY.toBoolean() == false }
       }
       steps {

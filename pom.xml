@@ -220,7 +220,7 @@
 	            <artifactId>groovy-cps</artifactId>
 	            <version>${groovy.cps.version}</version>
 	            <scope>test</scope>
-	        </dependency>            
+	        </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -244,7 +244,7 @@
             </exclusions>
             -->
         </dependency>
-        <!-- 
+        <!--
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
@@ -524,7 +524,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
-                <!-- 
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.groovy</groupId>
@@ -537,11 +536,10 @@
                         <version>${groovy.eclipse.batch.version}</version>
                     </dependency>
                 </dependencies>
-                 -->
                 <configuration>
                     <source>${jdk.level}</source>
                     <target>${jdk.level}</target>
-                    <!-- <compilerId>groovy-eclipse-compiler</compilerId> -->
+                    <compilerId>groovy-eclipse-compiler</compilerId>
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
