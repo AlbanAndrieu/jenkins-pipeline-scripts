@@ -18,8 +18,8 @@ def call(Map vars, Closure body=null) {
   vars.RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
   vars.RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
 
-  vars.SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim() // sonardev
-  vars.SONAR_HOST = vars.get("SONAR_HOST", env.SONAR_HOST ?: "sonar").trim() // sonardev
+  vars.SONAR_INSTANCE = vars.get("SONAR_INSTANCE", env.SONAR_INSTANCE ?: "sonar").trim()
+  vars.SONAR_HOST = vars.get("SONAR_HOST", env.SONAR_HOST ?: "sonarcloud.io").trim()
   vars.SONAR_URL = vars.get("SONAR_URL", env.SONAR_URL ?: "https://${vars.SONAR_HOST}").trim()
   vars.SONAR_SCANNER = vars.get("SONAR_SCANNER", env.SONAR_SCANNER ?: "Sonar-Scanner-4.2").trim()
   vars.SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
@@ -60,7 +60,7 @@ def call(Map vars, Closure body=null) {
   vars.HTTP_PROXY = vars.get("HTTP_PROXY", env.HTTP_PROXY ?: "http://192.168.1.57:3128").trim()
   vars.HTTPS_PROXY = vars.get("HTTPS_PROXY", env.HTTPS_PROXY ?: "http://192.168.1.57:3128").trim()
   vars.NO_PROXY = vars.get("NO_PROXY", env.NO_PROXY ?: "localhost,127.0.0.1,.finastra.com,.misys.global.ad,.finastra.global,.azurecr.io,verdaccio,10.199.52.11").trim()
-  
+
   // See https://opensource.triology.de/jenkins/pipeline-syntax/globals
 
   //def JENKINS_URL = vars.get("JENKINS_URL", env.JENKINS_URL ?: "TODO").trim()

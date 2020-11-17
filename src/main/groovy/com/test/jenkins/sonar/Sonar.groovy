@@ -15,10 +15,10 @@ class Sonar implements Serializable {
 	 *
 	 */
 	@NonCPS
-	static def get_project_name(jobName, defaultProject="RISK") {
+	static def get_project_name(jobName, defaultProject="nabla") {
 		def tokenized_job_name = jobName.split('/')
 		if (tokenized_job_name.size() == 2) {
-			return defaultProject  // e.g. CMR/develop, there is no good way to get Stash project name
+			return defaultProject  // e.g. nabla/develop, there is no good way to get Stash project name
 		} else {
 			return tokenized_job_name[0]
 		}
@@ -35,9 +35,9 @@ class Sonar implements Serializable {
 	static def get_repository_name(jobName) {
 		def tokenized_job_name = jobName.split('/')
 		if (tokenized_job_name.size() == 2) {
-			return tokenized_job_name[0]  // e.g. CMR/develop
+			return tokenized_job_name[0]  // e.g. nabla/develop
 		} else {
-			return tokenized_job_name[1]  // e.g. RISK/generic_limits/develop
+			return tokenized_job_name[1]  // e.g. nabla/nabla-hooks/develop
 		}
 	}
 
@@ -106,7 +106,7 @@ class Sonar implements Serializable {
 		vars = vars ?: [:]
 
 		def sonarCmdParameters = vars.get("sonarCmdParameters", "")
-		//vars.project = vars.get("project", "RISK")
+		//vars.project = vars.get("project", "nabla")
 
 		def sonarInclusions = filesChanged(vars) {}.collect{ filename -> "${filename}" }.join(",")
 
@@ -141,9 +141,9 @@ class Sonar implements Serializable {
 		vars.commitCap            = vars.get("commitCap", 50)
 		// If number of files changes exceeds the Cap, all files should be Sonar-scanned; the script will return ["*"]
 		vars.fileCap              = vars.get("fileCap", 50)
-		vars.baseUrl              = vars.get("baseUrl", "https://scm-git-eur.misys.global.ad/")
+		vars.baseUrl              = vars.get("baseUrl", "https://github.com/AlbanAndrieu/")
 		vars.jobName              = vars.get("jobName", "unknown")
-		vars.project              = vars.get("project", get_project_name(vars.jobName, "RISK"))
+		vars.project              = vars.get("project", get_project_name(vars.jobName, "nabla"))
 		vars.repository           = vars.get("repository", get_repository_name(vars.jobName))
 		vars.targetRevision       = vars.get("targetRevision", "refs/heads/develop")
 		vars.currentRevision      = vars.get("currentRevision", "0")
