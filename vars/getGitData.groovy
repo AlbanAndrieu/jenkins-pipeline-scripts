@@ -7,6 +7,7 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
+    echo "[JPL] Executing `vars/getGitData.groovy`"
     vars = vars ?: [:]
 
     script {
@@ -24,13 +25,15 @@ def call(Map vars, Closure body=null) {
 
         }
 
-        def RELEASE_VERSION = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: null)
         def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
-        def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
+        def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: "")
+
+        env.RELEASE_VERSION = getReleasedVersion(vars) ?: "0.0.1"
 
         if (DEBUG_RUN) {
             echo "2 - RELEASE=${RELEASE}"
-            echo "2 - RELEASE_BASE=${RELEASE_BASE}"
+            echo "3 - RELEASE_BASE=${RELEASE_BASE}"
+            echo "4 - RELEASE_VERSION=${env.RELEASE_VERSION}"
         }
 
         if (RELEASE && RELEASE_BASE) {
@@ -39,12 +42,17 @@ def call(Map vars, Closure body=null) {
 
         env.GIT_COMMIT = getCommitId()
         if (DEBUG_RUN) {
-            echo "GIT_COMMIT: ${GIT_COMMIT} - ${GIT_COMMIT}"
+            echo "GIT_COMMIT: ${env.GIT_COMMIT}"
         }
 
         env.GIT_COMMIT_SHORT = getCommitShortSHA1()
         if (DEBUG_RUN) {
-            echo "GIT_COMMIT_SHORT: ${GIT_COMMIT_SHORT} - ${GIT_COMMIT_SHORT}"
+            echo "GIT_COMMIT_SHORT: ${env.GIT_COMMIT_SHORT}"
+        }
+
+        env.BUILD_TIMESTAMP = getTimestamp()
+        if (DEBUG_RUN) {
+            echo "BUILD_TIMESTAMP: ${env.BUILD_TIMESTAMP}"
         }
 
         environment()

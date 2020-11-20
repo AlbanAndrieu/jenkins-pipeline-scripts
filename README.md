@@ -10,11 +10,28 @@ jenkins-pipeline-scripts
 [![Jenkins Version](https://img.shields.io/badge/Jenkins-2.221-green.svg?label=min.%20Jenkins)](https://jenkins.io/download/)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/AlbanAndrieu/jenkins-pipeline-scripts?label=changelog)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/releases)
 
+[![GitHub Actions](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/workflows/GitHub%20Actions/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1999b59401394431a1c2fea2923a919d)](https://www.codacy.com/app/uhafner/jenkins-pipeline-scripts?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlbanAndrieu/jenkins-pipeline-scripts&amp;utm_campaign=Badge_Grade)
+[![Codecov](https://img.shields.io/codecov/c/github/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://codecov.io/gh/AlbanAndrieu/jenkins-pipeline-scripts)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/pulls)
+
+# Table of contents
+
+<!-- toc -->
+
+- [Usage](#usage)
+- [Update README.md Table of Contents](#update-readmemd-table-of-contents)
+
+<!-- tocstop -->
+
 *NOTE: This repository is being deprecated internally at Nabla and hence
 will receive few updates going forward.*
 
+Usage
+-----
+
 This repository contains helper functions and classes to be used with the Jenkins Pipeline Plugin.
-This repository is used on http://home.nabla.mobi:8381/jenkins/ and other Jenkins instances managed by Nabla.
+This repository is used on http://albandrieu.com:8686/jenkins/ and other Jenkins instances managed by Nabla.
 
 Below feature have been removed on purpose
  * [tee](https://jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#-tee-%20tee%20output%20to%20file)
@@ -53,11 +70,18 @@ $ docker build -t groovy-test .
 $ docker run -it groovy-test:latest
 ```
 
+Update README.md Table of Contents
+-----------------------------------
+
+
+  * [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)
+  * With [github-markdown-toc](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
+
+`
+npm install --save markdown-toc
+
+
 ========================
 
 See [Extending environment variables with Shared Libraries](https://devops.datenkollektiv.de/programatically-add-environment-variables-to-a-jenkins-instance.html)
 
-[![GitHub Actions](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/workflows/GitHub%20Actions/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1999b59401394431a1c2fea2923a919d)](https://www.codacy.com/app/uhafner/jenkins-pipeline-scripts?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlbanAndrieu/jenkins-pipeline-scripts&amp;utm_campaign=Badge_Grade)
-[![Codecov](https://img.shields.io/codecov/c/github/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://codecov.io/gh/AlbanAndrieu/jenkins-pipeline-scripts)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/pulls)

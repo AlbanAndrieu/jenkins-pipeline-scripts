@@ -34,113 +34,113 @@ def call(Map vars, Closure body=null) {
     script {
         tee("${vars.sonarCheckOutputFile}") {
 
-        try {
+		      try {
 
-            withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
+		          withSonarQubeEnv("${vars.SONAR_INSTANCE}") {
 
-                def qg = null
+		              def qg = null
 
-                if (!vars.skipWaitForQualityGate) {
-                    // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
-                    retry(10) {
-                        sleep(time: vars.sleep, unit:"MINUTES")
-                        println "Wait for Quality Gate"
+		              if (!vars.skipWaitForQualityGate) {
+		                  // Wait until sonar scan is completed. Known issues - it freezes at first execution of waitForQualityGate()
+		                  retry(10) {
+		                      sleep(time: vars.sleep, unit:"MINUTES")
+		                      println "Wait for Quality Gate"
 
-                        timeout(time: vars.timeout, unit: 'MINUTES') {
+		                      timeout(time: vars.timeout, unit: 'MINUTES') {
 
-                          qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
-                          if (qg.status == 'OK')
-                            echo "Quality Gate status is OK"
-                          else
-                            echo "WARNING: Quality Gate status is ${qg.status}"
+		                        qg = waitForQualityGate(abortPipeline: vars.isAbortPipeline)
+		                        if (qg.status == 'OK')
+		                          echo "Quality Gate status is OK"
+		                        else
+		                          echo "WARNING: Quality Gate status is ${qg.status}"
 
-                        } // timeout
+		                      } // timeout
 
-                    } // retry
-			    } // skipWaitForQualityGate
+		                  } // retry
+					 				 } // skipWaitForQualityGate
 
-                // Read branch and projectKey from report-task.txt
-                def report = readProperties file: vars.reportTaskFile
-                def branch = report["branch"]
-                def projectKey = report["projectKey"]
-                def dashboardUrl = report["dashboardUrl"]
+		              // Read branch and projectKey from report-task.txt
+		              def report = readProperties file: vars.reportTaskFile
+		              def branch = report["branch"]
+		              def projectKey = report["projectKey"]
+		              def dashboardUrl = report["dashboardUrl"]
 
-                // Create REST call to SonarQube for issues count grouped by severity
-                def apiUrl = "${vars.SONAR_URL}/api/issues/search"
-                def severities = ""
-                def query = "branch=${branch}"
-                query += "&componentKeys=${projectKey}"
-                query += "&resolved=false"
-                query += "&severities=${severities}"
-                query += "&facets=severities"
-                query += "&ps=1"
-                query += "&additionalFields=_all"
+		              // Create REST call to SonarQube for issues count grouped by severity
+		              def apiUrl = "${vars.SONAR_URL}/api/issues/search"
+		              def severities = ""
+		              def query = "branch=${branch}"
+		              query += "&componentKeys=${projectKey}"
+		              query += "&resolved=false"
+		              query += "&severities=${severities}"
+		              query += "&facets=severities"
+		              query += "&ps=1"
+		              query += "&additionalFields=_all"
 
-                def results = [:]
-                // Make REST call
-                withCredentials([usernamePassword(credentialsId: vars.SONAR_CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+		              def results = [:]
+		              // Make REST call
+		              withCredentials([usernamePassword(credentialsId: vars.SONAR_CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
 
-                   if (body) {
-                     body()
-                   }
+		                 if (body) {
+		                   body()
+		                 }
 
-                  def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
-                  // Parse issues count from json response
-                  ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
+		                def ret = sonarRestCall(apiUrl, USER, PASSWORD, "GET", query)
+		                // Parse issues count from json response
+		                ret_json = new groovy.json.JsonSlurperClassic().parseText(ret)
 
-                  echo " json response : " + ret_json
+		                echo " json response : " + ret_json
 
-                  for (item in ret_json["facets"]) {
-                    if (item["property"] == "severities")
-                      severities = item["values"]
-                  }
-                  for (item in severities) {
-                    results.put(item["val"], item["count"])
-                  }
-                } // withCredentials
-                echo "Writing : ${vars.sonarCheckResultFile}"
+		                for (item in ret_json["facets"]) {
+		                  if (item["property"] == "severities")
+		                    severities = item["values"]
+		                }
+		                for (item in severities) {
+		                  results.put(item["val"], item["count"])
+		                }
+		              } // withCredentials
+		              echo "Writing : ${vars.sonarCheckResultFile}"
 
-                if (null != qg) {
-					echo "Quality Gate status: ${qg.status}"
-			    }
+		              if (null != qg) {
+						echo "Quality Gate status: ${qg.status}"
+					  }
 
-                writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
-Dashboard URL: ${dashboardUrl}
-Issue count: ${results}"""
+		              writeFile file: "${vars.sonarCheckResultFile}", text: """---Sonar scan summary---
+	Dashboard URL: ${dashboardUrl}
+	Issue count: ${results}"""
 
-                echo """---Sonar scan summary---
-Dashboard URL: ${dashboardUrl}
-Issue count: ${results}"""
+		              echo """---Sonar scan summary---
+	Dashboard URL: ${dashboardUrl}
+	Issue count: ${results}"""
 
-                // Fail the build if any CRITICAL or BLOCKER issues and is not in the release branch
-                if (!isReleaseBranch() && (results["CRITICAL"] > vars.criticalThreshold || results["BLOCKER"] > vars.blockerThreshold )) {
-                  if (!vars.skipFailure) {
-                    echo "SONAR CHECK UNSTABLE Pipeline aborted because the number of CRITICAL and BLOCKER and MAJOR issues is more than 0"
-                    currentBuild.result = 'UNSTABLE'
-                  } else {
-                    echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
-                    //error 'There are errors in sonar check'
-                  }
-                }
+		              // Fail the build if any CRITICAL or BLOCKER issues and is not in the release branch
+		              if (!isReleaseBranch() && (results["CRITICAL"] > vars.criticalThreshold || results["BLOCKER"] > vars.blockerThreshold )) {
+		                if (!vars.skipFailure) {
+		                  echo "SONAR CHECK UNSTABLE Pipeline aborted because the number of CRITICAL and BLOCKER and MAJOR issues is more than 0"
+		                  currentBuild.result = 'UNSTABLE'
+		                } else {
+		                  echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
+		                  //error 'There are errors in sonar check'
+		                }
+		              }
 
-                // Fail the build if not release branch and quality gate status is not OK
-                if (!isReleaseBranch() && null != qg && qg.status != 'OK') {
-                  echo "Quality gate status NOT met on short-lived branch"
-                  if (!vars.skipFailure) {
-                    echo "SONAR CHECK UNSTABLE on QUALITY GATE"
-                    currentBuild.result = 'UNSTABLE'
-                    //error "Pipeline aborted because of quality gate status on short-lived branch"
-                  } else {
-                    echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
-                    //error 'There are errors in sonar check'
-                  }
-                }
+		              // Fail the build if not release branch and quality gate status is not OK
+		              if (!isReleaseBranch() && null != qg && qg.status != 'OK') {
+		                echo "Quality gate status NOT met on short-lived branch"
+		                if (!vars.skipFailure) {
+		                  echo "SONAR CHECK UNSTABLE on QUALITY GATE"
+		                  currentBuild.result = 'UNSTABLE'
+		                  //error "Pipeline aborted because of quality gate status on short-lived branch"
+		                } else {
+		                  echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
+		                  //error 'There are errors in sonar check'
+		                }
+		              }
 
-            } // withSonarQubeEnv
+		          } // withSonarQubeEnv
 
-        } catch (exc) {
-          echo "WARNING : There was a problem retrieving sonar scan results : " + exc.toString()
-        }
+		      } catch (exc) {
+		        echo "WARNING : There was a problem retrieving sonar scan results : " + exc.toString()
+		      }
 
         } // tee
 

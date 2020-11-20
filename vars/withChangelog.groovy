@@ -41,7 +41,7 @@ def call(Map vars, Closure body=null) {
  "timeZone": "UTC",
  "removeIssueFromMessage": "true",
 
- "jiraServer": "https://almtools/jira",
+ "jiraServer": "https://nabla/jira",
  "jiraIssuePattern": "\\b[a-zA-Z]([a-zA-Z]+)-([0-9]+)\\b",
 
  "gitHubApi": "https://api.github.com/repos/tomasbjerre/git-changelog-lib",

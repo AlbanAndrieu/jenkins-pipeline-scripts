@@ -1,16 +1,16 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v3.1.0
+    rev: v3.3.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
-    -   id: autopep8-wrapper
     -   id: check-added-large-files
         args: ['--maxkb=123']
     -   id: check-case-conflict
     -   id: check-docstring-first
     -   id: check-executables-have-shebangs
     -   id: check-json
+        exclude: ^.vscode/
     -   id: check-xml
     -   id: check-yaml
     -   id: check-symlinks
@@ -18,7 +18,8 @@ repos:
     -   id: detect-private-key
         exclude: >
                   (?x)^(
-                      README.md
+                      README.md|
+                      src/test/jenkins/jenkins.yaml
                   )$
     -   id: double-quote-string-fixer
     -   id: name-tests-test
@@ -26,14 +27,12 @@ repos:
     -   id: fix-encoding-pragma
     -   id: requirements-txt-fixer
     -   id: sort-simple-yaml
-    -   id: flake8
-        args: [--max-line-length=120]
 -   repo: https://github.com/pre-commit/pre-commit.git
-    rev: v2.5.1
+    rev: v2.8.2
     hooks:
     -   id: validate_manifest
 -   repo: https://github.com/asottile/reorder_python_imports.git
-    rev: v2.3.0
+    rev: v2.3.6
     hooks:
     -   id: reorder-python-imports
 #        language_version: python2.7
@@ -63,7 +62,28 @@ repos:
 #    sha: 994f99b6498e9c76341367ecaf76c69dfb4ea4f2
 #    hooks:
 #    -   id: clang-format
+-   repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v1.5.4
+    hooks:
+    -   id: autopep8
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.4
+    hooks:
+    -   id: flake8
+        args: [--max-line-length=120]
 -   repo: git://github.com/pre-commit/pre-commit-docker-flake8
     rev: v0.0.3  # Fill this in with a current revision
     hooks:
     -   id: flake8-docker-not-for-production
+-   repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.1
+    hooks:
+#    -   id: htmlhint
+#        # optional custom config:
+#        args: [--config, .htmlhintrc]
+    -   id: htmllint
+    -   id: markdown-toc
+        args: [--maxdepth, "3", -i]
+    -   id: dockerfile_lint
+        # optional custom config:
+        args: [--json, --verbose, --dockerfile]

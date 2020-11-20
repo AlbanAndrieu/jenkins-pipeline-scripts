@@ -40,8 +40,9 @@ def call(Map vars, Closure body=null) {
   vars.isDelete = vars.get("isDelete", false).toBoolean()
   vars.isHarbor = vars.get("isHarbor", true).toBoolean()
   vars.isProvenance = vars.get("isProvenance", false).toBoolean()
+  vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
 
-  vars.helmDeleteOutputFile = vars.get("helmDeleteOutputFile", "helm-delete.log").trim()
+  vars.helmDeleteOutputFile = vars.get("helmDeleteOutputFile", "helm-delete-${vars.helmFileId}.log").trim()
   vars.skipFailure = vars.get("skipFailure", true).toBoolean()
 
   try {

@@ -25,6 +25,7 @@ def call(Map vars, Closure body=null) {
     vars.skipResults = vars.get("skipResults", true).toBoolean()
     //vars.buildCmd = vars.get("buildCmd", "./mvnw -B -e ")
     vars.skipSonar = vars.get("skipSonar", true).toBoolean()
+    vars.skipDependencyCheck= vars.get("skipDependencyCheck", true).toBoolean()
     vars.skipPitest = vars.get("skipPitest", true).toBoolean()
     vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
     vars.skipDocker = vars.get("skipDocker", true).toBoolean()
@@ -33,7 +34,7 @@ def call(Map vars, Closure body=null) {
     vars.artifacts = vars.get("artifacts", ['*_VERSION.TXT', '**/target/*.jar'].join(', '))
     vars.shellOutputFile = vars.get("shellOutputFile", "maven-depcheck.log").trim()
 
-    if (!DRY_RUN) {
+    if (!DRY_RUN && !vars.skipDependencyCheck) {
 
         vars.buildCmdParameters += " -Dskip.npm -Dskip.yarn -Dskip.bower -Dskip.grunt -Dmaven.exec.skip=true -Denforcer.skip=true -Dmaven.test.skip=true "
 

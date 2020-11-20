@@ -41,5 +41,13 @@ def call(Map vars, Closure body=null) {
 
         }
 
+        publishHTML (target: [
+          allowMissing: true,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: 'target/site/',
+          reportFiles: 'index.html',
+          reportName: "Maven site"
+        ])
     } // if DRY_RUN
 }

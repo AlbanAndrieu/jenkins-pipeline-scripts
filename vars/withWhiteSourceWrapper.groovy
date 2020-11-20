@@ -31,8 +31,7 @@ def call(Map vars, Closure body=null) {
   vars.skipWhitesource = vars.get("skipWhitesource", false).toBoolean()
 
   if (!vars.skipWhitesource) {
-
-  if (vars.projectName?.trim()) {
+ 	 if (vars.projectName?.trim()) {
       vars.productVersion += vars.projectName
       vars.requesterEmail = vars.get("requesterEmail", 'alban.andrieu@free.fr').trim()
 
@@ -43,12 +42,11 @@ def call(Map vars, Closure body=null) {
         tee("${vars.whithSourceOutputFile}") {
 
           if (!RELEASE_VERSION) {
-              echo 'No RELEASE_VERSION specified'
-              RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "LATEST"
-              if (!vars.projectVersion?.trim()) {
-                  vars.projectVersion = "${RELEASE_VERSION}"
-                  //vars.productVersion += vars.projectVersion
-              }
+            echo 'No RELEASE_VERSION specified'
+            RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "0.0.1"
+            if (!vars.projectVersion?.trim()) {
+              vars.projectVersion = "${RELEASE_VERSION}"
+            }
           }
 
           whitesource jobApiToken: WHITESOURCE_TOKEN, jobCheckPolicies: 'global', jobForceUpdate: 'global', jobUserKey: vars.jobUserKey, libExcludes: vars.libExcludes, libIncludes: vars.libIncludes, product: vars.product, productVersion: vars.productVersion, projectToken: vars.projectToken, requesterEmail: vars.requesterEmail
@@ -71,7 +69,7 @@ def call(Map vars, Closure body=null) {
         archiveArtifacts artifacts: "${vars.whithSourceOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
       }
 
-  } else {
+  	} else {
       echo "WARNING : There was a problem with whitesource scan, projectName cannot be empty"
     }
   } else {

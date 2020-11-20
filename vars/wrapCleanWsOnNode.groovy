@@ -21,15 +21,15 @@ def call(Map vars, Closure body=null) {
 
         wrapCleanWs(vars) {
 
-			echo "Hi from wrapCleanWs"
-			echo "Running on label:"
-			echo vars.nodeLabel.toString()
-			//echo "Currently in: "
-			//sh "pwd"
+				echo "Hi from wrapCleanWs"
+				echo "Running on label:"
+				echo vars.nodeLabel.toString()
+				//echo "Currently in: "
+				//sh "pwd"
 
-            if (body) { body() }
+          if (body) { body() }
 
-        } // wrapCleanWs
+      } // wrapCleanWs
 
     } // node
 

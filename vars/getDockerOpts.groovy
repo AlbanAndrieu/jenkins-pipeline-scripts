@@ -17,8 +17,8 @@ def call(Map vars, Closure body=null) {
   String DOCKER_OPTS_USER_ID = [
      '-v /etc/passwd:/etc/passwd:ro',
      '-v /etc/group:/etc/group:ro',
-//     '--group-add 2000',
-//     '--group-add 1101',
+//     '--group-add 2000', // docker
+     '--group-add 998', // microk8s
   ].join(" ")
 
   String DOCKER_OPTS_BASIC = DOCKER_OPTS_USER_ID
@@ -29,6 +29,9 @@ def call(Map vars, Closure body=null) {
 
   if (vars.isNetworkMapping == true) {
       DOCKER_OPTS_BASIC += ' --net=host'
+  }
+  if (vars.isUserNamespace == true) {
+      DOCKER_OPTS_BASIC += ' --userns=host'
   }
   if (vars.isPidMapping == true) {
       DOCKER_OPTS_BASIC += ' --pid=host'
@@ -47,9 +50,7 @@ def call(Map vars, Closure body=null) {
       DOCKER_OPTS_BASIC += " -e HOME=${WORKSPACE}"
   }
   if (vars.isProxy == true) {
-      DOCKER_OPTS_BASIC += " " + [ "-e http_proxy=${env.HTTP_PROXY}",
-                                   "-e https_proxy=${env.HTTPS_PROXY}",
-                                   "-e no_proxy='${env.NO_PROXY}'"].join(" ") + " "
+      DOCKER_OPTS_BASIC += " " + getProxyOpts(vars) + " "
   }
 
   if (vars.isLocalJenkinsUser == true) {

@@ -14,9 +14,15 @@ def call(Map vars, Closure body=null) {
 
   vars.helmTag = vars.get("helmTag", env.HELM_TAG ?: "0.0.1").trim()
   vars.commit = vars.get("commit", env.GIT_COMMIT ?: "").trim() // getCommitId.groovy
-  vars.buildId = vars.get("buildId", env.BUILD_ID ?: env.BUILD_NUMBER).trim()
-  vars.date = vars.get("date", timestamp())
-  vars.pomFile = vars.get("pomFile", "./pom.xml").trim()
+  vars.isBuildNumber = vars.get("isBuildNumber", false).toBoolean()
+  if (!vars.isBuildNumber) {
+    vars.buildId = vars.get("buildId", env.CUSTOM_BUILD_ID ?: "0").trim()
+  } else {
+		vars.buildId = vars.get("buildId", env.BUILD_ID ?: env.BUILD_NUMBER).trim()  // FYI : BUILD_ID and BUILD_NUMBER are the same
+  }
+  vars.pomFile = vars.get("pomFile", "../pom.xml").trim()
+
+  vars.date = vars.get("date", getTimestamp())
 
   RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "${vars.helmTag}"
 
@@ -33,10 +39,4 @@ def call(Map vars, Closure body=null) {
 
   return RELEASE_VERSION.toLowerCase()
 
-}
-
-def timestamp() {
-    def now = new Date()
-    def timezone="Europe/Paris"
-    return now.format("yyyyMMdd'T'HHmmss", TimeZone.getTimeZone(timezone))
 }

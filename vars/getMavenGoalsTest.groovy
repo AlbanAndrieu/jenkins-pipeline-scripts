@@ -36,7 +36,7 @@ def call(Map vars, Closure body=null) {
         //vars.mavenGoals += " -Dmaven.test.failure.ignore=true -Dmaven.test.failure.skip=true"
         if (!vars.skipRetryTests.toBoolean()) {
             vars.mavenGoals += " -Dsurefire.skipAfterFailureCount=2 -Dsurefire.rerunFailingTestsCount=3 "
-	    }
+	      }
     }
 
     if (body) { body() }

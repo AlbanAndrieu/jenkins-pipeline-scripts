@@ -44,6 +44,7 @@ pipeline {
     booleanParam(defaultValue: true, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_TEST')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_GRADLE')
+    booleanParam(defaultValue: true, description: 'Build jenkins docker images', name: 'BUILD_DOCKER')
   }
   environment {
     DRY_RUN = "${params.DRY_RUN}".toBoolean()
@@ -215,7 +216,7 @@ pipeline {
         //}
         when {
             expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-            expression { params.BUILD_ONLY == false }
+            expression { params.BUILD_ONLY == false && params.BUILD_DOCKER == true }
         }
         steps {
             script {
@@ -248,7 +249,7 @@ pipeline {
                         archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
                     }
 
-                    //dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
+                    dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
                     dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
 

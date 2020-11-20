@@ -15,7 +15,7 @@ def call(Map vars, Closure body=null) {
     def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
     def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
 
-    def JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'stash-jenkins').trim()
+    vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", 'stash-jenkins').trim()
 
     vars.skipDocker = vars.get("skipDocker", true).toBoolean()
     vars.mavenGoals = vars.get("mavenGoals", "")
@@ -24,7 +24,7 @@ def call(Map vars, Closure body=null) {
         if (!DRY_RUN && !RELEASE) {
             echo "docker added"
             withCredentials([
-              usernamePassword(credentialsId: JENKINS_CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USER')
+              usernamePassword(credentialsId: vars.JENKINS_CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USER')
             ]) {
                 vars.mavenGoals += " -Ddocker.username=${USER} -Ddocker.password=${PASSWORD}"
             }

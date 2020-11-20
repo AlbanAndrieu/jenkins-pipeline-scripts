@@ -6,69 +6,68 @@ def call(Closure body=null) {
     call(vars, body)
 }
 
-// withRegistry is buggy, because of wrong DOCKER_CONFIG, so until it gets fix, bellow is workaround
+// withRegistry is buggy, because it is not working inside docker image, bellow is workaround
 def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/withRegistryWrapper.groovy`"
 
     vars = vars ?: [:]
 
-    //def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").toLowerCase().trim()
-    def DOCKER_REGISTRY_TMP = vars.get("DOCKER_REGISTRY_TMP", env.DOCKER_REGISTRY_TMP ?: "registry-tmp.nabla.mobi").toLowerCase().trim()
-    //def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
-    def DOCKER_REGISTRY_TMP_URL = vars.get("DOCKER_REGISTRY_TMP_URL", env.DOCKER_REGISTRY_TMP_URL ?: "https://${DOCKER_REGISTRY_TMP}").trim()
-    def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
-    def JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
-    def DOCKER_CONFIG_DEFAULT = vars.get("DOCKER_CONFIG_DEFAULT", env.DOCKER_CONFIG_DEFAULT ?: "${JENKINS_USER_HOME}/.docker/").trim()
-    vars.dockerConfigPath = vars.get("dockerConfigPath", env.dockerConfigPath ?: "${JENKINS_USER_HOME}/.docker/").trim()
+    String DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.hub.docker.com").toLowerCase().trim()
+    String DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
+    String DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "hub-docker-nabla").trim()
 
-    def DOCKER_CLIENT_TIMEOUT = vars.get("DOCKER_CLIENT_TIMEOUT", env.DOCKER_CLIENT_TIMEOUT ?: "600").trim()
+    String JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
 
-//sh '''
-//echo "DOCKER_CONFIG BEFORE : $DOCKER_CONFIG"
-//'''
+    String DOCKER_CONFIG_DEFAULT = vars.get("DOCKER_CONFIG_DEFAULT", env.DOCKER_CONFIG_DEFAULT ?: "${JENKINS_USER_HOME}/.docker").trim()
 
-    withEnv(["DOCKER_REGISTRY_TMP_URL=${DOCKER_REGISTRY_TMP_URL}",
+    String DOCKER_CLIENT_TIMEOUT = vars.get("DOCKER_CLIENT_TIMEOUT", env.DOCKER_CLIENT_TIMEOUT ?: "600").trim()
+
+    vars.skipLogout = vars.get("skipLogout", true).toBoolean()
+    vars.skipShellLogin = vars.get("skipShellLogin", false).toBoolean()
+    vars.dockerRegistry = vars.get("dockerRegistry", vars.get("DOCKER_REGISTRY", "localhost")).trim()
+    vars.dockerRegistryUrl = vars.get("dockerRegistryUrl", "https://${vars.dockerRegistry}").trim()
+    vars.dockerRegistryCredentials = vars.get("dockerRegistryCredentials", vars.get("DOCKER_REGISTRY_CREDENTIAL", "jenkins")).trim()
+
+    withEnv(["DOCKER_CONFIG=${DOCKER_CONFIG_DEFAULT}",
              "DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}",
             ]) {
 
+        cleanDockerConfig(vars)
 
-        //cleanDockerConfig(vars)
+        if (!vars.skipLogout) {
+            sh  "docker logout || true"
+        }
 
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DOCKER_REGISTRY_CREDENTIAL, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]) {
-            usr = DOCKER_USERNAME
-            pswd = DOCKER_PASSWORD
+        //docker.withRegistry needed for container.push("develop") from pushDockerImage.groovy
+        docker.withRegistry(vars.dockerRegistryUrl, vars.dockerRegistryCredentials) {
 
-            sh 'ls -lrta ${DOCKER_CONFIG} || true'
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: vars.dockerRegistryCredentials, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]) {
+                usr = DOCKER_USERNAME
+                pswd = DOCKER_PASSWORD
 
-            // true added, because Client.Timeout exceeded while awaiting headers
-            login = sh (
-              script: 'docker logout && docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ${DOCKER_REGISTRY_TMP_URL}',
-              returnStatus: true
-            )
+                sh "ls -lrta ${DOCKER_CONFIG} || true"
+                sh "cat ${DOCKER_CONFIG}/config.json || true"
 
-            echo "LOGIN RETURN CODE : ${login}"
-            if (login == 0) {
-                echo "LOGIN SUCCESS"
+                //sh "echo DOCKER_REGISTRY : ${DOCKER_REGISTRY}"
+                //sh "echo DOCKER_REGISTRY_CREDENTIAL : ${DOCKER_REGISTRY_CREDENTIAL}"
+                //sh "echo vars.dockerRegistryUrl : ${vars.dockerRegistryUrl}"
+
+                if (!vars.skipShellLogin) {
+                    timeout(time: 2, unit: 'MINUTES') {
+                        retry(3) {
+                            sh "docker login ${vars.dockerRegistryUrl} --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}"
+                        }
+                    } // timeout
+
+                }
 
                 if (body) {
                     body()
                 }
+            } // withCredentials
 
-            } else {
-                echo "LOGIN FAILURE"
-                //currentBuild.result = 'FAILURE'
-                // TODO withRegistry is buggy, because of wrong DOCKER_CONFIG
-                docker.withRegistry(DOCKER_REGISTRY_HUB_URL, DOCKER_REGISTRY_HUB_CREDENTIAL) {
+        } // withRegistry
 
-                    if (body) {
-                        body()
-                    }
-
-                } // withRegistry
-            }
-
-        } // withCredentials
     } // withEnv
-
 }

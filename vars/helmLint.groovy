@@ -15,37 +15,48 @@ def call(Map vars, Closure body=null) {
   vars.helmDir = vars.get("helmDir", ".").trim()
   vars.helmChartName = vars.get("helmChartName", "charts").trim()
   vars.helmLintCmd = vars.get("helmLintCmd", "helm lint ${vars.helmDir}/${vars.helmChartName}").trim()
+  vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
 
   vars.skipHelmLintFailure = vars.get("skipHelmLintFailure", false).toBoolean()
-  vars.helmLintOutputFile = vars.get("helmLintOutputFile", "helm-lint.log").trim()
+  vars.skipHelmLint = vars.get("skipHelmLint", false).toBoolean()
+  vars.helmLintOutputFile = vars.get("helmLintOutputFile", "helm-lint-${vars.helmFileId}.log").trim()
 
-  try {
-    if (body) { body() }
+  //if ( BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
+  //    vars.skipHelmLint = true
+  //}
 
-    // TODO Remove it when tee will be back
-    vars.helmLintCmd += " 2>&1 > ${vars.helmLintOutputFile} "
+  if (!vars.skipHelmLint) {
 
-    helm = sh (script: vars.helmLintCmd, returnStatus: true)
-    echo "HELM LINT RETURN CODE : ${helm}"
-    if (helm == 0) {
-      echo "HELM LINT SUCCESS"
-    } else {
-	  echo "WARNING : Helm lint failed, check output at \'${vars.helmLintOutputFile}\' "
-      if (!vars.skipHelmLintFailure) {
-        echo "HELM LINT FAILURE"
-        //currentBuild.result = 'UNSTABLE'
-        currentBuild.result = 'FAILURE'
-        error 'There are errors in helm lint'
-      } else {
-        echo "HELM LINT FAILURE skipped"
-        //error 'There are errors in helm'
-      }
-    }
+		try {
+		  if (body) { body() }
 
-  } catch (exc) {
-    echo "Warn: There was a problem with helm lint " + exc.toString()
-  } finally {
-    archiveArtifacts artifacts: "*.log", onlyIfSuccessful: false, allowEmptyArchive: true
+		  // TODO Remove it when tee will be back
+		  vars.helmLintCmd += " 2>&1 > ${vars.helmLintOutputFile} "
+
+		  helm = sh (script: vars.helmLintCmd, returnStatus: true)
+		  echo "HELM LINT RETURN CODE : ${helm}"
+		  if (helm == 0) {
+		    echo "HELM LINT SUCCESS"
+		  } else {
+			echo "WARNING : Helm lint failed, check output at \'${vars.helmLintOutputFile}\' "
+		    if (!vars.skipHelmLintFailure) {
+		      echo "HELM LINT FAILURE"
+		      //currentBuild.result = 'UNSTABLE'
+		      currentBuild.result = 'FAILURE'
+		      error 'There are errors in helm lint'
+		    } else {
+		      echo "HELM LINT FAILURE skipped"
+		      //error 'There are errors in helm'
+		    }
+		  }
+
+		} catch (exc) {
+		  echo "Warn: There was a problem with helm lint " + exc.toString()
+		} finally {
+		  archiveArtifacts artifacts: "*.log", onlyIfSuccessful: false, allowEmptyArchive: true
+		}
+
+  } else {
+      echo "Helm Lint skipped"
   }
-
 }

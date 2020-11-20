@@ -31,9 +31,14 @@ def call(Map vars, Closure body=null) {
   vars.register = vars.get("register", true).toBoolean()
 
   vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
-  vars.aquaOutputFile = vars.get("aquaOutputFile", "aqua.log").trim()
+  vars.aquaFileId = vars.get("aquaFileId", vars.draftPack ?: "0").trim()
+  vars.aquaOutputFile = vars.get("aquaOutputFile", "aqua-${vars.aquaFileId}.log").trim()
   vars.skipAquaFailure = vars.get("skipAquaFailure", false).toBoolean()
-  vars.skipAqua = vars.get("skipAqua", false).toBoolean()
+  vars.skipAqua = vars.get("skipAqua", true).toBoolean()
+
+  if ( BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
+	  vars.skipAqua = true
+  }
 
   if (!vars.skipAqua) {
     try {
@@ -61,7 +66,7 @@ def call(Map vars, Closure body=null) {
       echo "WARNING : There was a problem with aqua scan : " + exc.toString()
       echo "Check on : ${vars.AQUA_URL}"
     } finally {
-      archiveArtifacts artifacts: "${vars.aquaOutputFile}, aqua.html", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+      archiveArtifacts artifacts: "${vars.aquaOutputFile}, scanout*.html, styles.css", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     }
   } else {
     echo "Aqua scan skipped"

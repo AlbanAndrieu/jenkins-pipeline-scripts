@@ -31,7 +31,7 @@ def call(Map vars, Closure body=null) {
   vars.JENKINS_CREDENTIALS = vars.get("JENKINS_CREDENTIALS", env.JENKINS_CREDENTIALS ?: "jenkins-ssh").trim()
   vars.JENKINS_SSH_CREDENTIALS = vars.get("JENKINS_SSH_CREDENTIALS", env.JENKINS_SSH_CREDENTIALS ?: "jenkins-ssh").trim()
 
-  vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins/").trim()
+  vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
 
   vars.DOCKER_REGISTRY_TMP = vars.get("DOCKER_REGISTRY_TMP", env.DOCKER_REGISTRY_TMP ?: "registry.hub.docker.com").toLowerCase().trim()
   vars.DOCKER_REGISTRY_TMP_URL = vars.get("DOCKER_REGISTRY_TMP_URL", env.DOCKER_REGISTRY_TMP_URL ?: "https://${vars.DOCKER_REGISTRY_TMP}").trim()
@@ -39,7 +39,7 @@ def call(Map vars, Closure body=null) {
 
   vars.DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.hub.docker.com").toLowerCase().trim()
   vars.DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${vars.DOCKER_REGISTRY}").trim()
-  vars.DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
+  vars.DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "hub-docker-nabla").trim()
 
   vars.DOCKER_REGISTRY_HUB = vars.get("DOCKER_REGISTRY_HUB", env.DOCKER_REGISTRY_HUB ?: "").toLowerCase().trim()
   vars.DOCKER_REGISTRY_HUB_URL = vars.get("DOCKER_REGISTRY_HUB_URL", env.DOCKER_REGISTRY_HUB_URL ?: "https://${vars.DOCKER_REGISTRY_HUB}").trim()
@@ -49,6 +49,9 @@ def call(Map vars, Closure body=null) {
 
   vars.COMPOSE_HTTP_TIMEOUT = vars.get("COMPOSE_HTTP_TIMEOUT", env.COMPOSE_HTTP_TIMEOUT ?: "200").trim()
 
+  vars.JENKINS_HELM_HOME = vars.get("JENKINS_HELM_HOME", env.JENKINS_HELM_HOME ?: "/home/jenkins/.cache/helm").trim()
+  vars.HELM_REGISTRY_STABLE_URL = vars.get("HELM_REGISTRY_STABLE_URL", env.HELM_REGISTRY_STABLE_URL ?: "https://charts.helm.sh/stable").toLowerCase().trim()
+
   vars.HELM_PROJECT = vars.get("HELM_PROJECT", env.HELM_PROJECT ?: "nabla").trim()
   vars.HELM_REGISTRY = vars.get("HELM_REGISTRY", env.HELM_REGISTRY ?: "registry.hub.docker.com").toLowerCase().trim()
   vars.HELM_REGISTRY_URL = vars.get("HELM_REGISTRY_URL", env.HELM_REGISTRY_URL ?: "https://${vars.HELM_REGISTRY}/api/chartrepo/${vars.HELM_PROJECT}/charts").trim()
@@ -56,6 +59,13 @@ def call(Map vars, Closure body=null) {
 
   vars.HELM_REGISTRY_TMP_URL = vars.get("HELM_REGISTRY_TMP_URL", env.HELM_REGISTRY_TMP_URL ?: "https://${vars.HELM_REGISTRY_TMP}/api/chartrepo/${vars.HELM_PROJECT}/charts").trim()
   vars.HELM_REGISTRY_CREDENTIAL = vars.get("HELM_REGISTRY_CREDENTIAL", env.HELM_REGISTRY_CREDENTIAL ?: "jenkins").trim()
+
+  vars.KUBECONFIG = vars.get("KUBECONFIG", env.KUBECONFIG ?: "/home/jenkins/.kube/config").trim()
+  vars.NPM_SETTINGS_CONFIG = vars.get("NPM_SETTINGS_CONFIG", env.NPM_SETTINGS_CONFIG ?: "nabla-npmrc-default").trim()
+  vars.BOWER_SETTINGS_CONFIG = vars.get("BOWER_SETTINGS_CONFIG", env.BOWER_SETTINGS_CONFIG ?: "nabla-bowerrc-default").trim()
+  vars.MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexu").trim()
+  vars.MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
+  vars.K8S_SETTINGS_CONFIG = vars.get("K8S_SETTINGS_CONFIG", env.K8S_SETTINGS_CONFIG ?: "nabla-k8s-default").trim()
 
   vars.HTTP_PROXY = vars.get("HTTP_PROXY", env.HTTP_PROXY ?: "http://192.168.1.57:3128").trim()
   vars.HTTPS_PROXY = vars.get("HTTPS_PROXY", env.HTTPS_PROXY ?: "http://192.168.1.57:3128").trim()
@@ -73,6 +83,7 @@ def call(Map vars, Closure body=null) {
   vars.isRoot = vars.get("isRoot", false).toBoolean()
   //vars.isCredentialsMapping = vars.get("isCredentialsMapping", true).toBoolean()
   vars.isNetworkMapping = vars.get("isNetworkMapping", false).toBoolean()
+  vars.isUserNamespace = vars.get("isUserNamespace", false).toBoolean()
   vars.isPidMapping = vars.get("isPidMapping", false).toBoolean()
   vars.isDnsSearchMapping = vars.get("isDnsSearchMapping", true).toBoolean()
   vars.isProxy = vars.get("isProxy", false).toBoolean()
@@ -101,14 +112,13 @@ def call(Map vars, Closure body=null) {
       echo 'Warn: There was a problem. '+exc.toString()
     }
   }
-  //if (JENKINS_URL ==~ /.*almonde-jenkins.*|.*risk-jenkins.*|.*test-jenkins.*|.*localhost.*/ ) {
   if ( JENKINS_URL ==~ /http:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// || JENKINS_URL ==~ /https:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// ) {
     echo "JPL is supported"
   } else {
     echo "JPL is NOT supported"
     vars.isLogParserPublisher = false
-    //vars.SONAR_INSTANCE = "sonar".trim()
-    //vars.SONAR_CREDENTIALS = "jenkins".trim()
+    vars.skipAqua = true
+    vars.skipCheckmarx = true
   }
 
   if (vars.SONAR_INSTANCE == "sonartest") {
@@ -132,8 +142,8 @@ def call(Map vars, Closure body=null) {
     }
   }
 
-  vars.isProperties = vars.get("isProperties", "TODO").trim()
-  echo "JPL testing ${vars.isProperties}"
+  vars.isProperties = vars.get("isProperties", "none").trim()
+  echo "JPL isProperties ${vars.isProperties}"
 
   if (vars.isProperties ==~ /LogParserPublisher/ ) {
     return vars.isLogParserPublisher

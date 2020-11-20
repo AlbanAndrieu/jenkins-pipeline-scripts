@@ -18,7 +18,9 @@ def call(Map vars, Closure body=null) {
     vars.skipSigning = vars.get("skipSigning", true).toBoolean()
     vars.mavenGoals = vars.get("mavenGoals", "")
 
-    vars.mavenGoals += " -Djarsigner.skip=" + vars.skipSigning + " "
+    if (vars.skipSigning.toBoolean()) {
+        vars.mavenGoals += " -Djarsigner.skip=" + vars.skipSigning + " "
+    }
 
     if (body) { body() }
 

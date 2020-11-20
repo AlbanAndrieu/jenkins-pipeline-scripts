@@ -42,9 +42,10 @@ def call(Map vars, Closure body=null) {
   vars.isSign = vars.get("isSign", false).toBoolean()
   vars.isDryRun = vars.get("isDryRun", false).toBoolean()
   vars.helmSetOverride = vars.get("helmSetOverride", "").trim() // Allow --set tags.api=false
+  vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
 
-  vars.helmInstallOutputFile = vars.get("helmInstallOutputFile", "helm-install.log").trim()
-  vars.helmDryRunOutputFile = vars.get("helmDryRunOutputFile", "helm-install-debug.log").trim()
+  vars.helmInstallOutputFile = vars.get("helmInstallOutputFile", "helm-install-${vars.helmFileId}.log").trim()
+  vars.helmDryRunOutputFile = vars.get("helmDryRunOutputFile", "helm-install-debug-${vars.helmFileId}.log").trim()
   vars.skipFailure = vars.get("skipFailure", true).toBoolean()
 
   try {
@@ -80,7 +81,7 @@ def call(Map vars, Closure body=null) {
           } // isInstall
         } // isHarbor
 
-		helmInstallCmd += vars.helmSetOverride
+		    helmInstallCmd += vars.helmSetOverride
 
         // TODO Remove it when tee will be back
         helmInstallCmd += " 2>&1 > ${vars.helmInstallOutputFile} "

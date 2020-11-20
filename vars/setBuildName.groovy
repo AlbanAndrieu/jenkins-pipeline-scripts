@@ -5,6 +5,14 @@ def call() {
 }
 
 def call(def gitBranchName, def desc = "") {
+    this.vars = [:]
+
+    vars.pomFile = vars.get("pomFile", "pom.xml").trim()
+
+    echo "gitBranchName: ${gitBranchName}"
+    if (vars.pomFile != null && vars.pomFile.trim() != "" && gitBranchName?.trim() == "" ) {
+        gitBranchName = readMavenPom(file: vars.pomFile).getArtifactId()
+    }
     currentBuild.displayName = "#" + currentBuild.number.toString() + " " + gitBranchName + " " + getCommitShortSHA1()
     def PULL_REQUEST_URL = env.getProperty('PULL_REQUEST_URL')
     def PULL_REQUEST_ID = env.getProperty("PULL_REQUEST_ID")

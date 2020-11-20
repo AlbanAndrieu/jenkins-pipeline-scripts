@@ -18,11 +18,13 @@ def call(Map vars, Closure body=null) {
 
     def arch = vars.get("arch", "TEST").trim()
     def script = vars.get("script", "build.sh").trim()
-    def command = vars.get("command", "cd \"${pwd()}\" && bash -c \"${script}\"").trim()
+    def command_bash = vars.get("command_bash", "cd \"${pwd()}\" && bash -c \"${script}\"").trim()
+    def command_bat = vars.get("command_bat", "call ${script}").trim()
     def artifacts = vars.get("artifacts", ['*_VERSION.TXT',
                    '*.md5',
                    '*.tar.gz',
                    '*.tgz',
+                   '*.zip',
                    ].join(', '))
     def excludes = vars.get("excludes", ['Latest*.tar.gz'
                    ].join(', '))
@@ -32,6 +34,7 @@ def call(Map vars, Closure body=null) {
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.isStashSconEnabled = vars.get("isStashSconEnabled", true).toBoolean()
     vars.isStashMavenEnabled = vars.get("isStashMavenEnabled", false).toBoolean()
+    vars.isUnixEnabled = vars.get("isUnixEnabled", true).toBoolean() // Force unix style bash on windows otherwise using bat
     vars.shellOutputFile = vars.get("shellOutputFile", "${arch}-scons.log").trim()
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
@@ -68,16 +71,23 @@ def call(Map vars, Closure body=null) {
 
 			    if (body) { body() }
 
-                // See https://stackoverflow.com/questions/38143485/how-do-i-make-jenkins-2-0-execute-a-sh-command-in-the-same-directory-as-the-chec/38166106
+          // See https://stackoverflow.com/questions/38143485/how-do-i-make-jenkins-2-0-execute-a-sh-command-in-the-same-directory-as-the-chec/38166106
 
-                //if (isUnix()) {
-			    build = sh (
-                    script: """#!/bin/bash -l
-                    ${command} 2>&1 > ${vars.shellOutputFile}
-                    """,
-                    //returnStdout: true,
-			        returnStatus: true
-			    )
+          if (vars.isUnixEnabled) { // isUnix()
+		    		build = sh (
+                script: """#!/bin/bash -l
+                    ${command_bash} 2>&1 > ${vars.shellOutputFile}
+                """,
+                //returnStdout: true,
+							  returnStatus: true
+								)
+          } else {
+              build = bat (
+                  script: "${command_bat} > ${vars.shellOutputFile} 2>&1 ",
+                  //returnStdout: true,
+                  returnStatus: true
+              )
+          }
 
 			    echo "BUILD RETURN CODE : ${build}"
 			    if (build == 0) {
@@ -95,7 +105,7 @@ def call(Map vars, Closure body=null) {
 	} finally {
 		//runHtmlPublishers(["WarningsPublisher"])
 
-		artifacts += ", bw-outputs/build-wrapper.log, *.log"
+		artifacts += ", bw-outputs/build-wrapper.log, ${vars.shellOutputFile}"
 		echo "archiveArtifacts: ${artifacts} - ${excludes}"
 		archiveArtifacts artifacts: "${artifacts}", excludes: "${excludes}", fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 

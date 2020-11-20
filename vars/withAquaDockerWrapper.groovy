@@ -19,9 +19,9 @@ def call(Map vars, Closure body=null) {
   def RELEASE = vars.get("RELEASE", env.RELEASE ?: false).toBoolean()
   def RELEASE_BASE = vars.get("RELEASE_BASE", env.RELEASE_BASE ?: null)
 
-  def DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.nabla.mobi").toLowerCase().trim()
-  def DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
-  def DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "jenkins").trim()
+  String DOCKER_REGISTRY = vars.get("DOCKER_REGISTRY", env.DOCKER_REGISTRY ?: "registry.hub.docker.com").toLowerCase().trim()
+  String DOCKER_REGISTRY_URL = vars.get("DOCKER_REGISTRY_URL", env.DOCKER_REGISTRY_URL ?: "https://${DOCKER_REGISTRY}").trim()
+  String DOCKER_REGISTRY_CREDENTIAL = vars.get("DOCKER_REGISTRY_CREDENTIAL", env.DOCKER_REGISTRY_CREDENTIAL ?: "hub-docker-nabla").trim()
 
   def AQUA_VERSION = vars.get("AQUA_VERSION", env.AQUA_VERSION ?: "latest").trim()
   //def AQUA_USER = vars.get("AQUA_USER", env.AQUA_USER ?: '--user scanner').trim()
@@ -30,7 +30,7 @@ def call(Map vars, Closure body=null) {
   def ASPASSWORD = vars.get("ASPASSWORD", env.ASPASSWORD ?: 'password').trim()
 
   //def AQUA_HOST = vars.get("AQUA_HOST", env.AQUA_HOST ?: '--host http://aqua:8080').trim()
-  def ASURI = vars.get("ASURI", env.ASURI ?: 'http://aqua:8080').trim()
+  String ASURI = vars.get("ASURI", env.ASURI ?: 'http://aqua:8080').trim()
 
   def AQUA_REPORT = vars.get("AQUA_REPORT", env.AQUA_REPORT ?: 'aqua.html').trim()
 
