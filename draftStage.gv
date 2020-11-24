@@ -22,7 +22,7 @@ subgraph cluster_2
   {
       helmPackage; helmPush;
   }
-helm -> helmPackage [weight=5, color=red, style=bold, label="add FR repo"]
+helm -> helmPackage [weight=5, color=red, style=bold, label="add NABLA repo"]
 { rank = same; "helmPackage"; "helmPush"; "build"; }
 helmPackage [label="helm\npackage"];
 helmPackage -> helmPush [color=red, style=bold, label="helm template"]
@@ -35,6 +35,6 @@ edge [color=red]; // so is this
 build -> push [style=bold,label="docker"];
 build [label="docker\nbuild"];
 node [shape=box,style=filled,color=".7 .3 1.0"];
-repo [label="pack from\ntechnology repo", shape=box,style=filled,color=".7 .3 1.0"];
-push [label="ACR\nHARBOR", shape=polygon,sides=5,peripheries=3,color=lightblue,style=filled];
+repo [label="pack from\nnabla repo", shape=box,style=filled,color=".7 .3 1.0"];
+push [label="internal\nrepo", shape=polygon,sides=5,peripheries=3,color=lightblue,style=filled];
 }
