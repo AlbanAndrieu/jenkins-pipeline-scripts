@@ -17,7 +17,7 @@ def call(Map vars, Closure body=null) {
 
   vars.NPM_SETTINGS_CONFIG = vars.get("NPM_SETTINGS_CONFIG", env.NPM_SETTINGS_CONFIG ?: "nabla-npmrc-default").trim()
   vars.BOWER_SETTINGS_CONFIG = vars.get("BOWER_SETTINGS_CONFIG", env.BOWER_SETTINGS_CONFIG ?: "nabla-bowerrc-default").trim()
-  vars.MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexu").trim()
+  vars.MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexus").trim()
   vars.MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
   vars.K8S_SETTINGS_CONFIG = vars.get("K8S_SETTINGS_CONFIG", env.K8S_SETTINGS_CONFIG ?: "nabla-k8s-default").trim()
 
