@@ -15,11 +15,11 @@ def call(Map vars, Closure body=null) {
 
   vars.dockerFilePath = vars.get("dockerFilePath", "./docker/ubuntu18").trim()
   vars.dockerFileName = vars.get("dockerFileName", "Dockerfile").trim()
-  vars.dockerFileId = vars.get("dockerFileId", "0").trim()
+  vars.dockerFileId = vars.get("dockerFileId", vars.draftPack ?: "0").trim()
   //vars.dockerTargetPath = vars.get("dockerTargetPath", vars.get("dockerFilePath", "./docker/ubuntu18")).trim()
 
   // Docker linter : hadolint, dockerfilelint, dive
-  vars.dockerLintCmd = vars.get("dockerLintCmd", "docker run --rm -i -v -v ${pwd()}:/project:ro --workdir=/project projectatomic/dockerfile-lint dockerfile_lint -j -f \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()
+  vars.dockerLintCmd = vars.get("dockerLintCmd", "docker run --rm -i -v ${pwd()}:/project:ro --workdir=/project projectatomic/dockerfile-lint dockerfile_lint -j -f \"${vars.dockerFilePath}/${vars.dockerFileName}\"").trim()
 
   vars.skipDockerLintFailure = vars.get("skipDockerLintFailure", true).toBoolean()
   vars.skipDockerLint = vars.get("skipDockerLint", false).toBoolean()

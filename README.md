@@ -68,8 +68,8 @@ $ docker build -t groovy-test .
 $ docker run -it groovy-test:latest
 ```
 
-Update README.md Table of Contents
------------------------------------
+Update README.md
+----------------
 
 
   * [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)

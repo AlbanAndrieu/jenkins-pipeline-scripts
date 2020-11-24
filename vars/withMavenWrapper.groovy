@@ -58,7 +58,7 @@ def call(Map vars, Closure body=null) {
     try {
         tee("${vars.shellOutputFile}") {
             // configFileProvider is working on with getDockerOpts(isLocalJenkinsUser: true)
-            withConfigFileProviderWrapper(vars) {
+            //withConfigFileProviderWrapper(vars) {
                 if (!vars.skipResults) {
 
          				   if (!vars.RELEASE_VERSION?.trim()) {
@@ -174,7 +174,7 @@ def call(Map vars, Closure body=null) {
                     vars.sonarCheckOutputFile = "maven-sonar-check.log"
                     withSonarQubeCheck(vars)
                 }
-            } // configFileProvider
+            //} // configFileProvider
 
             if (!vars.skipResults) {
                 if (!vars.DRY_RUN) {

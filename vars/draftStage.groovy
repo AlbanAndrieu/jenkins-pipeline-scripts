@@ -48,8 +48,7 @@ def call(Map vars, Map containers, Closure body=null) {
   vars.skipAqua = vars.get("skipAqua",false).toBoolean()
   vars.skipCST = vars.get("skipCST",false).toBoolean()
 
-  vars.pomFile = vars.get("pomFile", "pom.xml").trim()
-  vars.pomFile += "../" + vars.pomFile
+  vars.pomFile = vars.get("pomFile", "../pom.xml").trim()
 
   containers = containers ?: [:]
 
