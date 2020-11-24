@@ -17,8 +17,8 @@ def call(Map vars, Closure body=null) {
 
     getJenkinsOpts(vars)
 
-    vars.MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexus").trim()
-    vars.MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
+    //vars.MAVEN_SETTINGS_CONFIG = vars.get("MAVEN_SETTINGS_CONFIG", env.MAVEN_SETTINGS_CONFIG ?: "nabla-settings-nexus").trim()
+    //vars.MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
     vars.MAVEN_VERSION = vars.get("MAVEN_VERSION", env.MAVEN_VERSION ?: "maven 3.5.2").trim() // maven-latest
     vars.JENKINS_USER_HOME = vars.get("JENKINS_USER_HOME", env.JENKINS_USER_HOME ?: "/home/jenkins").trim()
     vars.JDK_VERSION = vars.get("JDK_VERSION", env.JDK_VERSION ?: "jdk8").trim() // java-latest
@@ -58,7 +58,7 @@ def call(Map vars, Closure body=null) {
     try {
         tee("${vars.shellOutputFile}") {
             // configFileProvider is working on with getDockerOpts(isLocalJenkinsUser: true)
-            //withConfigFileProviderWrapper(vars) {
+            withConfigFileProviderWrapper(vars) {
                 if (!vars.skipResults) {
 
          				   if (!vars.RELEASE_VERSION?.trim()) {
@@ -174,7 +174,7 @@ def call(Map vars, Closure body=null) {
                     vars.sonarCheckOutputFile = "maven-sonar-check.log"
                     withSonarQubeCheck(vars)
                 }
-            //} // configFileProvider
+            } // withConfigFileProviderWrapper
 
             if (!vars.skipResults) {
                 if (!vars.DRY_RUN) {

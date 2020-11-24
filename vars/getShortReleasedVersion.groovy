@@ -2,28 +2,30 @@
 import hudson.model.*
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
 
-    echo "[JPL] Executing `vars/getShortReleasedVersion.groovy`"
+  echo "[JPL] Executing `vars/getShortReleasedVersion.groovy`"
 
-    vars = vars ?: [:]
+  vars = vars ?: [:]
 
-    String RELEASE_VERSION_SHORT = "0.0.1"
+  String RELEASE_VERSION_SHORT = "0.0.1"
 
-    tokens = getReleasedVersion(vars).tokenize('.')
+  tokens = getReleasedVersion(vars).tokenize('.')
 
-    if (tokens.size() >= 4) {
-        MAJOR = tokens[0] // MAJOR
-        MINOR = tokens[1] // MINOR
-        RELEASE_VERSION_SHORT = MAJOR + "." + MINOR
-        PATCH = tokens[2]
-        CUT = tokens[3]
-        echo "MAJOR: ${MAJOR} - MINOR : ${MINOR} - SHORT : ${RELEASE_VERSION_SHORT} - PATCH : ${PATCH} - CUT - ${CUT}"
-    }
+  if (tokens.size() >= 4) {
+    MAJOR = tokens[0] // MAJOR
+    MINOR = tokens[1] // MINOR
+    RELEASE_VERSION_SHORT = MAJOR + "." + MINOR
+    PATCH = tokens[2]
+    CUT = tokens[3]
+    echo "MAJOR: ${MAJOR} - MINOR : ${MINOR} - SHORT : ${RELEASE_VERSION_SHORT} - PATCH : ${PATCH} - CUT - ${CUT}"
+  } else {
+    RELEASE_VERSION_SHORT = vars.RELEASE_VERSION
+  }
 
-    return "${RELEASE_VERSION_SHORT}".trim()
+  return "${RELEASE_VERSION_SHORT}".trim()
 }
