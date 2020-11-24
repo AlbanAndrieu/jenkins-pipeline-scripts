@@ -77,9 +77,21 @@ Update README.md Table of Contents
   * [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)
   * With [github-markdown-toc](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
 
-`
+```
 npm install --save markdown-toc
+```
 
+Graph dependency
+----------------
+
+  * [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
+
+```
+$ dot -Tps draftStage.gv -o draftStage.ps
+$ dot -Tpng draftStage.gv > draftStage.png
+```
+
+![draftStage](draftStage.png)
 
 ========================
 

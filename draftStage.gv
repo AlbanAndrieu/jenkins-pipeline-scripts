@@ -1,0 +1,40 @@
+digraph G {
+size ="4,4";
+{ rank = min; "main";}
+main [label="main :\ndraftStage", shape=box];
+{ rank = same; "draftPack"; "dockerLint"; "helm"; "aqua"; "cst"; }
+//main -> {draftPack , dockerLint, helm, aqua, cst}
+main -> draftPack [label=" body", color=red];
+main -> dockerLint [style=dotted];
+draftPack [shape=box]; /* this is a comment */
+draftPack -> build [weight=8, color=red];
+subgraph cluster_1
+  {
+      aqua; cst;
+  }
+main -> aqua [style=dotted];
+main -> cst [style=dotted];
+main -> helm [weight=8, color=red, rankdir=LR];
+{ rank = same; "helm"; "helmLint"; }
+helm [shape=box];
+helm -> helmLint [style=dotted];
+subgraph cluster_2
+  {
+      helmPackage; helmPush;
+  }
+helm -> helmPackage [weight=5, color=red, style=bold, label="add FR repo"]
+{ rank = same; "helmPackage"; "helmPush"; "build"; }
+helmPackage [label="helm\npackage"];
+helmPackage -> helmPush [color=red, style=bold, label="helm template"]
+helmPush [label="helm\npush"];
+helmPush -> push [color=red, style=bold,label="curl"]
+{ rank = sink; "repo";}
+repo -> build [label="Dockerfile"]
+repo -> helm [label="Charts"]
+edge [color=red]; // so is this
+build -> push [style=bold,label="docker"];
+build [label="docker\nbuild"];
+node [shape=box,style=filled,color=".7 .3 1.0"];
+repo [label="pack from\ntechnology repo", shape=box,style=filled,color=".7 .3 1.0"];
+push [label="ACR\nHARBOR", shape=polygon,sides=5,peripheries=3,color=lightblue,style=filled];
+}
