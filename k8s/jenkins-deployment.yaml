@@ -1,29 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jenkins
+  name: jenkins-master
+  namespace: jenkins
+  labels:
+    app: jenkins-master
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jenkins
+      app: jenkins-master
   template:
     metadata:
       labels:
-        app: jenkins
+        app: jenkins-master
     spec:
+      dnsConfig:
+        nameservers:
+          - 10.21.200.3
+          #- 10.25.200.3
+          #- 8.8.8.8
+          #- 8.8.4.4
+        searches:
+          - misys.global.ad
+          #- finastra.com
+        #options:
+        #  - name: ndots
+        #    value: "1"
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: jenkins-account
+      securityContext:
+        fsGroup: 1000
       containers:
         - name: jenkins
-          image: nabla/jenkins:local
+          image: nabla/jenkins-pipeline-scripts:1.0.0
           imagePullPolicy: Never
           env:
             - name: JAVA_OPTS
               value: -Djenkins.install.runSetupWizard=false
           ports:
             - name: http-port
-              containerPort: 8686
+              containerPort: 8080
             - name: jnlp-port
               containerPort: 50000
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 2
+            failureThreshold: 5
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 0.5
+              memory: 1.3Gi
           volumeMounts:
             - name: jenkins-home
               mountPath: /var/jenkins_home
@@ -33,3 +68,5 @@ spec:
           hostPath:
             path: /mnt/jenkins
             type: Directory
+          #persistentVolumeClaim:
+          #  claimName: pvc-jenkins-home

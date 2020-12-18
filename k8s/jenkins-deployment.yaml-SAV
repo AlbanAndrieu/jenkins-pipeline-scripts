@@ -1,17 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jenkins
+  name: jenkins-master
+  namespace: jenkins
+  labels:
+    app: jenkins-master
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jenkins
+      app: jenkins-master
   template:
     metadata:
       labels:
-        app: jenkins
+        app: jenkins-master
     spec:
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: jenkins
       containers:
         - name: jenkins
           image: nabla/jenkins:local
@@ -27,9 +32,24 @@ spec:
           volumeMounts:
             - name: jenkins-home
               mountPath: /var/jenkins_home
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: 8686
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12 # ~2 minutes
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 8686
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12 # ~2 minutes
       restartPolicy: Always
       volumes:
         - name: jenkins-home
           hostPath:
             path: /mnt/jenkins
             type: Directory
+

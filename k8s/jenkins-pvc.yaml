@@ -1,0 +1,13 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-jenkins-home
+  namespace: jenkins
+spec:
+  accessModes:
+  -  ReadWriteMany
+  #-  ReadWriteOnce  # volume can be mounted as read-write by many nodes.
+ storageClassName: aws-efs
+ resources:
+    requests:
+   storage: 1Gi
