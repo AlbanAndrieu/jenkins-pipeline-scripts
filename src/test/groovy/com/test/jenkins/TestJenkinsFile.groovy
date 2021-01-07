@@ -113,8 +113,13 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		//helper.registerAllowedMethod("createPropertyList", [Map.class, Closure.class], null)
 
 		helper.registerAllowedMethod("setBuildName", [], null)
+    helper.registerAllowedMethod("setBuildName", [String.class], null)
 
 		helper.registerAllowedMethod("sh", [Map.class], {c -> "build.sh"})
+
+    //For debuging
+    helper.registerAllowedMethod("getEnvironementData", [], null)
+    helper.registerAllowedMethod("getEnvironementData", [Map.class], null)
 
 		helper.registerAllowedMethod("withMavenWrapper", [Map.class], null)
 		helper.registerAllowedMethod("withMavenWrapper", [Map.class, Closure.class], null)
@@ -128,7 +133,7 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("withCheckmarxWrapper", [Map.class], null)
 		helper.registerAllowedMethod("withCheckmarxWrapper", [Map.class, Closure.class], null)
 
-		helper.registerAllowedMethod("runHtmlPublishers", [List.class], null)
+    helper.registerAllowedMethod("sshPublisherWrapper", [Map.class], null)
 
 		helper.registerAllowedMethod("wrapCleanWs", [], null)
 		helper.registerAllowedMethod("wrapCleanWs", [Map.class], null)
@@ -159,6 +164,85 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("taskScanner", [Map.class], null)
 		helper.registerAllowedMethod("tagList", [], null)
 		helper.registerAllowedMethod("tagList", [Map.class], null)
+
+    helper.registerAllowedMethod("getDockerProxyOpts", [], null)
+    helper.registerAllowedMethod("getDockerProxyOpts", [Map.class], null)
+
+    helper.registerAllowedMethod("withLogParser", [], null)
+    helper.registerAllowedMethod("withLogParser", [Map.class], null)
+
+    //helper.registerAllowedMethod("draftStage", [], null)
+    helper.registerAllowedMethod("draftStage", [Map.class], null)
+
+    helper.registerAllowedMethod("k8sConfig", [], null)
+    helper.registerAllowedMethod("k8sConfig", [Map.class], null)
+    helper.registerAllowedMethod("k8sNamespace", [], null)
+    helper.registerAllowedMethod("k8sNamespace", [Map.class], null)
+
+    helper.registerAllowedMethod("helmLint", [], null)
+    helper.registerAllowedMethod("helmLint", [Map.class], null)
+    helper.registerAllowedMethod("helmDeploy", [], null)
+    helper.registerAllowedMethod("helmDeploy", [Map.class], null)
+    helper.registerAllowedMethod("helmDelete", [], null)
+    helper.registerAllowedMethod("helmDelete", [Map.class], null)
+    helper.registerAllowedMethod("helmInstall", [], null)
+    helper.registerAllowedMethod("helmInstall", [Map.class], null)
+    helper.registerAllowedMethod("helmDependency", [], null)
+    helper.registerAllowedMethod("helmDependency", [Map.class], null)
+    helper.registerAllowedMethod("helmTest", [], null)
+    helper.registerAllowedMethod("helmTest", [Map.class], null)
+    helper.registerAllowedMethod("helmPush", [], null)
+    helper.registerAllowedMethod("helmPush", [Map.class], null)
+
+    helper.registerAllowedMethod("isReleaseBranch", [], null)
+    helper.registerAllowedMethod("dockerComposeLogs", [], null)
+
+    helper.registerAllowedMethod("withRegistryWrapper", [], null)
+    helper.registerAllowedMethod("withRegistryWrapper", [Map.class], null)
+    // dockerPush to be used wrapped with withRegistryWrapper for draftStage
+    helper.registerAllowedMethod("dockerPush", [Map.class], null)
+
+    //Do no use below deprecated method
+    //helper.registerAllowedMethod("abortPreviousRunningBuilds", [], null)
+    //helper.registerAllowedMethod("cleanCaches", [], null)
+    //helper.registerAllowedMethod("cleanDockerConfig", [], null)
+    //helper.registerAllowedMethod("dockerCleaning", [], null)
+    //helper.registerAllowedMethod("doDockerImagePush", [], null)
+    //helper.registerAllowedMethod("getDefaultCheckoutBranches", [], null)
+    //helper.registerAllowedMethod("getDefaultCheckoutExtensions", [], null)
+    //helper.registerAllowedMethod("gitCheckoutALF", [], null)
+    //helper.registerAllowedMethod("gitCheckoutALFRepo", [], null)
+    //helper.registerAllowedMethod("gitCheckoutARC", [], null)
+    //helper.registerAllowedMethod("gitCheckoutARCRepo", [], null)
+    //helper.registerAllowedMethod("gitCheckoutBMRepo", [], null)
+    //helper.registerAllowedMethod("gitCheckoutTEST", [], null)
+    //helper.registerAllowedMethod("gitCheckoutTESTRepo", [], null)
+    //helper.registerAllowedMethod("wrapCleanWs", [], null) // use wrapCleanWsOnNode instead
+    //helper.registerAllowedMethod("wrapCleanWs", [Map.class], null) // use wrapCleanWsOnNode instead
+    //helper.registerAllowedMethod("wrapCleanWs", [Map.class, Closure.class], null) // use wrapCleanWsOnNode instead
+    helper.registerAllowedMethod("runHtmlPublishers", [List.class], null)
+
+    //Do no use below method directly
+    //Do no use draftPack directly for instance it is run by draftStage
+    //helper.registerAllowedMethod("draftPack", [Map.class], null)
+    //helper.registerAllowedMethod("withConfigFileProviderWrapper", [Map.class], null)
+    //helper.registerAllowedMethod("helmTag", [], null)
+    //helper.registerAllowedMethod("dockerCheckHealth", [], null)
+    //helper.registerAllowedMethod("dockerWaitHealth", [], null)
+    //helper.registerAllowedMethod("doDockerImagePush", [], null)
+    //helper.registerAllowedMethod("getCommitRevision", [], null)
+    //helper.registerAllowedMethod("getCommitSha", [], null)
+    //helper.registerAllowedMethod("getCommitShortSHA1", [], null)
+    //helper.registerAllowedMethod("getCommitId", [], null)
+    //helper.registerAllowedMethod("getSemVerReleasedVersion", [], null)
+    //helper.registerAllowedMethod("getShortReleasedVersion", [], null)
+    //helper.registerAllowedMethod("getCurrentDate", [], null)
+    //helper.registerAllowedMethod("getJenkinsOpts", [], null)
+    //helper.registerAllowedMethod("getTimestamp", [], null)
+    //helper.registerAllowedMethod("pushDockerImage", [], null) use dockerPush instead
+    //helper.registerAllowedMethod("gitTagLocal", [], null)
+    //helper.registerAllowedMethod("gitTagRemote", [], null)
+    //helper.registerAllowedMethod("createVersionTextFile", [], null) use createManifest instead
 
 	}
 

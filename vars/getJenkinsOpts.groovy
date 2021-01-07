@@ -25,6 +25,9 @@ def call(Map vars, Closure body=null) {
   vars.SONAR_SCANNER_OPTS = vars.get("SONAR_SCANNER_OPTS", env.SONAR_SCANNER_OPTS ?: "-Xmx2g").trim()
   vars.SONAR_USER_HOME = vars.get("SONAR_USER_HOME", env.SONAR_USER_HOME ?: ".sonar").trim()
   vars.SONAR_CREDENTIALS = vars.get("SONAR_CREDENTIALS", env.SONAR_CREDENTIALS ?: "sonarcloud-nabla").trim()
+  vars.SONAR_TOKEN = vars.get("SONAR_TOKEN", env.SONAR_TOKEN ?: "nabla-token").trim()
+
+  vars.AQUA_URL = vars.get("AQUA_URL", env.AQUA_URL ?: "http://aqua.albandrieu.com:8080/").trim()
 
   vars.STASH_CREDENTIALS = vars.get("STASH_CREDENTIALS", env.STASH_CREDENTIALS ?: "stash-jenkins").trim()
 
@@ -69,7 +72,7 @@ def call(Map vars, Closure body=null) {
 
   vars.HTTP_PROXY = vars.get("HTTP_PROXY", env.HTTP_PROXY ?: "http://192.168.1.57:3128").trim()
   vars.HTTPS_PROXY = vars.get("HTTPS_PROXY", env.HTTPS_PROXY ?: "http://192.168.1.57:3128").trim()
-  vars.NO_PROXY = vars.get("NO_PROXY", env.NO_PROXY ?: "localhost,127.0.0.1,.finastra.com,.misys.global.ad,.finastra.global,.azurecr.io,verdaccio,10.199.52.11").trim()
+  vars.NO_PROXY = vars.get("NO_PROXY", env.NO_PROXY ?: "localhost,127.0.0.1,.nabla.mobi,.albandrieu.com,.azurecr.io,verdaccio").trim()
 
   // See https://opensource.triology.de/jenkins/pipeline-syntax/globals
 
@@ -101,9 +104,12 @@ def call(Map vars, Closure body=null) {
   vars.mavenHome = vars.get("mavenHome", "${vars.JENKINS_USER_HOME}/.m2/").trim()
   vars.isEntrypoint = vars.get("isEntrypoint", true).toBoolean()
 
-  vars.isLogParserPublisher = vars.get("isLogParserPublisher", true).toBoolean()
+  vars.skipLogParser = vars.get("skipLogParser", true).toBoolean()
   vars.skipAqua = vars.get("skipAqua", true).toBoolean()
+  vars.skipSonar = vars.get("skipSonar", true).toBoolean()
   vars.skipCheckmarx = vars.get("skipCheckmarx", true).toBoolean()
+  //vars.skipSshPublisher = vars.get("skipSshPublisher", true).toBoolean()
+  vars.skipTriggerRemoteJob = vars.get("skipTriggerRemoteJob", true).toBoolean()
 
   if (vars.DEBUG_RUN) {
     try {
@@ -113,12 +119,25 @@ def call(Map vars, Closure body=null) {
     }
   }
   if ( JENKINS_URL ==~ /http:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// || JENKINS_URL ==~ /https:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// ) {
-    echo "JPL is supported"
+    echo "JENKINS/JPL is supported"
+
+    if (JENKINS_URL ==~ /http:\/\/albandri.*\/jenkins\/|http:\/\/localhost.*\/jenkins\// ) {
+      echo "No proxy"
+      vars.isProxy = false
+    }
+
   } else {
     echo "JPL is NOT supported"
-    vars.isLogParserPublisher = false
+    vars.skipLogParser = true
     vars.skipAqua = true
     vars.skipCheckmarx = true
+    vars.skipSshPublisher = true
+    vars.skipTriggerRemoteJob = true
+  }
+
+  if (env.HTTP_PROXY != null && env.HTTP_PROXY.trim() != "") {
+    echo "No proxy defined"
+    vars.isProxy = false
   }
 
   if (vars.SONAR_INSTANCE == "sonartest") {
@@ -134,6 +153,7 @@ def call(Map vars, Closure body=null) {
 
       echo "JOB_NAME : ${JOB_NAME}"
       echo "JOB_BASE_NAME : ${JOB_BASE_NAME}"
+      echo "GIT_REPO_NAME : ${GIT_REPO_NAME}"
 
       echo "SONAR_INSTANCE : ${vars.SONAR_INSTANCE}"
       echo "SONAR_CREDENTIALS : ${vars.SONAR_CREDENTIALS}"
@@ -146,7 +166,7 @@ def call(Map vars, Closure body=null) {
   echo "JPL isProperties ${vars.isProperties}"
 
   if (vars.isProperties ==~ /LogParserPublisher/ ) {
-    return vars.isLogParserPublisher
+    return vars.skipLogParser
   }
 
   if (vars.isProperties ==~ /Aqua|skipAqua/ ) {

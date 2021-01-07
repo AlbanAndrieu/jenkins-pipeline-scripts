@@ -8,8 +8,9 @@ def call(body) {
   body()
 
   def content = '${SCRIPT, template="pipeline.template"}'
+  String JOB_NAME = getGitRepoName(vars)
   emailext(
-      subject: "${currentBuild.currentResult}: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+      subject: "${currentBuild.currentResult}: ${JOB_NAME} [${env.BUILD_NUMBER}]",
       to: emailextrecipients([
       [$class: 'CulpritsRecipientProvider'],
       [$class: 'DevelopersRecipientProvider'],

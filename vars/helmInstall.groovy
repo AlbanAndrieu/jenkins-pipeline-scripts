@@ -8,109 +8,132 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
-  echo "[JPL] Executing `vars/helmInstall.groovy"
+  echo "[JPL] Executing `vars/helmInstall.groovy`"
 
   vars = vars ?: [:]
 
-  String HELM_REGISTRY_CREDENTIAL = vars.get("HELM_REGISTRY_CREDENTIAL", env.HELM_REGISTRY_CREDENTIAL ?: "ad.jenkins-bm").trim()
-  //String HELM_ORGANISATION = vars.get("HELM_ORGANISATION", env.HELM_ORGANISATION ?: "fusion-risk").trim()
-  String HELM_PROJECT = vars.get("HELM_PROJECT", env.HELM_PROJECT ?: "fusion-risk").trim()
+  vars.KUBECONFIG = vars.get("KUBECONFIG", env.KUBECONFIG ?: "/home/jenkins/.kube/config").trim()
 
-  String HELM_REGISTRY_STABLE_URL = vars.get("HELM_REGISTRY_STABLE_URL", env.HELM_REGISTRY_STABLE_URL ?: "https://kubernetes-charts.storage.googleapis.com/").toLowerCase().trim()
+  // helmDir must be relatif, never ${pwd()}/charts
+  vars.helmDir = vars.get("helmDir", "./packs").toLowerCase().trim()
+  vars.helmChartName = vars.get("helmChartName", vars.draftPack ?: "packs").toLowerCase().trim()
+  //vars.helmChart = vars.get("helmChart", "charts").trim() // helmChart --> dev
+  vars.helmRelease = vars.get("helmRelease", vars.helmChartName ?:"test").trim()
 
-  String HELM_REGISTRY = vars.get("HELM_REGISTRY", env.HELM_REGISTRY ?: "registry.misys.global.ad").toLowerCase().trim()
-  String HELM_REGISTRY_URL = vars.get("HELM_REGISTRY_URL", env.HELM_REGISTRY_URL ?: "https://${HELM_REGISTRY}/api/chartrepo/${HELM_PROJECT}/charts").trim()
-
-  String HELM_REGISTRY_TMP = vars.get("HELM_REGISTRY_TMP", env.HELM_REGISTRY_TMP ?: "albandrieu:6532/harbor").toLowerCase().trim()
-  String HELM_REGISTRY_TMP_REPO_URL = vars.get("HELM_REGISTRY_TMP_REPO_URL", env.HELM_REGISTRY_TMP_REPO_URL ?: "https://${HELM_REGISTRY_TMP}/chartrepo/${HELM_PROJECT}").trim()
-  String HELM_REGISTRY_TMP_URL = vars.get("HELM_REGISTRY_TMP_URL", env.HELM_REGISTRY_TMP_URL ?: "${HELM_REGISTRY_TMP_REPO_URL}/charts").trim()
-
-  //String DRAFT_BRANCH = vars.get("DRAFT_BRANCH", params.DRAFT_BRANCH ?: "develop").trim()
-  //String DRAFT_VERSION = vars.get("DRAFT_VERSION", env.DRAFT_VERSION ?: "0.16.0").trim()
-
-  vars.helmChart = vars.get("helmChart", "charts").trim() // helmChart --> dev
-  vars.helmRelease = vars.get("helmRelease", "test").trim()
-  vars.buildDir = vars.get("buildDir", "${pwd()}").trim()
-
-  vars.skipStableRepo = vars.get("skipStableRepo", true).toBoolean()
-  vars.stableRepoName = vars.get("stableRepoName", "stable").trim()
-  vars.skipCustomRepo = vars.get("skipCustomRepo", false).toBoolean()
   vars.customRepoName = vars.get("customRepoName", "custom").trim()
+
   vars.isHelm2 = vars.get("isHelm2", false).toBoolean()
-  vars.isInstall = vars.get("isInstall", false).toBoolean()
-  vars.isHarbor = vars.get("isHarbor", true).toBoolean()
+  vars.skipInstall = vars.get("skipInstall", false).toBoolean()
   vars.isSign = vars.get("isSign", false).toBoolean()
-  vars.isDryRun = vars.get("isDryRun", false).toBoolean()
+  vars.isInsecure = vars.get("isInsecure", false).toBoolean()
+  vars.isAtomic = vars.get("isAtomic", false).toBoolean() // See https://github.com/helm/helm/issues/7426
+  vars.isWait = vars.get("isWait", false).toBoolean()
+  vars.isDevel = vars.get("isDevel", true).toBoolean()
+  vars.isReplace = vars.get("isReplace", true).toBoolean()
+  vars.isPackageDependencyUpdate = vars.get("isPackageDependencyUpdate", true).toBoolean()
+
+  vars.isGenerateName = vars.get("isGenerateName", false).toBoolean()
   vars.helmSetOverride = vars.get("helmSetOverride", "").trim() // Allow --set tags.api=false
+  vars.helmInstallTimeout = vars.get("helmInstallTimeout", "5m0s").trim()
+  vars.helmInstallVersion = vars.get("helmInstallVersion", "").trim()
   vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
+  vars.kubeNamespace = vars.get("kubeNamespace", env.KUBENAMESPACE ?: "fr-standalone-devops").trim()
 
   vars.helmInstallOutputFile = vars.get("helmInstallOutputFile", "helm-install-${vars.helmFileId}.log").trim()
-  vars.helmDryRunOutputFile = vars.get("helmDryRunOutputFile", "helm-install-debug-${vars.helmFileId}.log").trim()
-  vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+  vars.isDryRun = vars.get("isDryRun", env.DRY_RUN ?: false).toBoolean()
+  vars.skipInstallFailure = vars.get("skipInstallFailure", true).toBoolean()
 
-  try {
-    echo "Using ${HELM_REGISTRY_TMP_URL}"
+  if (!vars.skipInstall) {
+    try {
 
-    dir("${vars.buildDir}") {
+      if (body) { body() }
 
-      //withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: HELM_REGISTRY_CREDENTIAL, usernameVariable: 'HELM_USERNAME', passwordVariable: 'HELM_PASSWORD']]) {
+      sh "helm repo list || true"
 
-        if (body) { body() }
+      String helmInstallCmd = ""
 
-        if (vars.isDryRun.toBoolean()) {
-          sh """#!/bin/bash -l
-          helm install ${vars.helmChart} --dry-run --debug 2>&1 > ${vars.helmDryRunOutputFile}"""
-          //sh "helm install $${vars.customRepoName}/${vars.helmRelease} --dry-run --debug 2>&1 > ${vars.helmDryRunOutputFile}"
+      if (vars.isHelm2.toBoolean()) {
+        helmInstallCmd = "helm install --name ${vars.helmChartName} ${vars.customRepoName}/${vars.helmRelease}"
+      } else {
+        helmInstallCmd = "helm install "
+        if (vars.KUBECONFIG?.trim()) {
+          helmInstallCmd += " --kubeconfig ${vars.KUBECONFIG} "
         }
-
-        String helmInstallCmd = ""
-
-        // Install chart from repo
-        // https://github.com/goharbor/harbor-helm
-        if (vars.isHarbor.toBoolean()) {
-          if (vars.isInstall.toBoolean()) {
-            if (vars.isHelm2.toBoolean()) {
-              helmInstallCmd = "helm install --name ${vars.helmChart} ${vars.customRepoName}/${vars.helmRelease}"
-            } else {
-              if (vars.isSign) {
-                helmInstallCmd = "helm install ${vars.helmChart} ${vars.customRepoName}/${vars.helmRelease} --verify"
-              } else {
-                helmInstallCmd = "helm install ${vars.helmChart} ${vars.customRepoName}/${vars.helmRelease}"
-              }
-            }
-          } // isInstall
-        } // isHarbor
-
-		    helmInstallCmd += vars.helmSetOverride
-
-        // TODO Remove it when tee will be back
-        helmInstallCmd += " 2>&1 > ${vars.helmInstallOutputFile} "
-
-        // https://github.com/helm/chartmuseum
-        helm = sh (script: helmInstallCmd, returnStatus: true)
-        echo "HELM RETURN CODE : ${helm}"
-        if (helm == 0) {
-          echo "HELM SUCCESS"
+        if (vars.isGenerateName.toBoolean()) {
+          helmInstallCmd += " --generate-name "
         } else {
-          echo "WARNING : Helm install failed, check output at \'${vars.helmInstallOutputFile}\' "
-          if (!vars.skipFailure) {
-            echo "HELM FAILURE"
-            //currentBuild.result = 'UNSTABLE'
-            currentBuild.result = 'FAILURE'
-            error 'There are errors in helm'
-          } else {
-            echo "HELM FAILURE skipped"
-            //error 'There are errors in helm'
-          }
+          helmInstallCmd += " ${vars.helmRelease} "
         }
+        helmInstallCmd += " ${vars.helmDir}/${vars.helmChartName} "
+        //helmInstallCmd += " ${vars.customRepoName}/${vars.helmRelease} "
+        if (vars.kubeNamespace?.trim()) {
+          helmInstallCmd += " --namespace ${vars.kubeNamespace} "
+        }
+        if (vars.isSign.toBoolean()) {
+          helmInstallCmd += " --verify "
+        }
+        if (vars.isInsecure.toBoolean()) {
+          helmInstallCmd += " --insecure-skip-tls-verify "
+        }
+        if (vars.isDryRun.toBoolean()) {
+          helmInstallCmd += " --dry-run "
+        }
+        if (vars.helmInstallTimeout?.trim()) {
+          helmInstallCmd += "--timeout ${vars.helmInstallTimeout} "
+        }
+        if (vars.isWait.toBoolean()) {
+          helmInstallCmd += " --wait "
+        }
+        if (vars.isAtomic.toBoolean()) {
+          helmInstallCmd += " --atomic "
+        }
+        if (vars.isDevel.toBoolean()) {
+          helmInstallCmd += " --devel "
+        }
+        if (vars.isReplace.toBoolean()) {
+          helmInstallCmd += " --replace "
+        }
+        if (vars.isPackageDependencyUpdate.toBoolean()) {
+          helmInstallCmd += " --dependency-update "
+        }
+        if (vars.helmInstallVersion?.trim()) {
+          helmInstallCmd += "--version ${vars.helmInstallVersion} "
+        }
+      }
 
-        sh "helm list || true"
+      if (vars.helmSetOverride?.trim()) {
+        helmInstallCmd += vars.helmSetOverride
+      }
 
-      //} // withCredentials
+      // TODO Remove it when tee will be back
+      helmInstallCmd += " 2>&1 > ${vars.helmInstallOutputFile} "
 
-    } // dir
-  } catch (exc) {
-    echo "Warn: There was a problem with pushing helm to \'${HELM_REGISTRY_TMP_URL}\' " + exc.toString()
+      helm = sh (script: helmInstallCmd, returnStatus: true)
+      echo "HELM INSTALL RETURN CODE : ${helm}"
+      if (helm == 0) {
+        echo "HELM INSTALL SUCCESS"
+        if (vars.isWait.toBoolean()) {
+          helmTest(vars)
+      } else {
+          echo "Not waiting for deployment so no helmTest"
+        }
+      } else {
+        echo "WARNING : Helm install failed, check output at \'${env.BUILD_URL}artifact/${vars.helmInstallOutputFile}\' "
+        if (!vars.skipInstallFailure) {
+          echo "HELM INSTALL FAILURE"
+          //currentBuild.result = 'UNSTABLE'
+          currentBuild.result = 'FAILURE'
+          error 'There are errors in helm install'
+        } else {
+          echo "HELM INSTALL FAILURE skipped"
+          //error 'There are errors in helm'
+        }
+      }
+
+    } catch (exc) {
+      echo "Warn: There was a problem with installing helm " + exc.toString()
+    }
+  } else {
+    echo "Helm install skipped"
   }
-
 }

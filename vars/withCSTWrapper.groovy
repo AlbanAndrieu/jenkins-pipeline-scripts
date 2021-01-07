@@ -80,7 +80,7 @@ def call(Map vars, Closure body=null) {
 		          if (!vars.skipCSTFailure) {
 		              echo "CST UNSTABLE"
 	     	          currentBuild.result = 'UNSTABLE'
-        			    echo "WARNING : Scan failed, check output at \'${vars.cstOutputFile}\' "
+            echo "WARNING : Scan failed, check output at \'${env.BUILD_URL}artifact/${vars.cstOutputFile}\' "
 		          } else {
 		              echo "CST FAILURE skipped"
 		              error 'There are errors in cst'
@@ -90,7 +90,7 @@ def call(Map vars, Closure body=null) {
 
 		    } catch (exc) {
 		      //currentBuild.result = 'FAILURE'
-		      echo "WARNING : There was a problem with cst scan image \'${vars.imageName}\' \'${vars.configFile}\' " + exc.toString()
+	      echo "WARNING : There was a problem with cst scan image \'${vars.localImage}\' \'${vars.configFile}\' " + exc.toString()
 		    }
 
 		  } // tee

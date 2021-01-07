@@ -20,23 +20,37 @@ def call(Map vars, Closure body=null) {
   } else {
 		vars.buildId = vars.get("buildId", env.BUILD_ID ?: env.BUILD_NUMBER).trim()  // FYI : BUILD_ID and BUILD_NUMBER are the same
   }
-  vars.pomFile = vars.get("pomFile", "../pom.xml").trim()
+  vars.pomFile = vars.get("pomFile", "./pom.xml").trim()
 
   vars.date = vars.get("date", getTimestamp())
 
   RELEASE_VERSION = getSemVerReleasedVersion(vars) ?: "${vars.helmTag}"
 
-  RELEASE_VERSION += "-" + vars.date
+  try {
+    //println(env.HELM_TAG)
+    if (!env.HELM_TAG?.trim()) {
+      env.HELM_TAG = RELEASE_VERSION + "-" + vars.date
 
-  if (vars.commit != null && vars.commit.trim() != "" ) {
-    def commitShortSHA1 = vars.commit.take(7)
-    RELEASE_VERSION += ".sha${commitShortSHA1}"
+      if (vars.commit != null && vars.commit.trim() != "" ) {
+        def commitShortSHA1 = vars.commit.take(7)
+        env.HELM_TAG += ".sha${commitShortSHA1}"
+      }
+
+      env.HELM_TAG += "." + vars.buildId
+
+      echo "NEW HELM_TAG : ${env.HELM_TAG}"
+    }
+    environment()
+  } catch(exc) {
+      echo 'Error: There were errors in helmTag. '+exc.toString()
+      env.HELM_TAG = RELEASE_VERSION
   }
-
-  RELEASE_VERSION += "." + vars.buildId
+  echo "HELM_TAG : ${env.HELM_TAG}"
 
   if (body) { body() }
 
-  return RELEASE_VERSION.toLowerCase()
+  // See https://helm.sh/docs/chart_best_practices/conventions/
+  // TODO .replaceAll('\\+','_')
+  return env.HELM_TAG.toLowerCase()
 
 }

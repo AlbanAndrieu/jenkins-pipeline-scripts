@@ -9,6 +9,8 @@ def call(Map vars, Closure body=null) {
 
     echo "[JPL] Executing `vars/cleanStash.groovy`"
 
+    vars = vars ?: [:]
+
     vars.isCleaningStashEnabled = vars.get("isCleaningStashEnabled", false).toBoolean()
 
     def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()

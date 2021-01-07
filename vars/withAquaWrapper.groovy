@@ -24,6 +24,7 @@ def call(Map vars, Closure body=null) {
   vars.imageTag = vars.get("imageTag", "${vars.DOCKER_RUNTIME_TAG}").trim()
 
   vars.registry = vars.get("registry", "${vars.DOCKER_REGISTRY_TMP}").trim()
+
   vars.hostedImage = vars.get("hostedImage", "${vars.DOCKER_ORGANISATION}/${vars.imageName}:${vars.imageTag}").trim()
   vars.localImage = vars.get("localImage", "${vars.DOCKER_ORGANISATION}/${vars.imageName}:${vars.imageTag}").trim()
 
@@ -49,7 +50,13 @@ def call(Map vars, Closure body=null) {
          vars.hostedImage = ""
       }
 
-      aqua customFlags: '', hideBase: true, hostedImage: vars.hostedImage, localImage: vars.localImage, locationType: vars.locationType, notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: vars.register, registry: vars.registry, showNegligible: true
+      //withRegistryWrapper(dockerRegistry: vars.DOCKER_REGISTRY_ACR, dockerRegistryCredentials: vars.DOCKER_REGISTRY_ACR_CREDENTIAL) {
+		    aqua customFlags: '', hideBase: true, hostedImage: vars.hostedImage, localImage: vars.localImage, locationType: vars.locationType, notCompliesCmd: '',
+		      onDisallowed: 'ignore', policies: '',
+		      register: vars.register,
+		      registry: vars.registry,
+		      showNegligible: true
+      //} // withRegistryWrapper
 
       if (body) { body() }
 
@@ -62,7 +69,7 @@ def call(Map vars, Closure body=null) {
           echo "AQUA FAILURE skipped"
           //error 'There are errors in aqua' // not needed
       }
-      echo "WARNING : Scan failed, check output at \'${vars.aquaOutputFile}\' "
+      echo "WARNING : Scan failed, check output at \'${env.BUILD_URL}artifact/${vars.aquaOutputFile}\' "
       echo "WARNING : There was a problem with aqua scan : " + exc.toString()
       echo "Check on : ${vars.AQUA_URL}"
     } finally {

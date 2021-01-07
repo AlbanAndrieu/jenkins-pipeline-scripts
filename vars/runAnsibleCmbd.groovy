@@ -37,7 +37,7 @@ def call(String shell) {
 					    returnStatus: true
 					)
 
-					echo "BUILD RETURN CODE : ${build}"
+					echo "CMDB RETURN CODE : ${build}"
 					if (build == 0) {
 						echo "CMBD SUCCESS"
 					} else {
@@ -67,7 +67,7 @@ def call(String shell) {
 
 			} // tee
 		} catch (exc) {
-			echo "ANSIBLE CMDB FAILURE"
+			echo "CMDB FAILURE"
 			currentBuild.result = 'FAILURE'
 			//build = "FAIL" // make sure other exceptions are recorded as failure too
 			echo "WARNING : There was a problem with sphinx " + exc.toString()

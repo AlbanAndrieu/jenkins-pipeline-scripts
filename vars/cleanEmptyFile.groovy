@@ -22,7 +22,11 @@ def call(Map vars, Closure body=null) {
   def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
   if (vars.isCleaningEmptyFileEnabled == true) {
-    sh "docker run --rm -v ${pwd()}:/src -w /src ${vars.DOCKER_REGISTRY}/alpine:latest find . -mindepth 1 -maxdepth 1 -size  0 -exec rm -r {} +"
+    try {
+      sh "docker run --rm -v ${pwd()}:/src -w /src ${vars.DOCKER_REGISTRY}/alpine:latest find . -mindepth 1 -maxdepth 1 -size  0 -exec rm -r {} +"
+    } catch (exc) {
+      echo "Warn: There was a problem with cleaning empty files " + exc.toString()
+    }
   }
 
   if (body) { body() }

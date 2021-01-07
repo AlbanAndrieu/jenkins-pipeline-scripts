@@ -8,94 +8,88 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
-  echo "[JPL] Executing `vars/helmDelete.groovy"
+  echo "[JPL] Executing `vars/helmDelete.groovy`"
 
   vars = vars ?: [:]
 
-  String HELM_REGISTRY_CREDENTIAL = vars.get("HELM_REGISTRY_CREDENTIAL", env.HELM_REGISTRY_CREDENTIAL ?: "ad.jenkins-bm").trim()
-  //String HELM_ORGANISATION = vars.get("HELM_ORGANISATION", env.HELM_ORGANISATION ?: "fusion-risk").trim()
-  String HELM_PROJECT = vars.get("HELM_PROJECT", env.HELM_PROJECT ?: "fusion-risk").trim()
+  vars.KUBECONFIG = vars.get("KUBECONFIG", env.KUBECONFIG ?: "/home/jenkins/.kube/config").trim()
 
-  String HELM_REGISTRY_STABLE_URL = vars.get("HELM_REGISTRY_STABLE_URL", env.HELM_REGISTRY_STABLE_URL ?: "https://kubernetes-charts.storage.googleapis.com/").toLowerCase().trim()
+  vars.helmRelease = vars.get("helmRelease", vars.helmChartName ?: "test").trim()
 
-  String HELM_REGISTRY = vars.get("HELM_REGISTRY", env.HELM_REGISTRY ?: "registry.misys.global.ad").toLowerCase().trim()
-  String HELM_REGISTRY_URL = vars.get("HELM_REGISTRY_URL", env.HELM_REGISTRY_URL ?: "https://${HELM_REGISTRY}/api/chartrepo/${HELM_PROJECT}/charts").trim()
-
-  String HELM_REGISTRY_TMP = vars.get("HELM_REGISTRY_TMP", env.HELM_REGISTRY_TMP ?: "albandrieu:6532/harbor").toLowerCase().trim()
-  String HELM_REGISTRY_TMP_REPO_URL = vars.get("HELM_REGISTRY_TMP_REPO_URL", env.HELM_REGISTRY_TMP_REPO_URL ?: "https://${HELM_REGISTRY_TMP}/chartrepo/${HELM_PROJECT}").trim()
-  String HELM_REGISTRY_TMP_URL = vars.get("HELM_REGISTRY_TMP_URL", env.HELM_REGISTRY_TMP_URL ?: "${HELM_REGISTRY_TMP_REPO_URL}/charts").trim()
-
-  //String DRAFT_BRANCH = vars.get("DRAFT_BRANCH", params.DRAFT_BRANCH ?: "develop").trim()
-  //String DRAFT_VERSION = vars.get("DRAFT_VERSION", env.DRAFT_VERSION ?: "0.16.0").trim()
-
-  vars.helmChart = vars.get("helmChart", "charts").trim()
-  vars.helmRelease = vars.get("helmRelease", "test").trim()
-  vars.buildDir = vars.get("buildDir", "${pwd()}").trim()
-
-  vars.skipStableRepo = vars.get("skipStableRepo", true).toBoolean()
-  vars.stableRepoName = vars.get("stableRepoName", "stable").trim()
-  vars.skipCustomRepo = vars.get("skipCustomRepo", false).toBoolean()
-  vars.customRepoName = vars.get("customRepoName", "custom").trim()
   vars.isHelm2 = vars.get("isHelm2", false).toBoolean()
-  vars.isDelete = vars.get("isDelete", false).toBoolean()
-  vars.isHarbor = vars.get("isHarbor", true).toBoolean()
-  vars.isProvenance = vars.get("isProvenance", false).toBoolean()
+  vars.isDryRun = vars.get("isDryRun", env.DRY_RUN ?: false).toBoolean()
+  vars.helmDeleteTimeout = vars.get("helmDeleteTimeout", "5m0s").trim()
+  vars.isAtomic = vars.get("isAtomic", false).toBoolean()
+  vars.isWait = vars.get("isWait", false).toBoolean()
+
+  vars.skipDelete = vars.get("skipDelete", false).toBoolean()
+  vars.isKeepHistory = vars.get("isKeepHistory", false).toBoolean()
   vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
+  vars.kubeNamespace = vars.get("kubeNamespace", env.KUBENAMESPACE ?: "fr-standalone-devops").trim()
 
   vars.helmDeleteOutputFile = vars.get("helmDeleteOutputFile", "helm-delete-${vars.helmFileId}.log").trim()
-  vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+  vars.skipDeleteFailure = vars.get("skipDeleteFailure", true).toBoolean()
 
-  try {
-    echo "Using ${HELM_REGISTRY_TMP_URL}"
+  if (!vars.skipDelete) {
+    try {
+      //echo "Using ${HELM_REGISTRY_TMP_URL}"
 
-    dir("${vars.buildDir}") {
+      if (body) { body() }
 
-      //withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: HELM_REGISTRY_CREDENTIAL, usernameVariable: 'HELM_USERNAME', passwordVariable: 'HELM_PASSWORD']]) {
+      String helmDeleteCmd = ""
 
-        if (body) { body() }
-
-        String helmDeleteCmd = ""
-
-        // Install chart from repo
-        // https://github.com/goharbor/harbor-helm
-        if (vars.isHarbor.toBoolean()) {
-          if (vars.isDelete.toBoolean()) {
-            if (vars.isHelm2.toBoolean()) {
-              helmDeleteCmd = "helm delete --purge ${vars.helmRelease} || true"
-            } else {
-              helmDeleteCmd = "helm uninstall ${vars.helmRelease}"
-            }
-          } // isDelete
-        } // isHarbor
-
-        // TODO Remove it when tee will be back
-        helmDeleteCmd += " 2>&1 > ${vars.helmDeleteOutputFile} "
-
-        // https://github.com/helm/chartmuseum
-        helm = sh (script: helmDeleteCmd, returnStatus: true)
-        echo "HELM RETURN CODE : ${helm}"
-        if (helm == 0) {
-          echo "HELM SUCCESS"
-        } else {
-	      echo "WARNING : Helm delete failed, check output at \'${vars.helmDeleteOutputFile}\' "
-          if (!vars.skipFailure) {
-            echo "HELM FAILURE"
-            //currentBuild.result = 'UNSTABLE'
-            currentBuild.result = 'FAILURE'
-            error 'There are errors in helm'
-          } else {
-            echo "HELM FAILURE skipped"
-            //error 'There are errors in helm'
-          }
+      if (vars.isHelm2.toBoolean()) {
+        helmDeleteCmd = "helm delete --purge ${vars.helmRelease}"
+      } else {
+        helmDeleteCmd = "helm uninstall "
+        if (vars.KUBECONFIG?.trim()) {
+          helmDeleteCmd += " --kubeconfig ${vars.KUBECONFIG} "
         }
+        helmDeleteCmd += " --debug ${vars.helmRelease}"
+        if (vars.kubeNamespace?.trim()) {
+          helmDeleteCmd += " --namespace ${vars.kubeNamespace} "
+        }
+        if (vars.helmDeleteTimeout?.trim()) {
+          helmDeleteCmd += "--timeout ${vars.helmDeleteTimeout} "
+        }
+        if (vars.isDryRun.toBoolean()) {
+          helmDeleteCmd += " --dry-run "
+        }
+        if (vars.isKeepHistory.toBoolean()) {
+          helmDeleteCmd += " --keep-history "
+        }
+      }
 
-        sh "helm list || true"
+      // TODO Remove it when tee will be back
+      helmDeleteCmd += " 2>&1 > ${vars.helmDeleteOutputFile} "
 
-      //} // withCredentials
+      // https://github.com/helm/chartmuseum
+      helm = sh (script: helmDeleteCmd, returnStatus: true)
+      echo "HELM DELETE RETURN CODE : ${helm}"
+      if (helm == 0) {
+        echo "HELM DELETE SUCCESS"
+        if (!vars.isWait && !vars.isAtomic) {
+          echo "Waiting..."
+          sleep(time:5, unit:"SECONDS")
+        } // isWait
+      } else {
+        echo "WARNING : Helm delete failed, check output at \'${env.BUILD_URL}artifact/${vars.helmDeleteOutputFile}\' "
+        if (!vars.skipDeleteFailure) {
+          echo "HELM DELETE FAILURE"
+          //currentBuild.result = 'UNSTABLE'
+          currentBuild.result = 'FAILURE'
+          error 'There are errors in helm delete'
+        } else {
+          echo "HELM DELETE FAILURE skipped"
+          //error 'There are errors in helm'
+        }
+      }
 
-    } // dir
-  } catch (exc) {
-    echo "Warn: There was a problem with pushing helm to \'${HELM_REGISTRY_TMP_URL}\' " + exc.toString()
+    } catch (exc) {
+      echo "Warn: There was a problem with deleting helm " + exc.toString()
+    }
+  } else {
+    echo "Helm delete skipped"
   }
 
 }

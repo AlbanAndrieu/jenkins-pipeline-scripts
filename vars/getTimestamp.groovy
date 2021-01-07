@@ -21,8 +21,7 @@ def call(Map vars, Closure body=null) {
           echo "NEW BUILD_TIMESTAMP : ${env.BUILD_TIMESTAMP}"
       }
       environment()
-    }
-    catch(exc) {
+    } catch(exc) {
         echo 'Error: There were errors in getTimestamp. '+exc.toString()
         env.BUILD_TIMESTAMP = "TODO"
     }

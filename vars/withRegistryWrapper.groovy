@@ -46,13 +46,6 @@ def call(Map vars, Closure body=null) {
                 usr = DOCKER_USERNAME
                 pswd = DOCKER_PASSWORD
 
-                sh "ls -lrta ${DOCKER_CONFIG} || true"
-                sh "cat ${DOCKER_CONFIG}/config.json || true"
-
-                //sh "echo DOCKER_REGISTRY : ${DOCKER_REGISTRY}"
-                //sh "echo DOCKER_REGISTRY_CREDENTIAL : ${DOCKER_REGISTRY_CREDENTIAL}"
-                //sh "echo vars.dockerRegistryUrl : ${vars.dockerRegistryUrl}"
-
                 if (!vars.skipShellLogin) {
                     timeout(time: 2, unit: 'MINUTES') {
                         retry(3) {

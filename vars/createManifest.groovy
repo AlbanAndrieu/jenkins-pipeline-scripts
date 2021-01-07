@@ -15,7 +15,7 @@ def call(Map vars, Closure body=null) {
     vars = vars ?: [:]
 
     vars.releaseVersion = vars.get("RELEASE_VERSION", env.RELEASE_VERSION ?: "1.0.1")
-    vars.projectName = vars.get("projectName", env.JOB_NAME.split("/")[1] ?: "TEST").trim()
+    vars.projectName = vars.get("projectName", getGitRepoName(vars) ?: "TEST").trim()
     vars.fileName = vars.get("fileName", "${vars.projectName}_VERSION.TXT").trim()
     vars.description = vars.get("description", "${vars.projectName}").trim()
 

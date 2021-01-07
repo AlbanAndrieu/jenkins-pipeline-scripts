@@ -27,7 +27,7 @@ def call(Map vars, Closure body=null) {
 				//echo "Currently in: "
 				//sh "pwd"
 
-          if (body) { body() }
+        if (body) { body() }
 
       } // wrapCleanWs
 

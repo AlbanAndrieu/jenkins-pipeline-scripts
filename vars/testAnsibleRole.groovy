@@ -10,63 +10,82 @@ def call(Closure body=null) {
 
 def call(Map vars, Closure body=null) {
 
-    echo "[JPL] Executing `vars/testAnsibleRole.groovy`"
+  echo "[JPL] Executing `vars/testAnsibleRole.groovy"
 
-    vars = vars ?: [:]
+  vars = vars ?: [:]
 
-    def roleName = vars.get("roleName", "todo")
+  vars.roleName = vars.get("roleName", "todo").trim()
+  vars.testAnsibleCmd = vars.get("testAnsibleCmd", "./scripts/test-with-ara.sh" + vars.roleName).trim()
+  vars.testAnsibleFileId = vars.get("testAnsibleFileId", vars.roleName ?: "0").trim()
 
-    call(roleName)
+  vars.skipTestAnsibleFailure = vars.get("skipTestAnsibleFailure", false).toBoolean()
+  vars.skipTestAnsible = vars.get("skipTestAnsible", false).toBoolean()
+  vars.testAnsibleOutputFile = vars.get("testAnsibleOutputFile", "molecule-${vars.testAnsibleFileId}.log").trim()
 
-    if (body) {
-        body()
-    }
+  if ( BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
+      vars.skipTestAnsible = true
+  }
 
-}
+  if (!vars.skipTestAnsible) {
 
-def call(String roleName) {
+    try {
 
-    if (roleName != null && roleName.trim() != "" ) {
+      //tee("${vars.testAnsibleOutputFile}") {
 
-        try {
-            tee("molecule-" + roleName + ".log") {
+      if (body) { body() }
 
-                build = sh (
-                  script: "./scripts/test-with-ara.sh " + roleName,
-                  returnStatus: true
-                )
+      if (vars.roleName != null && vars.roleName.trim() != "" ) {
 
-                echo "ARA RETURN CODE : ${build}"
-                if (build == 0) {
-                  echo "ARA SUCCESS"
-                } else {
-                  echo "ARA UNSTABLE"
-                  error 'There are errors in ara'
-                  currentBuild.result = 'UNSTABLE'
-                }
+        writeFile(file: "${pwd()}/test-with-ara.sh", text: libraryResource('test-with-ara.sh'))
+        sh("ls -lrta ${pwd()}/")
+        sh("chmod a+x ${pwd()}/test-with-ara.sh")
 
-                junit testResults: "**/ara-" + roleName + ".xml", healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [[$class: 'ClaimTestDataPublisher']]
+        // TODO Remove it when tee will be back
+        vars.testAnsibleCmd += " 2>&1 > ${vars.testAnsibleOutputFile} "
 
-                //publishHTML([
-                //  allowMissing: true,
-                //  alwaysLinkToLastBuild: false,
-                //  keepAll: true,
-                //  reportDir: "./ara-" + roleName + "/",
-                //  reportFiles: 'index.html',
-                //  includes: '**/*',
-                //  reportName: "ARA " + roleName + " Report",
-                //  reportTitles: "ARA " + roleName + " Report Index"
-                //])
+        helm = sh (script: vars.testAnsibleCmd, returnStatus: true)
+        echo "MOLECULE RETURN CODE : ${helm}"
+        if (helm == 0) {
+          echo "MOLECULE SUCCESS"
 
-            } // tee
-        } catch (e) {
+          // TOREDO ClaimTestDataPublisher
+          //junit testResults: "**/ara-" + vars.roleName + ".xml", healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true, testDataPublishers: [[$class: 'ClaimTestDataPublisher']]
+          junit testResults: "**/ara-" + vars.roleName + ".xml", healthScaleFactor: 2.0, allowEmptyResults: true, keepLongStdio: true
+
+          //publishHTML([
+          //  allowMissing: true,
+          //  alwaysLinkToLastBuild: false,
+          //  keepAll: true,
+          //  reportDir: "./ara-" + vars.roleName + "/",
+          //  reportFiles: 'index.html',
+          //  includes: '**/*',
+          //  reportName: "ARA " + vars.roleName + " Report",
+          //  reportTitles: "ARA " + vars.roleName + " Report Index"
+          //])
+
+        } else {
+          echo "WARNING : Molecule failed, check output at \'${env.BUILD_URL}artifact/${vars.testAnsibleOutputFile}\' "
+          if (!vars.skipTestAnsibleFailure) {
+            echo "MOLECULE FAILURE"
+            //currentBuild.result = 'UNSTABLE'
             currentBuild.result = 'FAILURE'
-            build = "FAIL" // make sure other exceptions are recorded as failure too
-            throw e
-        } finally {
-            archiveArtifacts artifacts: "molecule-" + roleName + ".log", onlyIfSuccessful: false, allowEmptyArchive: true
+            error 'There are errors in molecule'
+          } else {
+            echo "MOLECULE FAILURE skipped"
+            //error 'There are errors in helm'
+          }
         }
 
-    }
+      //} // tee
+      } // if
 
+    } catch (exc) {
+      echo "Warn: There was a problem testing ansible " + exc.toString()
+    } finally {
+      archiveArtifacts artifacts: "${vars.testAnsibleOutputFile}", onlyIfSuccessful: false, allowEmptyArchive: true
+      echo "Check : ${env.BUILD_URL}artifact/${vars.testAnsibleOutputFile}"
+    }
+  } else {
+    echo "Test ansible skipped"
+  }
 }

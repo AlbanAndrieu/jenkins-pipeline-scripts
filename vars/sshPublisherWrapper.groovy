@@ -12,7 +12,7 @@ def call(Map vars, Closure body=null) {
 
     vars = vars ?: [:]
 
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+    getJenkinsOpts(vars)
 
     vars.excludes = vars.get("excludes", "**/*Debug*.tar.gz").trim()
     vars.remoteDirectory = vars.get("remoteDirectory", "TEST/LatestBuildsUntested/latest").trim()

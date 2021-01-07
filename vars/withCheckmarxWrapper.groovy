@@ -28,10 +28,11 @@ def call(Map vars, Closure body=null) {
     vars.highThreshold = vars.get("highThreshold", 50)
     vars.avoidDuplicateProjectScans = vars.get("avoidDuplicateProjectScans", false).toBoolean()
     vars.incremental = vars.get("incremental", true).toBoolean()
+    vars.waitForResultsEnabled = vars.get("waitForResultsEnabled", true).toBoolean()
 
     RELEASE_VERSION = getSemVerReleasedVersion(vars)
 
-    String projectName = "MasterScan_RISK_" + env.JOB_BASE_NAME ?: "TEST" + "_[" + RELEASE_VERSION + "]"
+    String projectName = "NABLA_" + getGitRepoName(vars) ?: "TEST" + "_[" + RELEASE_VERSION + "]"
     vars.projectName = vars.get("projectName", projectName).trim().replaceAll(' ','-')
     vars.skipCheckmarxFailure = vars.get("skipCheckmarxFailure", false).toBoolean()
     vars.skipCheckmarx = vars.get("skipCheckmarx", false).toBoolean()
@@ -103,7 +104,7 @@ def call(Map vars, Closure body=null) {
              step([
                  $class: 'CxScanBuilder',
                  avoidDuplicateProjectScans: vars.avoidDuplicateProjectScans,
-                 comment: '',
+                 comment: 'Jenkins JPL',
                  excludeFolders: '.repository, target, .node_cache, .tmp, .node_tmp, .git, .grunt, .bower, .mvnw, bower_components, node_modules, npm, node, lib, libs, docs, hooks, help, test, Sample, vendors, dist, build, site, fonts, images, coverage, .mvn, ansible' + vars.excludeFolders,
                  excludeOpenSourceFolders: '',
                  exclusionsSetting: 'job',
@@ -151,7 +152,7 @@ def call(Map vars, Closure body=null) {
                     username: '',
                     vulnerabilityThresholdEnabled: true,
                     vulnerabilityThresholdResult: 'FAILURE',
-                    waitForResultsEnabled: true
+                        waitForResultsEnabled: vars.waitForResultsEnabled
                 ])
 
         } else if (userInput == true) {
@@ -166,7 +167,7 @@ def call(Map vars, Closure body=null) {
                   echo "CHECKMARX FAILURE skipped"
                   //error 'There are errors in aqua' // not needed
                 }
-                echo "WARNING : Scan failed, check output."
+                echo "WARNING : Scan failed, check output at ${vars.CHECKMARX_URL}/CxWebClient."
         } // if didTimeout
        } catch (exc) {
          echo "WARNING : There was a problem retrieving checkmarx scan" + exc.toString()

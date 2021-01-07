@@ -27,12 +27,15 @@ def call(Map vars, Closure body=null) {
   vars.projectToken = vars.get("projectToken", "").trim()
   //productToken 2dcf60630aca4d3fb29fe59ad731d488747f2f6b0ba04b8b8664ae3629a1c3ae
   vars.jobUserKey = vars.get("jobUserKey", "cf5b762ee7ab4f2cb9fdab9728e59c2a3ccc2d77cb9b4718986dfe90fac671bb").trim()
+  vars.jobCheckPolicies = vars.get("jobCheckPolicies", "global").trim()  // enableNew enableAll disable
+  vars.jobForceUpdate = vars.get("jobForceUpdate", "global").trim()  // jobForceUpdate enableAll jobUpdate
   vars.skipFailure = vars.get("skipFailure", true).toBoolean()
-  vars.skipWhitesource = vars.get("skipWhitesource", false).toBoolean()
+  vars.skipWhitesource = vars.get("skipWhitesource", true).toBoolean()
 
   if (!vars.skipWhitesource) {
  	 if (vars.projectName?.trim()) {
       vars.productVersion += vars.projectName
+
       vars.requesterEmail = vars.get("requesterEmail", 'alban.andrieu@free.fr').trim()
 
       vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
@@ -49,9 +52,12 @@ def call(Map vars, Closure body=null) {
             }
           }
 
-          whitesource jobApiToken: WHITESOURCE_TOKEN, jobCheckPolicies: 'global', jobForceUpdate: 'global', jobUserKey: vars.jobUserKey, libExcludes: vars.libExcludes, libIncludes: vars.libIncludes, product: vars.product, productVersion: vars.productVersion, projectToken: vars.projectToken, requesterEmail: vars.requesterEmail
+		      whitesource jobCheckPolicies: vars.jobCheckPolicies, jobForceUpdate: vars.jobForceUpdate,
+		        libExcludes: vars.libExcludes, libIncludes: vars.libIncludes,
+		        product: vars.product, productVersion: vars.productVersion,
+		        requesterEmail: vars.requesterEmail
 
-          if (body) { body() }
+		        if (body) { body() }
 
         } // tee
       } catch (exc) {
@@ -62,11 +68,9 @@ def call(Map vars, Closure body=null) {
             echo "WHITESOURCE FAILURE skipped"
             //error 'There are errors in whitesource'
         }
-        echo "WARNING : Scan failed, check output at \'${vars.whithSourceOutputFile}\' "
+        echo "WARNING : Scan failed, check output at \'${env.BUILD_URL}artifact/${vars.whithSourceOutputFile}\' "
         echo "WARNING : There was a problem with white source scan : " + exc.toString()
         echo "Check on : ${WHITESOURCE_URL}"
-      } finally {
-        archiveArtifacts artifacts: "${vars.whithSourceOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
       }
 
   	} else {

@@ -31,7 +31,7 @@ def call(Map vars, Closure body=null) {
                             returnStatus: true
                             )
 
-                    echo "BUILD RETURN CODE : ${sphinxResult}"
+                    echo "SPHINX RETURN CODE : ${sphinxResult}"
                     if (sphinxResult == 0) {
                         echo "SPHINX SUCCESS"
 
@@ -62,7 +62,7 @@ def call(Map vars, Closure body=null) {
 				                //} // isReleaseBranch
 
                     } else {
-                      echo "WARNING : Sphinx failed, check output at \'${vars.sphinxOutputFile}\' "
+                      echo "WARNING : Sphinx failed, check output at \'${env.BUILD_URL}artifact/${vars.sphinxOutputFile}\' "
                       if (!vars.skipSphinxFailure) {
                         echo "SPHINX UNSTABLE"
                         currentBuild.result = 'UNSTABLE'
@@ -86,7 +86,7 @@ def call(Map vars, Closure body=null) {
             //build = "FAIL" // make sure other exceptions are recorded as failure too
             echo "WARNING : There was a problem with sphinx " + exc.toString()
         } finally {
-            archiveArtifacts artifacts: "sphinx.log", onlyIfSuccessful: false, allowEmptyArchive: true
+            archiveArtifacts artifacts: "${vars.sphinxOutputFile}", onlyIfSuccessful: false, allowEmptyArchive: true
         }
     } // if skipSphinx
 

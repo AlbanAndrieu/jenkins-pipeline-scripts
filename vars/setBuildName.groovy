@@ -24,4 +24,6 @@ def call(def gitBranchName, def desc = "") {
     } else if (null != NODE_NAME) {
         currentBuild.setDescription("Executed @ ${NODE_NAME}")
     }
+
+    step([$class: 'GitHubSetCommitStatusBuilder'])
 }

@@ -20,21 +20,27 @@ helm [shape=box];
 helm -> helmLint [style=dotted];
 subgraph cluster_2
   {
-      helmPackage; helmPush;
+      helmPackage; cluster;
   }
-helm -> helmPackage [weight=5, color=red, style=bold, label="add NABLA repo"]
-{ rank = same; "helmPackage"; "helmPush"; "build"; }
-helmPackage [label="helm\npackage"];
-helmPackage -> helmPush [color=red, style=bold, label="helm template"]
-helmPush [label="helm\npush"];
-helmPush -> push [color=red, style=bold,label="curl"]
-{ rank = sink; "repo";}
-repo -> build [label="Dockerfile"]
-repo -> helm [label="Charts"]
+helm -> helmPackage [weight=5, color=red, style=bold, label="add FR repo"]
+{ rank = same; "build"; "helmPackage"; "cluster";  }
+helmPackage [label="helm\npackage\ninstall\ntest"];
+helmPackage -> cluster [color=red, style=bold, label="deploy charts\n or umbrella"]
+cluster [label="cluster\ncheck"];
+cluster -> tests [color=red, style=bold,label="curl\npush"]
+{ rank = sink; "tests";}
+tests [label="newman\ntests"];
+tests -> push [color=red, style=bold,label="curl\npush"]
+{ rank = sink; "repo"; "push";}
+repo -> build [label="Dockerfile", style=dotted]
+repo -> helm [label="Charts", style=dotted]
 edge [color=red]; // so is this
 build -> push [style=bold,label="docker"];
 build [label="docker\nbuild"];
 node [shape=box,style=filled,color=".7 .3 1.0"];
-repo [label="pack from\nnabla repo", shape=box,style=filled,color=".7 .3 1.0"];
-push [label="internal\nrepo", shape=polygon,sides=5,peripheries=3,color=lightblue,style=filled];
+repo [label="pack from\n(technology) repo", shape=box,style=filled,color=".7 .3 1.0"];
+push [label="ACR\nHARBOR", shape=polygon,sides=5,peripheries=3,color=lightblue,style=filled];
+tag [label="tag", shape=box,style=filled,color=".7 .3 1.0"];
+tag -> build [label="", style=dotted]
+tag -> tests [label="1.7.11-timestamp.sha.0", style=dotted]
 }

@@ -26,40 +26,50 @@ def call(Map vars, Closure body=null) {
   // hadolint Dockerfile -f checkstyle > checkstyle-hadolint.xml
 
   vars.skipDockerLintFailure = vars.get("skipDockerLintFailure", true).toBoolean()
+  vars.skipDockerLint = vars.get("skipDockerLint", false).toBoolean()
   vars.dockerLintOutputFile = vars.get("dockerLintOutputFile", "docker-hadolint-${vars.dockerFileId}.json").trim()
 
-  try {
-    if (body) { body() }
+  if (!vars.skipDockerLint) {
+    if (fileExists("${vars.dockerFilePath}/${vars.dockerFileName}")) {
+			try {
+				if (body) { body() }
 
-    //docker history --no-trunc fusion-risk/ansible-jenkins-slave:latest > docker-history.log
-    //dive fusion-risk/ansible-jenkins-slave:latest
+				//docker history --no-trunc fusion-risk/ansible-jenkins-slave:latest > docker-history.log
+				//dive fusion-risk/ansible-jenkins-slave:latest
 
-    // TODO Remove it when tee will be back
-    vars.dockerLintCmd += " 2>&1 > ${vars.dockerLintOutputFile} "
+				// TODO Remove it when tee will be back
+				vars.dockerLintCmd += " 2>&1 > ${vars.dockerLintOutputFile} "
 
-    docker = sh (script: vars.dockerLintCmd, returnStatus: true)
-    echo "DOCKER HADOLINT RETURN CODE : ${docker}"
-    if (docker == 0) {
-      echo "DOCKER HADOLINT SUCCESS"
-      //sh "hadolint Dockerfile -f checkstyle > target/checkstyle-hadolint.xml \"${vars.dockerFilePath}/${vars.dockerFileName}\""
+				docker = sh (script: vars.dockerLintCmd, returnStatus: true)
+				echo "DOCKER HADOLINT RETURN CODE : ${docker}"
+				if (docker == 0) {
+				  echo "DOCKER HADOLINT SUCCESS"
+				  //sh "hadolint Dockerfile -f checkstyle > target/checkstyle-hadolint.xml \"${vars.dockerFilePath}/${vars.dockerFileName}\""
+				} else {
+				  echo "WARNING : Docker HadoLint failed, check output at \'${env.BUILD_URL}artifact/${vars.dockerLintOutputFile}\' "
+				  if (!vars.skipDockerLintFailure) {
+				    echo "DOCKER HADOLINT UNSTABLE"
+				    currentBuild.result = 'UNSTABLE'
+				    error 'There are errors in docker HadoLint'
+				  } else {
+				    echo "DOCKER HADOLINT UNSTABLE skipped"
+				    //error 'There are errors in docker'
+				  }
+				}
+
+			} catch (exc) {
+				echo "Warn: There was a problem with docker HadoLint " + exc.toString()
+			} finally {
+				    cleanEmptyFile(vars)
+				archiveArtifacts artifacts: "${vars.dockerLintOutputFile}, target/checkstyle-hadolint.xml", onlyIfSuccessful: false, allowEmptyArchive: true
+				echo "Check : ${env.BUILD_URL}artifact/${vars.dockerLintOutputFile}"
+				//recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'target/checkstyle-hadolint.xml', id: "checkstyle-hadolint-${vars.dockerFileId}")
+				recordIssues enabledForFailure: true, tool: hadoLint(pattern: "${vars.dockerLintOutputFile}")
+			}
     } else {
-      echo "WARNING : Docker HadoLint failed, check output at \'${vars.dockerLintOutputFile}\' "
-      if (!vars.skipDockerLintFailure) {
-        echo "DOCKER HADOLINT FAILURE"
-        currentBuild.result = 'FAILURE'
-        error 'There are errors in docker HadoLint'
-      } else {
-        echo "DOCKER HADOLINT FAILURE skipped"
-        //error 'There are errors in docker'
-      }
+      echo "No fileExists(${vars.dockerFileBuildPath}/${vars.dockerFileName})"
     }
-
-  } catch (exc) {
-    echo "Warn: There was a problem with docker HadoLint " + exc.toString()
-  } finally {
-    archiveArtifacts artifacts: "${vars.dockerLintOutputFile}, target/checkstyle-hadolint.xml", onlyIfSuccessful: false, allowEmptyArchive: true
-    //recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'target/checkstyle-hadolint.xml', id: "checkstyle-hadolint-${vars.dockerFileId}")
-    recordIssues enabledForFailure: true, tool: hadoLint(pattern: "${vars.dockerLintOutputFile}")
+  } else {
+      echo "Docker Lint skipped"
   }
-
 }

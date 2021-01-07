@@ -56,6 +56,7 @@ jenkins:
     enabled: false
   scmCheckoutRetryCount: 0
   slaveAgentPort: 0
+  systemMessage: "Jenkins UAT"
   updateCenter:
     sites:
     - id: "default"
@@ -73,20 +74,29 @@ security:
     enableLoadingFromMaster: false
     enablePermissions: false
     hideInjectedVars: false
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: true
   sSHD:
     port: -1
   scriptApproval:
     approvedSignatures:
     - "method groovy.lang.GString getBytes"
+    - "method java.io.BufferedReader readLine"
+    - "method java.net.HttpURLConnection getErrorStream"
+    - "method java.net.HttpURLConnection getResponseCode"
     - "method java.net.HttpURLConnection setRequestMethod java.lang.String"
     - "method java.net.URL openConnection"
     - "method java.net.URLConnection connect"
+    - "method java.net.URLConnection getInputStream"
     - "method java.net.URLConnection setRequestProperty java.lang.String java.lang.String"
     - "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses"
     - "method org.jenkinsci.plugins.workflow.support.actions.EnvironmentAction getEnvironment"
     - "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
-    - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
-      \ createSummary java.lang.String"
+    - "new java.io.BufferedReader java.io.Reader"
+    - "new java.io.InputStreamReader java.io.InputStream"
+    - "new java.lang.StringBuffer"
+    - "staticField java.net.HttpURLConnection HTTP_BAD_REQUEST"
+    - "staticMethod hudson.console.ModelHyperlinkNote encodeTo java.lang.String java.lang.String"
     - "staticMethod hudson.model.Hudson getInstance"
     - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods toBoolean java.lang.Boolean"
     - "staticMethod org.codehaus.groovy.runtime.EncodingGroovyMethods encodeBase64\
@@ -206,6 +216,9 @@ unclassified:
     stickyByDefault: true
   cxScanBuilder:
     enableCertificateValidation: false
+    excludeFolders: ".repository, target, .node_cache, .node_tmp, .grunt, .bower,\
+      \ bower_components, node_modules, node, lib, libs, docs, help, test,  Sample,\
+      \ vendors, dist, build"
     filterPattern: |-
       !**/_cvs/**/*, !**/.svn/**/*,   !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*, !**/bin/**/*,
       !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr,     !**/*.iws,
@@ -231,6 +244,11 @@ unclassified:
     healthMetrics:
     - worstChildHealthMetric:
         recursive: true
+  dependencyTrackPublisher:
+    dependencyTrackApiKey: "I1hGhlH8LvQ9kfFqkVfpaieZTKpmpepJ"
+    dependencyTrackAutoCreateProjects: false
+    dependencyTrackPollingTimeout: 5
+    dependencyTrackUrl: "http://150.151.160.25:8087"
   descriptionSetterWrapper:
     charset: "UTF-8"
     disableTokens: false
@@ -255,7 +273,12 @@ unclassified:
   gitHubPluginConfig:
     hookUrl: "http://albandrieu.com:8686/jenkins/github-webhook/"
   gitSCM:
+    allowSecondFetch: false
     createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    globalConfigEmail: "alban.andrieu@free.fr"
+    globalConfigName: "Andrieu, Alban"
+    hideCredentials: false
     showEntireCommitSummaryInChanges: false
     useExistingAccountWithSameEmail: false
   globalConfigFiles:
@@ -735,6 +758,7 @@ unclassified:
               remote: "git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git"
               traits:
               - "gitBranchDiscovery"
+              - "wipeWorkspaceTrait"
   globalSettings:
     failOnCorrupt: false
     noAuthors: false
@@ -786,6 +810,7 @@ unclassified:
     legacyFormatting: false
   mailer:
     charset: "UTF-8"
+    defaultSuffix: "@free.fr"
     useSsl: false
   mavenModuleSet:
     localRepository: "default"

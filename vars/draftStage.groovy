@@ -34,49 +34,86 @@ def call(Map vars, Map containers, Closure body=null) {
   String DRAFT_BRANCH = vars.get("DRAFT_BRANCH", params.DRAFT_BRANCH ?: "develop").trim()
 
   vars.draftPack = vars.get("draftPack", "nabla").trim()
-  vars.imageName = vars.get("imageName", env.JOB_BASE_NAME).replaceAll("/", "-").replaceAll("%2F", "-").toLowerCase().trim()   // Target imageName should be provided by dev
+  // Target imageName should be provided by dev
+  vars.imageName = vars.get("imageName",  vars.draftPack ?: getGitRepoName(vars)).replaceAll("/", "-").replaceAll("%2F", "-").toLowerCase().trim()
   vars.dockerFileName = vars.get("dockerFileName", "Dockerfile").trim()
   vars.dockerTag = vars.get("dockerTag", env.DOCKER_TAG ?: "latest").toLowerCase().trim()
   vars.buildArgs = vars.get("buildArgs", "").trim()
   vars.buildArgs += [getDockerProxyOpts()].join(" ")
 
+  // The directory that contains a chart MUST have the same name as the chart.
+  // See https://helm.sh/docs/chart_best_practices/conventions/
+  // helmDir must be relatif, never ${pwd()}/charts
+  // draftPack if enable wil loverride helmDir
+  vars.helmDir = vars.get("helmDir", "./charts").toLowerCase().trim()
+  // draftPack if enable wil loverride buildDockerDir
+  vars.buildDockerDir = vars.get("buildDockerDir", vars.buildDir ?: "./packs").trim()
+
   vars.image = vars.get("image", "${DOCKER_ORGANISATION}/${vars.imageName}:${vars.dockerTag}").trim()
 
   vars.configFile = vars.get("configFile", "config.yaml").trim()
-  vars.skipFailure = vars.get("skipFailure", true).toBoolean()
+
+  vars.skipDraftStage = vars.get("skipDraftStage", false).toBoolean()
+
   vars.skipContainers = vars.get("skipContainers", false).toBoolean()
   vars.skipAqua = vars.get("skipAqua",false).toBoolean()
   vars.skipCST = vars.get("skipCST",false).toBoolean()
 
-  vars.pomFile = vars.get("pomFile", "../pom.xml").trim()
+  vars.pomFile = vars.get("pomFile", "../pom.xml").trim() // No pom.xml on draft pack. they are in product directory, just the directory before
 
   containers = containers ?: [:]
 
-  dir("${vars.imageName}") {
+  if ( BRANCH_NAME ==~ /master|master_.+|release\/.+/ ) {
+      vars.skipDraftStage = true
+  }
 
-    vars.buildDir = vars.get("buildDir", "${pwd()}").trim()
-    vars.dockerFileBuildPath = vars.get("buildDir", "./").trim()  // dockerTargetPath
+  if (!vars.skipDraftStage) {
+    // Draft is making a copy of the packs inside a local directory ${vars.imageName}/charts
+		dir("${vars.imageName}") {
 
-    draftPack(vars, body)
+      echo "[JPL] Executing `vars/draftStage.groovy` FOR ${vars.draftPack}"
 
-    dockerHadoLint(vars)
+		  vars.buildDir = vars.get("buildDir", "${pwd()}").trim()
+		  vars.dockerFileBuildPath = vars.get("buildDir", "./").trim()  // dockerTargetPath
 
-    if (!vars.skipContainers) {
-      containers.put("${vars.imageName}", docker.build("${vars.image}", "${vars.buildArgs} -f ${vars.dockerFileBuildPath}/${vars.dockerFileName} ${vars.buildDir}"))
-    }
+      if (body) { body() }
 
-    vars.localImage = vars.get("image", "${DOCKER_ORGANISATION}/${vars.imageName}:${vars.dockerTag}").trim()
-    vars.imageTag = vars.get("dockerTag", env.DOCKER_TAG ?: "latest").toLowerCase().trim()
-    vars.registry = vars.get("registry", "${DOCKER_REGISTRY}").toLowerCase().trim()
-    vars.locationType = vars.get("locationType", "local").toLowerCase().trim()
+		  draftPack(vars, body)
 
-    withAquaWrapper(vars)
+		  dockerHadoLint(vars)
 
-    withCSTWrapper(vars)
+      if (fileExists("${vars.dockerFileBuildPath}/${vars.dockerFileName}")) {
+				if (!vars.skipContainers) {
+          // Add docker login when draftPack is disabled (skipDraftPack: true)
+          withRegistryWrapper(dockerRegistry: vars.DOCKER_REGISTRY, dockerRegistryCredentials: vars.DOCKER_REGISTRY_CREDENTIAL) {
+				    containers.put("${vars.imageName}", docker.build("${vars.image}", "${vars.buildArgs} -f ${vars.dockerFileBuildPath}/${vars.dockerFileName} ${vars.buildDockerDir}"))
+          } // withRegistryWrapper
+				}
 
-    helmPush(vars)
+				vars.localImage = vars.get("image", "${DOCKER_ORGANISATION}/${vars.imageName}:${vars.dockerTag}").trim()
+				vars.imageTag = vars.get("dockerTag", env.DOCKER_TAG ?: "latest").toLowerCase().trim()
+				vars.registry = vars.get("registry", "${DOCKER_REGISTRY_TMP}").toLowerCase().trim()
+				vars.locationType = vars.get("locationType", "local").toLowerCase().trim()
 
-  } // dir
+        withCSTWrapper(vars)
+      } else {
+        echo "No fileExists(${vars.dockerFileBuildPath}/${vars.dockerFileName})"
+      }
+		  withAquaWrapper(vars)
+
+      if (vars.skipDraftPack.toBoolean()) {
+        // Draft is making a copy of the packs inside a local directory, we are doing the same here
+        echo "Move charts from dir ../packs/${vars.imageName}/charts/* to local (${vars.imageName}/charts/${vars.imageName})"
+        sh "mkdir -p charts/${vars.imageName} && cp -R ../packs/${vars.imageName}/charts/* ./charts/${vars.imageName} || true"
+        //vars.helmDir = vars.get("helmDir", "./packs").toLowerCase().trim()
+      }
+
+		  helmPush(vars)
+
+		} // dir
+  } else {
+    echo "Draft stage skipped"
+  }
 
   return containers
 

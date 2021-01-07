@@ -48,7 +48,7 @@ def call(Map vars, Closure body=null) {
     vars.skipFailure = vars.get("skipFailure", false).toBoolean()
     vars.skipDeploy = vars.get("skipDeploy", true).toBoolean()
     vars.skipMavenSettings = vars.get("skipMavenSettings", false).toBoolean()
-    vars.skipSonarCheck = vars.get("skipSonarCheck", true).toBoolean()
+    vars.skipSonarCheck = vars.get("skipSonarCheck", vars.skipSonar ?: false).toBoolean()
     vars.isFingerprintEnabled = vars.get("isFingerprintEnabled", false).toBoolean()
     vars.pomFile = vars.get("pomFile", "pom.xml").trim()
     vars.mavenGoals = vars.get("mavenGoals", "").trim()
@@ -157,7 +157,7 @@ def call(Map vars, Closure body=null) {
                     if (build == 0) {
                         echo "MAVEN SUCCESS"
                     } else {
-                        echo "WARNING : Maven failed, check output at \'${vars.shellOutputFile}\' "
+                        echo "WARNING : Maven failed, check output at \'${env.BUILD_URL}artifact/${vars.shellOutputFile}\' "
                         if (!vars.skipFailure) {
                             echo "MAVEN FAILURE"
                             //currentBuild.result = 'UNSTABLE'
@@ -217,6 +217,7 @@ def call(Map vars, Closure body=null) {
         }
 
         archiveArtifacts artifacts: "*.log, **/report-task.txt, **/dependency-check-report.xml, **/ZKM_log.txt, **/ChangeLog.txt, *_VERSION.TXT, ${vars.artifacts}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
+        echo "Check : ${env.BUILD_URL}artifact/${vars.shellOutputFile}"
 
         if ((!vars.DRY_RUN && !vars.RELEASE) && !vars.skipTests && !vars.skipResults) {
             junit '**/target/surefire-reports/TEST-*.xml, **/target/failsafe-reports-embedded/TEST-*.xml'

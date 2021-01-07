@@ -19,13 +19,16 @@ def call(Map vars, Closure body=null) {
   String DOCKER_OPTS_PROXY = ""
 
   if (vars.isProxy == true) {
+    if (env.HTTP_PROXY != null && env.HTTP_PROXY.trim() != "") {
       DOCKER_OPTS_PROXY += " " + [ "--build-arg http_proxy=${env.HTTP_PROXY}",
                                    "--build-arg HTTP_PROXY=${env.HTTP_PROXY}",
                                    "--build-arg https_proxy=${env.HTTPS_PROXY}",
-                                   "--build-arg HTTPS_PROXY=${env.HTTPS_PROXY}",
-                                   "--build-arg no_proxy='${env.NO_PROXY}'",
-                                   "--build-arg NO_PROXY='${env.NO_PROXY}'" ].join(" ") + " "
+                                   "--build-arg HTTPS_PROXY=${env.HTTPS_PROXY}" ].join(" ") + " "
+    } // HTTP_PROXY
   }
+
+  DOCKER_OPTS_PROXY += " " + [ "--build-arg no_proxy='${env.NO_PROXY}'",
+                               "--build-arg NO_PROXY='${env.NO_PROXY}'" ].join(" ") + " "
 
   return DOCKER_OPTS_PROXY
 
