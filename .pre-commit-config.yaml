@@ -83,6 +83,8 @@ repos:
 #        args: [--config, .htmlhintrc]
     -   id: htmllint
     -   id: markdown-toc
+        # optional custom config:
+        #args: [--indent, "    ", -i]
         args: [--maxdepth, "3", -i]
     -   id: dockerfile_lint
         # optional custom config:

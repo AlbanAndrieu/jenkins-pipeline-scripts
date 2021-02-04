@@ -12,8 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- toc -->
 
+- [Changelog](#changelog)
+- [[Unreleased]](#unreleased)
+- [[1.0.0] - 2020-09-11](#100---2020-09-11)
+  * [Added](#added)
+  * [Updated](#updated)
 - [Usage](#usage)
-- [Update README.md Table of Contents](#update-readmemd-table-of-contents)
 
 <!-- tocstop -->
 

@@ -18,7 +18,10 @@
 <!-- toc -->
 
 - [Usage](#usage)
-- [Update README.md Table of Contents](#update-readmemd-table-of-contents)
+- [Docker](#docker)
+- [Kubernetes](#kubernetes)
+- [Update README.md](#update-readmemd)
+- [Graph dependency](#graph-dependency)
 
 <!-- tocstop -->
 
@@ -87,6 +90,12 @@ $docker save nabla/jenkins-pipeline-scripts:1.0.0 > jenkins.tar
 $microk8s ctr image import jenkins.tar
 
 $microk8s ctr images ls
+
+
+```
+k config get-contexts
+k config use-context microk8s
+```
 ```
 Create jenkins namespace
 
@@ -94,12 +103,28 @@ Create jenkins namespace
 $k apply -f jenkins-namespace.yaml
 ```
 
-Add [deployment](https://kubernetes.io/fr/docs/concepts/workloads/controllers/deployment/)
+[service-account-tokens](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens)
 
 ```
-k config get-contexts
-k config use-context microk8s
+$k create serviceaccount jenkins-account -n jenkins
+$k get serviceaccounts jenkins-account -o yaml  -n jenkins
+$k get secret jenkins-account-token-xswhp -o yaml  -n jenkins
 ```
+
+[set-up-jenkins-in-a-kubernetes-cluster](https://medium.com/swlh/set-up-jenkins-in-a-kubernetes-cluster-96660c8d9ab)
+
+```
+$k apply -f jenkins-resourcequota.yaml -n jenkins
+$k apply -f jenkins-role.yaml -f jenkins-serviceaccount.yaml -f jenkins-rolebinding.yaml -n jenkins
+$k apply -f jenkins-deployment.yaml -n jenkins
+
+$k get pods -n jenkins
+$k -n jenkins port-forward jenkins-master-7b49df974d-kzlrg 8080:8080
+
+$k get svc -n jenkins
+```
+
+Add [deployment](https://kubernetes.io/fr/docs/concepts/workloads/controllers/deployment/)
 
 ```
 $ #k delete pods --all
@@ -144,27 +169,6 @@ $k create -f jenkins-volume.yaml
 $k exec -it jenkins-master-7b49df974d-kzlrg -n jenkins -- /bin/bash
 ```
 
-[service-account-tokens](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens)
-
-```
-$k create serviceaccount jenkins-account -n jenkins
-$k get serviceaccounts jenkins-account -o yaml  -n jenkins
-$k get secret jenkins-token-2dmg9 -o yaml  -n jenkins
-```
-
-[set-up-jenkins-in-a-kubernetes-cluster](https://medium.com/swlh/set-up-jenkins-in-a-kubernetes-cluster-96660c8d9ab)
-
-```
-$k apply -f jenkins-resourcequota.yaml -n jenkins
-$k apply -f jenkins-role.yaml -f jenkins-serviceaccount.yaml -f jenkins-rolebinding.yaml -n jenkins
-$k apply -f jenkins-deployment.yaml -n jenkins
-
-$k get pods -n jenkins
-$k -n jenkins port-forward jenkins-master-7b49df974d-kzlrg 8080:8080
-
-$k get svc -n jenkins
-```
-
 See [dns-debugging-resolution](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/)
 
 ```
@@ -199,8 +203,7 @@ TODO : Have proper DNS service
 http://jenkins-master.jenkins.svc.cluster.local
 mon-service.mon-namespace.svc.cluster.local
 
-Update README.md Table of Contents
------------------------------------
+## Update README.md
 
 
   * [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)
@@ -208,6 +211,13 @@ Update README.md Table of Contents
 
 ```
 npm install --save markdown-toc
+markdown-toc README.md
+markdown-toc CHANGELOG.md  -i
+```
+
+```
+git add README.md
+pre-commit run markdown-toc
 ```
 
 Graph dependency

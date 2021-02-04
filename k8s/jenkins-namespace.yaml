@@ -3,17 +3,6 @@ kind: Namespace
 metadata:
   name: jenkins
 #----
-#apiVersion: v1
 #kind: Namespace
 #metadata:
 #  name: jenkins-slave
-#----
-#apiVersion: v1
-#kind: Namespace
-#metadata:
-#  name: fr-standalone-devops
-#----
-#apiVersion: v1
-#kind: Namespace
-#metadata:
-#  name: fr-standalone-aandrieu

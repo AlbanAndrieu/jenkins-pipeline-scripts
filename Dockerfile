@@ -146,8 +146,7 @@ RUN unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy \
   next-build-number qc multiple-scms job-import-plugin \
   junit files-found-trigger compact-columns build-keeper-plugin \
   pam-auth log-parser all-changes slave-status \
-  parameterized-remote-trigger \
-  jenkins-remote-build-trigger \
+  Parameterized-Remote-Trigger \
   jenkinslint \
   kubernetes
 
