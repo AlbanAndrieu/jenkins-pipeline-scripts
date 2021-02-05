@@ -24,6 +24,34 @@ jenkins:
   - "JNLP4-connect"
   - "Ping"
   clouds:
+  - kubernetes:
+      containerCap: 10
+      containerCapStr: "10"
+      credentialsId: "config-treasury-trba"
+      name: "kubernetes"
+      templates:
+      - containers:
+        - envVars:
+          - envVar:
+              key: "JENKINS_URL"
+              value: "http://192.168.1.57:8686/"
+          image: "jenkinsci/jnlp-slave"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "albandri-k8s-docker"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/"
+        id: "3a717aaa-23b7-4c86-bdb0-21c754cd14cb"
+        label: "albandri-k8s-pod"
+        name: "albandri-k8s-pod"
+        yamlMergeStrategy: "override"
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
   - docker:
       disabled:
         disabledByChoice: true
@@ -178,20 +206,12 @@ unclassified:
       yellowB: "#C4A000"
   audit-trail:
     logBuildCause: true
-    pattern: ".*/(?:configSubmit|doDelete|postBuildResult|enable|disable|cancelQueue|stop|toggleLogKeep|doWipeOutWorkspace|createItem|createView|toggleOffline|cancelQuietDown|quietDown|restart|exit|safeExit)"
+    pattern: ".*/(?:configSubmit|doDelete|postBuildResult|enable|disable|cancelQueue|stop|toggleLogKeep|doWipeOutWorkspace|createItem|createView|toggleOffline|cancelQuietDown|quietDown|restart|exit|safeExit)/?.*"
   badgePlugin:
     disableFormatHTML: false
-  bitbucketEndpointConfiguration:
-    endpoints:
-    - bitbucketCloudEndpoint:
-        enableCache: false
-        manageHooks: false
-        repositoriesCacheDuration: 0
-        teamCacheDuration: 0
-    - bitbucketServerEndpoint:
-        displayName: "STASH"
-        manageHooks: false
-        serverUrl: "https://home.nabla.mobi"
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - "jobBuildDiscarder"
   buildFailureAnalyzer:
     doNotAnalyzeAbortedJob: false
     gerritTriggerEnabled: true
@@ -203,6 +223,8 @@ unclassified:
     noCausesMessage: "No problems were identified. If you know why this problem occurred,\
       \ please add a suitable Cause for it."
     nrOfScanThreads: 3
+    slackFailureCategories: "ALL"
+    slackNotifEnabled: false
     testResultParsingEnabled: false
   buildStepOperation:
     enabled: false
@@ -233,6 +255,7 @@ unclassified:
       !**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*
     forcingVulnerabilityThresholdEnabled: false
     hideResults: false
+    isProxy: true
     jobGlobalStatusOnError: FAILURE
     jobGlobalStatusOnThresholdViolation: FAILURE
     lockVulnerabilitySettings: true
@@ -252,22 +275,6 @@ unclassified:
   descriptionSetterWrapper:
     charset: "UTF-8"
     disableTokens: false
-  extendedEmailPublisher:
-    adminRequiredForTemplateTesting: false
-    allowUnregisteredEnabled: false
-    charset: "UTF-8"
-    debugMode: false
-    defaultBody: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\r\n\r\nCheck\
-      \ console output at $BUILD_URL to view the results."
-    defaultContentType: "text/plain"
-    defaultSubject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!"
-    maxAttachmentSize: -1
-    maxAttachmentSizeMb: 0
-    precedenceBulk: false
-    useSsl: false
-    watchingEnabled: false
-  fTPPublisher:
-    flattenFilesSelectedByDefault: false
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
@@ -759,10 +766,6 @@ unclassified:
               traits:
               - "gitBranchDiscovery"
               - "wipeWorkspaceTrait"
-  globalSettings:
-    failOnCorrupt: false
-    noAuthors: false
-    quietMode: false
   hudsonSoundsNotifier:
     pipeTimeoutSecs: 5
     playMethod: BROWSER
@@ -800,9 +803,6 @@ unclassified:
     timeoutCheckerEnabled: true
     timerTriggerCheckerEnabled: true
     windowsSlaveLaunchCheckerEnabled: true
-  jiraGlobalConfiguration:
-    sites:
-    - url: "https://albandrieu.com/jira/"
   location:
     adminAddress: "Adresse pas encore configurée <nobody@nowhere>"
     url: "http://albandrieu:8686/jenkins/"
@@ -812,6 +812,7 @@ unclassified:
     charset: "UTF-8"
     defaultSuffix: "@free.fr"
     useSsl: false
+    useTls: false
   mavenModuleSet:
     localRepository: "default"
   naginatorPublisher:

@@ -18,8 +18,6 @@ String DOCKER_BUILD_IMG="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME_BUILD}:${DOCKE
 
 def DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: true)
 
-def branchName = env.BRANCH_NAME
-
 pipeline {
   //agent none
   agent {
@@ -41,10 +39,11 @@ pipeline {
     booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")
     string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
     string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
-    booleanParam(defaultValue: true, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
+    booleanParam(defaultValue: false, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_TEST')
-    booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_GRADLE')
-    booleanParam(defaultValue: true, description: 'Build jenkins docker images', name: 'BUILD_DOCKER')
+    booleanParam(defaultValue: false, description: 'Build gradle', name: 'BUILD_GRADLE')
+    booleanParam(defaultValue: false, description: 'Build jenkins docker images', name: 'BUILD_DOCKER')
+    booleanParam(defaultValue: true, description: 'Build with sonar', name: 'BUILD_SONAR')
   }
   environment {
     DRY_RUN = "${params.DRY_RUN}".toBoolean()
@@ -79,7 +78,7 @@ pipeline {
 
           myenv.printEnvironment()
 
-          setBuildName()
+          setBuildName("JPL")
           RESULT = sh(returnStdout: true, script: './clean.sh').trim()
 
           echo "RESULT : ${RESULT}"
@@ -98,6 +97,7 @@ pipeline {
               sh "$WORKSPACE/clean.sh"
           }
 
+          def branchName = env.BRANCH_NAME
           sh "echo TEST : $branchName"
 
           withMavenWrapper(goal: "install",
@@ -106,13 +106,9 @@ pipeline {
               skipPitest: true,
               skipArtifacts: true,
               buildCmdParameters: "-Dserver=jetty9x",
-              mavenHome: "/home/jenkins/.m2/",
+              //mavenHome: "/home/jenkins/.m2/",
               skipMavenSettings: false,
-              artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip") {
-
-                //sh 'chown -R jenkins:docker .[^.]* *'
-
-          }
+              artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip")
 
           withShellCheckWrapper(pattern: "*.sh")
 
@@ -225,14 +221,13 @@ pipeline {
 
                     // this give the registry
                     DOCKER_BUILD_ARGS = ["--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz"].join(" ")
+                    //DOCKER_BUILD_ARGS += getDockerProxyOpts()
                     if (env.CLEAN_RUN) {
-                        DOCKER_BUILD_ARGS = ["--no-cache",
+                        DOCKER_BUILD_ARGS += ["--no-cache",
                                              "--pull",
                                              ].join(" ")
                     }
-                    DOCKER_BUILD_ARGS = [ "${DOCKER_BUILD_ARGS}",
-                                          "--target BUILD", // See issue https://issues.jenkins-ci.org/browse/JENKINS-44609?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&showAll=true
-                                          "--label 'version=1.0.0'",
+                    DOCKER_BUILD_ARGS += [ " --label 'version=1.0.0'",
                                         ].join(" ")
 
                     def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
@@ -249,7 +244,7 @@ pipeline {
                         archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
                     }
 
-                    dockerFingerprintFrom dockerfile: 'Dockerfile', image: "${DOCKER_BUILD_IMG}"
+                    dockerFingerprintFrom dockerfile: './Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
                     dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
 
@@ -287,18 +282,6 @@ pipeline {
         }
       } // steps
     } // stage SonarQube analysis
-    //stage('\u2795 Quality - Security - Checkmarx') {
-    //  steps {
-    //    script {
-    //       withCheckmarxWrapper(projectName: 'jenkins-pipeline-scripts',
-    //                          preset: '1',
-    //                          groupId: '1234',
-    //                          lowThreshold: 10,
-    //                          mediumThreshold: 0,
-    //                          highThreshold: 0)
-    //    } // script
-    //  } // steps
-    //} // stage Security
   } // stages
   post {
     always {
@@ -307,9 +290,11 @@ pipeline {
                 tagList()
         ]
 
-      archiveArtifacts allowEmptyArchive: true, artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
+      //archiveArtifacts allowEmptyArchive: true, artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
 
-      runHtmlPublishers(["LogParserPublisher", "AnalysisPublisher"])
+      node('any||flyweight') {
+        withLogParser(unstableOnWarning: false)
+      }
 
     } // always
     //cleanup {

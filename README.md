@@ -75,8 +75,7 @@ $ docker build -t groovy-test .
 $ docker run -it groovy-test:latest
 ```
 
-Kubernetes
------------
+## Kubernetes
 
 [cheatsheet](https://kubernetes.io/fr/docs/reference/kubectl/cheatsheet)
 [conventions](https://helm.sh/docs/chart_best_practices/conventions/)
@@ -93,14 +92,65 @@ $microk8s ctr images ls
 
 
 ```
-k config get-contexts
-k config use-context microk8s
-```
-```
 Create jenkins namespace
 
 ```
 $k apply -f jenkins-namespace.yaml
+```
+
+Add [deployment](https://kubernetes.io/fr/docs/concepts/workloads/controllers/deployment/)
+
+```
+k config get-contexts
+k config use-context microk8s
+```
+
+```
+$ #k delete pods --all
+#k delete -f jenkins-deployment.yaml
+$k apply -f jenkins-deployment.yaml -n jenkins
+
+$k get deployments jenkins-master -n jenkins --watch
+$k describe pod -n jenkins | grep jenkins
+#stop deployement
+$k scale --replicas=0 deployment/jenkins-master -n jenkins
+```
+
+Copy volume data
+
+```
+cp -r /jenkins/* /mnt/jenkins
+chown -R albandrieu:docker /mnt/jenkins
+```
+
+Add service
+
+```
+$k create -f jenkins-service.yaml -n jenkins
+$k get service -n jenkins
+$k logs jenkins-master-7b49df974d-kzlrg -n jenkins
+
+```
+
+Check http://127.0.0.1:32082/
+
+Check [nfs](https://github.com/kubernetes/examples/tree/master/staging/volumes/nfs)
+
+Add [PersistentVolume](https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolume)
+
+
+```
+$k create -f jenkins-pvc.yaml -n jenkins
+$k get pvc pvc-jenkins-home -n jenkins
+$k create -f jenkins-volume.yaml -n jenkins
+$k get pv jenkins-pv-volume -n jenkins
+
+#k describe pv  -n jenkins
+```
+
+
+```
+$k exec -it jenkins-master-7b49df974d-kzlrg -n jenkins -- /bin/bash
 ```
 
 [service-account-tokens](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens)
@@ -108,7 +158,7 @@ $k apply -f jenkins-namespace.yaml
 ```
 $k create serviceaccount jenkins-account -n jenkins
 $k get serviceaccounts jenkins-account -o yaml  -n jenkins
-$k get secret jenkins-account-token-xswhp -o yaml  -n jenkins
+$k get secret jenkins-token-2dmg9 -o yaml  -n jenkins
 ```
 
 [set-up-jenkins-in-a-kubernetes-cluster](https://medium.com/swlh/set-up-jenkins-in-a-kubernetes-cluster-96660c8d9ab)
@@ -122,51 +172,6 @@ $k get pods -n jenkins
 $k -n jenkins port-forward jenkins-master-7b49df974d-kzlrg 8080:8080
 
 $k get svc -n jenkins
-```
-
-Add [deployment](https://kubernetes.io/fr/docs/concepts/workloads/controllers/deployment/)
-
-```
-$ #k delete pods --all
-#k delete -f jenkins-deployment.yaml
-$k apply -f jenkins-deployment.yaml
-
-$k get deployments jenkins --watch
-$k describe pod | grep jenkins
-#stop deployement
-$k scale --replicas=0 deployment/jenkins
-```
-
-Copy volume data
-
-```
-cp -r /jenkins/* /mnt/jenkins
-chown -R albandrieu:docker /mnt/jenkins
-```
-
-Add service
-
-```
-$k create -f jenkins-service.yaml
-$k get service
-$k logs jenkins-698d88d89d-vtwzf
-
-```
-
-Check http://127.0.0.1:30603/
-
-TODO Add [PersistentVolume](https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolume)
-
-
-```
-$k create -f jenkins-volume.yaml
-
-#k describe pv
-```
-
-
-```
-$k exec -it jenkins-master-7b49df974d-kzlrg -n jenkins -- /bin/bash
 ```
 
 See [dns-debugging-resolution](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/)
@@ -203,6 +208,111 @@ TODO : Have proper DNS service
 http://jenkins-master.jenkins.svc.cluster.local
 mon-service.mon-namespace.svc.cluster.local
 
+========================
+
+See [Extending environment variables with Shared Libraries](https://devops.datenkollektiv.de/programatically-add-environment-variables-to-a-jenkins-instance.html)
+
+## Graph dependency
+
+  * [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
+
+```
+$ dot -Tps draftStage.gv -o draftStage.ps
+$ dot -Tpng draftStage.gv > draftStage.png
+```
+
+![draftStage](draftStage.png)
+
+
+## Folder Structure Conventions
+
+> Folder structure options and naming conventions for software projects
+
+### A typical top-level directory layout
+
+    .
+    ├── docs                    # Documentation files (alternatively `doc`)
+    docker                      # Deprectated, using packs/Dockerfile instead
+    docker-compose              # Put docker-compose files
+    ├── src                     # Source files (alternatively `lib` or `app`)
+    ├── resources               # Resources for jenkins
+    ├── vars                    # Groovy scripts for jenkins
+    bower.json                  # Bower not build directly, using maven instead
+    Dockerfile                  # Deprectated, using packs/Dockerfile instead
+    Jenkinsfile
+    Jenkinsfile-checkmarx       # Will run Checkmarx scan
+    Jenkinsfile-aqua            # Will run WhiteSource. Aqua as standalone scan
+    package.json                # Nnpm not build directly, using maven instead
+    pom.xml                     # Will run maven clean install
+    .pre-commit-config.yaml
+    requirements.testing.txt    # Python package used for test and build only
+    requirements.txt            # Python package used for production only
+    tox.ini
+    sonar-project.properties    # Will run sonar standalone scan
+    LICENSE
+    CHANGELOG.md
+    README.md
+    ├── target                  # Compiled files (alternatively `dist`) for maven
+    └── test                    # Automated tests
+
+    .
+    ├── ...
+    ├── test                    # Test files
+    │   ├── e2e                 # End-to-end, integration tests (alternatively `e2e`)
+    │   karma.conf.js
+    │   ├── postman             # API tests for postman
+    │   protractor.conf.js
+    │   └── spec                # Karma unit tests
+    └── ...
+
+    docker-compose irectory is used only to test project in jenkins
+    .
+    ├── ...
+    ├── docker-compose          # Docker compose files
+    │   docker-compose.yml
+    │   docker-compose.dev.yml  # For developper (with port open)
+    │   docker-compose.prod.yml # For production such as jenkins
+    │   docker-compose.test.yml # For tests such as newman, robot
+    └── ...
+
+    docker irectory is used only to build project
+    .
+    ├── ...
+    ├── docker                  # Docker files used to build project
+    │   ├── centos7             # End-to-end, integration tests (alternatively `e2e`)
+    │   ├── ubuntu18            # End-to-end, integration tests (alternatively `e2e`)
+    │   └── ubuntu20
+    │       Dockerfile          # File to build
+    │       config.yaml         # File to run CST
+    └── ...
+
+    .
+    ├── ...
+    ├── docs                    # Documentation files
+    │   ├── index.rst           # Table of contents
+    │   ├── faq.rst             # Frequently asked questions
+    │   ├── misc.rst            # Miscellaneous information
+    │   ├── usage.rst           # Getting started guide
+    │   └── ...                 # etc.
+    └── ...
+
+    .
+    ├── ...
+    ├── packs                    # Files used to build docker image and chart
+    │   config.yaml              # File to run CST
+    │   Dockerfile               # File to build docker image
+    │   └── newman               # Name of the helm chart
+    │       └── charts
+    │           Chart.yaml
+    │           README.md
+    │           └── templates
+    │               deployment.yaml
+    │               _helpers.tpl
+    │               └── tests
+    │                   test-connection.yaml
+    │           values.yaml
+    └── ...
+
 ## Update README.md
 
 
@@ -216,23 +326,7 @@ markdown-toc CHANGELOG.md  -i
 ```
 
 ```
+pre-commit install
 git add README.md
 pre-commit run markdown-toc
 ```
-
-Graph dependency
-----------------
-
-  * [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
-
-```
-$ dot -Tps draftStage.gv -o draftStage.ps
-$ dot -Tpng draftStage.gv > draftStage.png
-```
-
-![draftStage](draftStage.png)
-
-========================
-
-See [Extending environment variables with Shared Libraries](https://devops.datenkollektiv.de/programatically-add-environment-variables-to-a-jenkins-instance.html)
-

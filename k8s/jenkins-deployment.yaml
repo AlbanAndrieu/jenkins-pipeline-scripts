@@ -15,18 +15,6 @@ spec:
       labels:
         app: jenkins-master
     spec:
-      dnsConfig:
-        nameservers:
-          - 10.21.200.3
-          #- 10.25.200.3
-          #- 8.8.8.8
-          #- 8.8.4.4
-        searches:
-          - misys.global.ad
-          #- finastra.com
-        #options:
-        #  - name: ndots
-        #    value: "1"
       terminationGracePeriodSeconds: 10
       serviceAccountName: jenkins-account
       securityContext:
@@ -34,7 +22,7 @@ spec:
       containers:
         - name: jenkins
           image: nabla/jenkins-pipeline-scripts:1.0.0
-          imagePullPolicy: Never
+          #imagePullPolicy: Always
           env:
             - name: JAVA_OPTS
               value: -Djenkins.install.runSetupWizard=false
@@ -65,6 +53,7 @@ spec:
       restartPolicy: Always
       volumes:
         - name: jenkins-home
+          #emptyDir: {}
           hostPath:
             path: /mnt/jenkins
             type: Directory

@@ -2,7 +2,7 @@
 
 // Use  instead createManifest.groovy
 @Deprecated
-def call(def description="TEST", def fileName="TEST_VERSION.TXT", def pomFile="pom.xml", def releaseVersion="1.0.1") {
+def call(def description = "", def fileName = "", def pomFile = "pom.xml", def releaseVersion = "") {
 
     echo "[JPL] Executing `vars/createVersionTextFile.groovy`"
 
@@ -10,7 +10,7 @@ def call(def description="TEST", def fileName="TEST_VERSION.TXT", def pomFile="p
 
     vars.pomFile = pomFile.trim()
     vars.releaseVersion = getReleasedVersion(vars) ?: releaseVersion.trim()
-    vars.projectName = vars.get("projectName", env.JOB_NAME.split("/")[1] ?: "TEST").trim()
+    vars.projectName = vars.get("projectName", getGitRepoName(vars).toUpperCase() ?: "TEST").trim()
     vars.fileName = vars.get("fileName", fileName ?: "${vars.projectName}_VERSION.TXT").trim()
     vars.description = vars.get("description", description ?: "${vars.projectName}").trim()
 

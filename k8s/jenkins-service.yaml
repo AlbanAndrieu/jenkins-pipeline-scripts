@@ -6,8 +6,8 @@ metadata:
   labels:
     app: jenkins-master
 spec:
-  type: NodePort
-  # type: LoadBalancer
+  # type: NodePort
+  type: LoadBalancer
   selector:
     app: jenkins-master
   ports:

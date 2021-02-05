@@ -135,9 +135,6 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 
     helper.registerAllowedMethod("sshPublisherWrapper", [Map.class], null)
 
-		helper.registerAllowedMethod("wrapCleanWs", [], null)
-		helper.registerAllowedMethod("wrapCleanWs", [Map.class], null)
-		helper.registerAllowedMethod("wrapCleanWs", [Map.class, Closure.class], null)
 		helper.registerAllowedMethod("wrapCleanWsOnNode", [], null)
 		helper.registerAllowedMethod("wrapCleanWsOnNode", [Map.class], null)
 		helper.registerAllowedMethod("wrapCleanWsOnNode", [Map.class, Closure.class], null)

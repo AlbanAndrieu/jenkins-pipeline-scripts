@@ -62,7 +62,7 @@
             <id>albandri</id>
             <name>Alban Andrieu</name>
             <email>alban.andrieu@free.fr</email>
-            <organization>finastra</organization>
+            <organization>nabla</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -470,11 +470,13 @@
                         <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
                         <centralAnalyzerEnabled>false</centralAnalyzerEnabled>
                         <nexusAnalyzerEnabled>false</nexusAnalyzerEnabled>
-                        <nexusUrl>https://alm-artifacts.misys.global.ad/nexus/</nexusUrl>
-                        <cveUrl12Modified>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-Modified.xml.gz</cveUrl12Modified>
-                        <cveUrl20Modified>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-2.0-Modified.xml.gz</cveUrl20Modified>
-                        <cveUrl12Base>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-%d.xml</cveUrl12Base>
-                        <cveUrl20Base>http://FR1CSLFRBM0059.misys.global.ad/download/nist/nvdcve-2.0-%d.xml</cveUrl20Base>
+                        <!--
+                        <nexusUrl>https://albandrieu.com/nexus/</nexusUrl>
+                        <cveUrl12Modified>http://albandrieu.com/download/nist/nvdcve-Modified.xml.gz</cveUrl12Modified>
+                        <cveUrl20Modified>http://albandrieu.com/download/nist/nvdcve-2.0-Modified.xml.gz</cveUrl20Modified>
+                        <cveUrl12Base>http://albandrieu.com/download/nist/nvdcve-%d.xml</cveUrl12Base>
+                        <cveUrl20Base>http://albandrieu.com/download/nist/nvdcve-2.0-%d.xml</cveUrl20Base>
+                        -->
                     </configuration>
                 </plugin>
                 <plugin>
@@ -653,7 +655,9 @@
                         <inherited>true</inherited>
                         <configuration>
                             <encoding>${project.build.sourceEncoding}</encoding>
-                            <argLine>${jacoco.agent.ut.arg} -Xms64m -Xmx256m -Djava.awt.headless=true -XX:ReservedCodeCacheSize=128m -Dfile.encoding=UTF-8</argLine>
+                            <argLine>${jacoco.agent.ut.arg} -Xms64m -Xmx256m
+                                -Djava.awt.headless=true -XX:ReservedCodeCacheSize=128m
+                                -Dfile.encoding=UTF-8</argLine>
                             <skipTests>${maven.test.ut.skip}</skipTests>
                             <!-- Enable or disable Stop maven -->
                             <testFailureIgnore>${maven.test.failure.skip}</testFailureIgnore>

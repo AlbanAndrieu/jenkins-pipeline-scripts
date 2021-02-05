@@ -40,7 +40,7 @@ if [ -n "${DOCKER_NAME}" ]; then
 else
   # shellcheck disable=SC2154
   echo -e "${red} ${double_arrow} Undefined build parameter ${head_skull} : DOCKER_NAME, use the default one ${NC}"
-  export DOCKER_NAME=${DOCKER_NAME:-"ansible-nabla"}
+  export DOCKER_NAME=${DOCKER_NAME:-"jenkins-pipeline-script"}
   echo -e "${magenta} DOCKER_NAME : ${DOCKER_NAME} with ${CST_CONFIG} ${NC}"
 fi
 
@@ -71,6 +71,5 @@ readonly DOCKER_ORGANISATION_HUB=${DOCKER_ORGANISATION_HUB:-"nabla"}
 readonly DOCKER_REGISTRY_HUB_CREDENTIAL=${DOCKER_REGISTRY_HUB_CREDENTIAL:-"hub-docker-nabla"}
 
 readonly DOCKER_USERNAME=${DOCKER_USERNAME:-""}
-export DOCKER_NAME=${DOCKER_NAME:-"ansible-jenkins-slave-docker"}
+export DOCKER_NAME=${DOCKER_NAME:-"jenkins-pipeline-script"}
 export DOCKER_TAG=${DOCKER_TAG:-"latest"}
-

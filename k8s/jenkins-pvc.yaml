@@ -4,10 +4,12 @@ metadata:
   name: pvc-jenkins-home
   namespace: jenkins
 spec:
+  #storageClassName: aws-efs
+  storageClassName: nfs-provisioner
+  #storageClassName: manual
   accessModes:
   -  ReadWriteMany
   #-  ReadWriteOnce  # volume can be mounted as read-write by many nodes.
- storageClassName: aws-efs
  resources:
     requests:
-   storage: 1Gi
+      storage: 10Gi

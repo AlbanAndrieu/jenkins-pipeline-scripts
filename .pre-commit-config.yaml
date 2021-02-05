@@ -13,6 +13,11 @@ repos:
         exclude: ^.vscode/
     -   id: check-xml
     -   id: check-yaml
+        exclude: >
+          (?x)^(
+              packs/.*|
+              k8s/.*|
+          )$
     -   id: check-symlinks
     -   id: debug-statements
     -   id: detect-private-key
@@ -89,3 +94,15 @@ repos:
     -   id: dockerfile_lint
         # optional custom config:
         args: [--json, --verbose, --dockerfile]
+-   repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.9
+    hooks:
+    -   id: helmlint
+-   repo: https://github.com/norwoodj/helm-docs
+    rev: v1.3.0
+    hooks:
+    -   id: helm-docs
+        args:
+          # Make the tool search for charts only under the `packs/helm-sample` directory
+          - --chart-search-root=packs/jenkins
+        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
