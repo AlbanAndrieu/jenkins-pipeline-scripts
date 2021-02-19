@@ -20,8 +20,11 @@
 - [Usage](#usage)
 - [Docker](#docker)
 - [Kubernetes](#kubernetes)
-- [Update README.md](#update-readmemd)
 - [Graph dependency](#graph-dependency)
+- [Folder Structure Conventions](#folder-structure-conventions)
+  * [A typical top-level directory layout](#a-typical-top-level-directory-layout)
+- [Update documentation](#update-documentation)
+- [Update README.md](#update-readmemd)
 
 <!-- tocstop -->
 
@@ -70,6 +73,12 @@ Docker
 Build and Run
 
 ```
+$ ./scripts/docker-build.sh
+```
+
+or
+
+```
 $ docker build -t groovy-test .
 #You can reproduce issue `Conflicting module versions. Module [groovy-all is loaded in version 2.4.8 and you are trying to load version 2.4.12` with
 $ docker run -it groovy-test:latest
@@ -89,9 +98,9 @@ $docker save nabla/jenkins-pipeline-scripts:1.0.0 > jenkins.tar
 $microk8s ctr image import jenkins.tar
 
 $microk8s ctr images ls
-
-
 ```
+
+
 Create jenkins namespace
 
 ```
@@ -223,6 +232,7 @@ $ dot -Tpng draftStage.gv > draftStage.png
 
 ![draftStage](draftStage.png)
 
+![pods-helm-sample](pods-helm-sample.svg)
 
 ## Folder Structure Conventions
 
@@ -312,6 +322,19 @@ $ dot -Tpng draftStage.gv > draftStage.png
     │                   test-connection.yaml
     │           values.yaml
     └── ...
+
+
+## Update documentation
+
+```
+mvn gplus:groovydoc
+# or
+mvn site
+```
+
+Maven site and groovy doc will be published with jenkins build
+
+`README.md` then `CHANGELOG.md` are the default entry points.
 
 ## Update README.md
 

@@ -12,11 +12,7 @@ String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub
 String DOCKER_IMAGE_TAG=env.DOCKER_IMAGE_TAG ?: "latest".trim()
 String DOCKER_IMAGE="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
 
-String DOCKER_NAME_BUILD="jenkins-pipeline-scripts-test".trim()
-String DOCKER_BUILD_TAG=dockerTag("temp").trim()
-String DOCKER_BUILD_IMG="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME_BUILD}:${DOCKER_BUILD_TAG}".trim()
-
-def DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: true)
+String DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: false, isLocalJenkinsUser: false)
 
 pipeline {
   //agent none

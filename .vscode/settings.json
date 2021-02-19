@@ -1,0 +1,4 @@
+{
+    "jenkins.pipeline.linter.connector.url": "http://10.152.183.83/pipeline-model-converter/validate",
+    "editor.tabSize": 2
+}

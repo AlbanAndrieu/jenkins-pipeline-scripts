@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-master
+  namespace: jenkins
+  labels:
+    app: jenkins-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-master
+  template:
+    metadata:
+      labels:
+        app: jenkins-master
+    spec:
+      dnsConfig:
+        #nameservers:
+        #  - 8.8.8.8
+        searches:
+          - albandrieu.com
+        #options:
+        #  - name: ndots
+        #    value: "1"
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: jenkins-account
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: jenkins
+          image: nabla/jenkins:local
+          imagePullPolicy: Never
+          env:
+            - name: JAVA_OPTS
+              value: -Djenkins.install.runSetupWizard=false
+          ports:
+            - name: http-port
+              containerPort: 8080
+            - name: jnlp-port
+              containerPort: 50000
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: 8080
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12 # ~2 minutes
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12 # ~2 minutes
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 0.5
+              memory: 1.3Gi
+          volumeMounts:
+            - name: jenkins-home
+              mountPath: /var/jenkins_home
+      restartPolicy: Always
+      volumes:
+        - name: jenkins-home
+          hostPath:
+            path: /mnt/jenkins
+            type: Directory

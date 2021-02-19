@@ -1,0 +1,72 @@
+#!/usr/bin/env groovy
+@Library(value='jenkins-pipeline-scripts@master', changelog=false)
+
+String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: "registry.hub.docker.com".trim()
+String DOCKER_ORGANISATION_HUB=env.DOCKER_ORGANISATION_HUB ?: "nabla".trim()
+
+String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
+
+String DOCKER_REGISTRY_HUB_URL=env.DOCKER_REGISTRY_HUB_URL ?: "https://${DOCKER_REGISTRY_HUB}".trim()
+String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub-docker-nabla".trim()
+
+String DOCKER_IMAGE_TAG=env.DOCKER_IMAGE_TAG ?: "latest".trim()
+String DOCKER_IMAGE="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
+
+String DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: false, isLocalJenkinsUser: false)
+
+pipeline {
+  agent {
+    docker {
+      image DOCKER_IMAGE
+      alwaysPull true
+      reuseNode true
+      registryUrl DOCKER_REGISTRY_HUB_URL
+      registryCredentialsId DOCKER_REGISTRY_HUB_CREDENTIAL
+      args DOCKER_OPTS_COMPOSE
+      label 'molecule'
+    }
+  }
+  parameters {
+    booleanParam(defaultValue: false, description: 'Dry run', name: 'DRY_RUN')
+    booleanParam(defaultValue: false, description: 'Clean before run', name: 'CLEAN_RUN')
+    booleanParam(defaultValue: false, description: 'Debug run', name: 'DEBUG_RUN')
+    booleanParam(defaultValue: false, description: 'Debug mvnw', name: 'MVNW_VERBOSE')
+    booleanParam(name: "RELEASE", defaultValue: false, description: "Perform release-type build.")
+    string(name: "RELEASE_BASE", defaultValue: "", description: "Commit tag or branch that should be checked-out for release")
+    string(name: "RELEASE_VERSION", defaultValue: "", description: "Release version for artifacts")
+  }
+  environment {
+    RELEASE = "${params.RELEASE}".toBoolean()
+    RELEASE_BASE = "${params.RELEASE_BASE}"
+    RELEASE_VERSION = "${params.RELEASE_VERSION}"
+  }
+  options {
+    //skipDefaultCheckout()
+    disableConcurrentBuilds()
+    //ansiColor('xterm')
+    timeout(time: 120, unit: 'MINUTES')
+    timestamps()
+  }
+  stages {
+    stage('\u2795 Quality - Site/Javadoc') {
+      when {
+        expression { BRANCH_NAME ==~ /release|master|develop|PR-.*/ }
+      }
+      steps {
+        script {
+          setUp()
+
+          withMavenSiteWrapper(buildCmdParameters: "-Dpipeline.stack.write=true",
+            shellOutputFile: "maven-site.log",
+            skipSonarCheck: true)
+
+        } // script
+      } // steps
+    } // stage Quality - More check
+  } // stages
+  post {
+    cleanup {
+      wrapCleanWsOnNode(isEmailEnabled: false)
+    } // cleanup
+  } // post
+} // pipeline

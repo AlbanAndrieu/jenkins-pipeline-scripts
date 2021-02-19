@@ -13,20 +13,17 @@ def call(Map vars, Closure body=null) {
     vars.isCleaningEnabled = vars.get("isCleaningEnabled", true).toBoolean()
 
 	script {
-		//def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-		def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-		def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
 
 		if (body) { body() }
 
 		cleanStash(vars)
 		cleanCaches(vars)
 
-		if (!DEBUG_RUN && vars.isCleaningEnabled) {
+		if (!isDebugRun(vars) && vars.isCleaningEnabled) {
 			cleanWs(disableDeferredWipeout: true, deleteDirs: true)
 		}
 
-		if (!DRY_RUN && !DEBUG_RUN && vars.isEmailEnabled) {
+		if (!isDryRun(vars) && !isDebugRun(vars) && vars.isEmailEnabled) {
 			standardNotify { }
 		}
 	} // script
