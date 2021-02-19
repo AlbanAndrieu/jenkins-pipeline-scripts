@@ -9,9 +9,9 @@
 
     <!--
     <parent>
-        <artifactId>interview</artifactId>
-        <groupId>com.nabla.project.sample.interview</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+      <artifactId>interview</artifactId>
+      <groupId>com.nabla.project.sample.interview</groupId>
+      <version>1.0.1-SNAPSHOT</version>
     </parent>
     -->
 
@@ -24,54 +24,54 @@
     <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
 
     <scm>
-        <connection>scm:git:https://github.com/AlbanAndrieu/jenkins-pipeline-scripts.git</connection>
-        <developerConnection>scm:git:git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git</developerConnection>
-        <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
-        <tag>HEAD</tag>
+      <connection>scm:git:https://github.com/AlbanAndrieu/jenkins-pipeline-scripts.git</connection>
+      <developerConnection>scm:git:git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git</developerConnection>
+      <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/</url>
+      <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/issues</url>
+      <system>GitHub Issues</system>
+      <url>https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/issues</url>
     </issueManagement>
 
     <ciManagement>
-        <system>Jenkins</system>
-        <url>${JOB_URL}</url>
-        <notifiers>
-            <notifier>
-                <type>mail</type>
-                <sendOnError>true</sendOnError>
-                <sendOnFailure>true</sendOnFailure>
-                <sendOnSuccess>false</sendOnSuccess>
-                <sendOnWarning>false</sendOnWarning>
-                <configuration>
-                        <address>nabla@free.fr</address>
-                </configuration>
-            </notifier>
-        </notifiers>
+      <system>Jenkins</system>
+      <url>${JOB_URL}</url>
+      <notifiers>
+        <notifier>
+          <type>mail</type>
+          <sendOnError>true</sendOnError>
+          <sendOnFailure>true</sendOnFailure>
+          <sendOnSuccess>false</sendOnSuccess>
+          <sendOnWarning>false</sendOnWarning>
+          <configuration>
+            <address>nabla@free.fr</address>
+          </configuration>
+        </notifier>
+      </notifiers>
     </ciManagement>
 
     <mailingLists>
-        <mailingList>
-        </mailingList>
+      <mailingList>
+      </mailingList>
     </mailingLists>
 
     <developers>
-        <developer>
-            <id>albandri</id>
-            <name>Alban Andrieu</name>
-            <email>alban.andrieu@free.fr</email>
-            <organization>nabla</organization>
-            <roles>
-                <role>Developer</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
+      <developer>
+        <id>albandri</id>
+        <name>Alban Andrieu</name>
+        <email>alban.andrieu@free.fr</email>
+        <organization>nabla</organization>
+        <roles>
+          <role>Developer</role>
+        </roles>
+        <timezone>+1</timezone>
+      </developer>
     </developers>
 
     <prerequisites>
-        <maven>3.5.0</maven>
+      <maven>3.5.0</maven>
     </prerequisites>
 
     <properties>
@@ -114,6 +114,7 @@
         <maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>
         <!--<maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>-->
         <maven.gmavenplus.plugin.version>1.5</maven.gmavenplus.plugin.version>
+        <maven.jgitflow.plugin.version>1.0-m5.1</maven.jgitflow.plugin.version>
 
         <jdk.version>1.8.0</jdk.version>
         <jdk.level>1.8</jdk.level>
@@ -774,6 +775,49 @@
                             <excludes>
                                 <exclude>jsp/**/*.class</exclude>
                             </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>external.atlassian.jgitflow</groupId>
+                        <artifactId>jgitflow-maven-plugin</artifactId>
+                        <version>${maven.jgitflow.plugin.version}</version>
+                        <configuration>
+                            <flowInitContext>
+                                <masterBranchName>master</masterBranchName>
+                                <developBranchName>develop</developBranchName>
+                                <featureBranchPrefix>feature/</featureBranchPrefix>
+                                <releaseBranchPrefix>release/</releaseBranchPrefix>
+                                <hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+                                <versionTagPrefix>version/</versionTagPrefix>
+                            </flowInitContext>
+                            <noDeploy>true</noDeploy>
+                            <squash>true</squash>
+
+                            <pullDevelop>false</pullDevelop>
+                            <scmCommentPrefix>[RELEASE]</scmCommentPrefix>
+
+                            <!-- Enable this to push to origin using SSH keys -->
+                            <enableSshAgent>true</enableSshAgent>
+                            <!-- Keep your maven submodules at the same version as the parent POM -->
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <!--
+                              Pusing in-development features to origin allows all devs to see what each other
+                              are working on
+                            -->
+                            <pushFeatures>false</pushFeatures>
+                            <!--
+                              This allows the CI server (e.g. Jenkins) to automatically push new releases to
+                              origin; you can then either manually deploy them or, if you are doing Continuous
+                              Deployments, auto-deploy them to prod
+                            -->
+                            <pushReleases>false</pushReleases>
+                            <!--
+                              Hot Fixes should be pushed to origin as well so that any dev can pick them up
+                            -->
+                            <pushHotfixes>false</pushHotfixes>
+                            <allowSnapshots>true</allowSnapshots>
+                            <alwaysUpdateOrigin>false</alwaysUpdateOrigin>
+                            <pullMaster>false</pullMaster>
                         </configuration>
                     </plugin>
                 </plugins>
