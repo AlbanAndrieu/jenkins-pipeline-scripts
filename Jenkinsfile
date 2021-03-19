@@ -12,6 +12,10 @@ String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub
 String DOCKER_IMAGE_TAG=env.DOCKER_IMAGE_TAG ?: "latest".trim()
 String DOCKER_IMAGE="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
 
+String DOCKER_NAME_BUILD="jenkins-pipeline-scripts-test".trim()
+String DOCKER_BUILD_TAG=dockerTag("temp").trim()
+String DOCKER_BUILD_IMG="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME_BUILD}:${DOCKER_BUILD_TAG}".trim()
+
 String DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: false, isLocalJenkinsUser: false)
 
 pipeline {
@@ -39,17 +43,7 @@ pipeline {
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_TEST')
     booleanParam(defaultValue: false, description: 'Build gradle', name: 'BUILD_GRADLE')
     booleanParam(defaultValue: false, description: 'Build jenkins docker images', name: 'BUILD_DOCKER')
-    booleanParam(defaultValue: true, description: 'Build with sonar', name: 'BUILD_SONAR')
-  }
-  environment {
-    DRY_RUN = "${params.DRY_RUN}".toBoolean()
-    CLEAN_RUN = "${params.CLEAN_RUN}".toBoolean()
-    DEBUG_RUN = "${params.DEBUG_RUN}".toBoolean()
-    MVNW_VERBOSE = "${params.MVNW_VERBOSE}".toBoolean()
-    RELEASE = "${params.RELEASE}".toBoolean()
-    RELEASE_BASE = "${params.RELEASE_BASE}"
-    RELEASE_VERSION = "${params.RELEASE_VERSION}"
-    //SONAR_INSTANCE = "sonartest"
+    booleanParam(defaultValue: false, description: 'Build with sonar', name: 'BUILD_SONAR')
   }
   options {
     disableConcurrentBuilds()
@@ -63,9 +57,7 @@ pipeline {
     stage('Setup') {
       steps {
         script {
-          if (env.CLEAN_RUN == true) {
-            cleanWs(isEmailEnabled: false, disableDeferredWipeout: true, deleteDirs: true)
-          }
+          setUp(description: "JPL")
 
           def myenv = load "src/test/jenkins/lib/myenv.groovy"
           properties(myenv.getPropertyList())
@@ -73,11 +65,6 @@ pipeline {
           //myenv.defineEnvironment()
 
           myenv.printEnvironment()
-
-          setBuildName("JPL")
-          RESULT = sh(returnStdout: true, script: './clean.sh').trim()
-
-          echo "RESULT : ${RESULT}"
 
         }
       }
@@ -88,10 +75,6 @@ pipeline {
       }
       steps {
         script {
-
-          if (env.CLEAN_RUN) {
-              sh "$WORKSPACE/clean.sh"
-          }
 
           def branchName = env.BRANCH_NAME
           sh "echo TEST : $branchName"
@@ -123,16 +106,18 @@ pipeline {
               zoomCoverageChart: false
               ])
 
-          recordIssues enabledForFailure: true, tool: checkStyle()
-          recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
-          recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
           //recordIssues enabledForFailure: true, tool: pit()
-
+          //taskScanner()
           recordIssues enabledForFailure: true,
                      aggregatingResults: true,
-                     id: "analysis-java",
-                     tools: [mavenConsole(), java(reportEncoding: 'UTF-8'), javaDoc(),
+                     id: "analysis-java-jps",
+                     tools: [mavenConsole(),
+                             java(reportEncoding: 'UTF-8'),
+                             javaDoc(),
                              spotBugs(),
+                             checkStyle(),
+                             cpd(pattern: '**/target/cpd.xml'),
+                             pmdParser(pattern: '**/target/pmd.xml')
                      ],
                      filters: [excludeFile('.*\\/target\\/.*'),
                                excludeFile('node_modules\\/.*'),
@@ -179,74 +164,70 @@ pipeline {
         } // script
       } // steps
     } // stage Maven
-    //stage('\u2795 Quality - SonarQube analysis') {
-    //  when {
-    //  expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-    //  expression { params.BUILD_ONLY.toBoolean() == false }
-    //  }
-    //  environment {
-    //    SONAR_USER_HOME = "$WORKSPACE"
-    //  }
-    //  steps {
-    //    script {
-    //      withSonarQubeWrapper(verbose: true,
-    //          skipFailure: false,
-    //          skipSonarCheck: false,
-    //          skipMaven: true,
-    //          isScannerHome: false,
-    //          sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
-    //          reportTaskFile: ".scannerwork/report-task.txt",
-    //          project: "NABLA",
-    //          repository: "jenkins-pipeline-scripts") {
-    //      }
-    //    }
-    //  } // steps
-    //} // stage SonarQube analysis
+    stage('\u2795 Quality - SonarQube analysis') {
+      when {
+        expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+        expression { params.BUILD_ONLY == false && params.BUILD_SONAR == true }
+      }
+      environment {
+        SONAR_USER_HOME = "$WORKSPACE"
+      }
+      steps {
+        script {
+          withSonarQubeWrapper(verbose: true,
+            skipFailure: false,
+            skipSonarCheck: false,
+            skipMaven: true,
+            isScannerHome: false,
+            sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
+            reportTaskFile: ".scannerwork/report-task.txt",
+            project: "NABLA",
+            repository: "jenkins-pipeline-scripts")
+        }
+      } // steps
+    } // stage SonarQube analysis
     stage('\u27A1 Build - Docker') {
-        //environment {
-        //    CST_CONFIG = "docker/ubuntu18/config-BUILD.yaml"
-        //}
         when {
-            expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
-            expression { params.BUILD_ONLY == false && params.BUILD_DOCKER == true }
+          expression { env.BRANCH_NAME ==~ /release\/.+|master|develop|PR-.*|feature\/.*|bugfix\/.*/ }
+          expression { params.BUILD_ONLY == false && params.BUILD_DOCKER == true }
         }
         steps {
-            script {
+          script {
 
-                tee("docker-build.log") {
+              tee("docker-build.log") {
 
-                    // this give the registry
-                    DOCKER_BUILD_ARGS = ["--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz"].join(" ")
-                    //DOCKER_BUILD_ARGS += getDockerProxyOpts()
-                    if (env.CLEAN_RUN) {
-                        DOCKER_BUILD_ARGS += ["--no-cache",
-                                             "--pull",
-                                             ].join(" ")
-                    }
-                    DOCKER_BUILD_ARGS += [ " --label 'version=1.0.0'",
-                                        ].join(" ")
+                dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
 
-                    def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
-                    container.inside {
-                        sh 'echo DEBUGING image : $PATH'
-                        sh 'git --version || true'
-                        sh 'java -version || true'
-                        sh 'id jenkins || true'
-                        sh 'ls -lrta'
-                        //sh 'ls -lrta /home/jenkins/ || true'
-                        sh 'date > /tmp/test.txt'
-                        sh "cp /tmp/test.txt ${WORKSPACE}"
-                        sh "cp ${HOME}/microscanner.log ${WORKSPACE} || true"
-                        archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
-                    }
+                // this give the registry
+                DOCKER_BUILD_ARGS = ["--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz"].join(" ")
+                //DOCKER_BUILD_ARGS += getDockerProxyOpts()
+                if (env.CLEAN_RUN) {
+                  DOCKER_BUILD_ARGS += ["--no-cache",
+                                       "--pull",
+                                       ].join(" ")
+                }
+                DOCKER_BUILD_ARGS += [ " --label 'version=1.0.0'",
+                                     ].join(" ")
 
-                    dockerFingerprintFrom dockerfile: './Dockerfile', image: "${DOCKER_BUILD_IMG}"
+                def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
+                container.inside {
+                  sh 'echo DEBUGING image : $PATH'
+                  sh 'git --version || true'
+                  sh 'java -version || true'
+                  sh 'id jenkins || true'
+                  sh 'ls -lrta'
+                  //sh 'ls -lrta /home/jenkins/ || true'
+                  sh 'date > /tmp/test.txt'
+                  sh "cp /tmp/test.txt ${WORKSPACE}"
+                  sh "cp ${HOME}/microscanner.log ${WORKSPACE} || true"
+                  archiveArtifacts artifacts: 'test.txt, *.log', excludes: null, fingerprint: false, onlyIfSuccessful: false
+                }
 
-                    dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
+                dockerFingerprintFrom dockerfile: './Dockerfile', image: "${DOCKER_BUILD_IMG}"
 
-                } // tee
+              } // tee
 
-            } // script
+          } // script
         } // steps
     } // Build - Docker
     stage('\u2795 Quality - E2E tests') {
@@ -294,7 +275,7 @@ pipeline {
 
     } // always
     //cleanup {
-    //  wrapCleanWsOnNode(isEmailEnabled: false)
+    //  wrapCleanWs(isEmailEnabled: false)
     //} // cleanup
   } // post
 } // pipeline

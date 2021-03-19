@@ -1,5 +1,4 @@
 digraph G {
-size ="4,4";
 { rank = min; "main";}
 main [label="main :\ndraftStage", shape=box];
 { rank = same; "draftPack"; "dockerLint"; "helm"; "aqua"; "cst"; }

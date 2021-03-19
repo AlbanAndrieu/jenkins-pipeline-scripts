@@ -35,11 +35,6 @@ pipeline {
     string(name: "RELEASE_BASE", defaultValue: "", description: "Commit tag or branch that should be checked-out for release")
     string(name: "RELEASE_VERSION", defaultValue: "", description: "Release version for artifacts")
   }
-  environment {
-    RELEASE = "${params.RELEASE}".toBoolean()
-    RELEASE_BASE = "${params.RELEASE_BASE}"
-    RELEASE_VERSION = "${params.RELEASE_VERSION}"
-  }
   options {
     //skipDefaultCheckout()
     disableConcurrentBuilds()
@@ -66,7 +61,7 @@ pipeline {
   } // stages
   post {
     cleanup {
-      wrapCleanWsOnNode(isEmailEnabled: false)
+      wrapCleanWs(isEmailEnabled: false)
     } // cleanup
   } // post
 } // pipeline

@@ -21,6 +21,7 @@
 - [Docker](#docker)
 - [Kubernetes](#kubernetes)
 - [Graph dependency](#graph-dependency)
+  * [sonar](#sonar)
 - [Folder Structure Conventions](#folder-structure-conventions)
   * [A typical top-level directory layout](#a-typical-top-level-directory-layout)
 - [Update documentation](#update-documentation)
@@ -53,7 +54,18 @@ OR (if jenkins is managing the version, the prefered way)
 ```groovy
 @Library('jenkins-pipeline-scripts') _
 ```
-In jenkins use Load implicitly
+In jenkins
+
+Library
+
+* Set Load implicitly to false
+*	Allow default version to be overridden to true
+*	Include @Library changes in job recent changes
+
+Behaviour
+
+Within Repository -> Discover branches
+Additional -> Wipe out repository & force clone
 
 See [Extending with Shared Libraries](https://jenkins.io/doc/book/pipeline/shared-libraries/) for more
 information on Jenkins pipeline extensions.
@@ -227,12 +239,27 @@ See [Extending environment variables with Shared Libraries](https://devops.daten
 
 ```
 $ dot -Tps draftStage.gv -o draftStage.ps
-$ dot -Tpng draftStage.gv > draftStage.png
+$ dot -Tpng draftStage.gv -o draftStage.png
+$ dot -Tsvg draftStage.gv -o draftStage.svg
 ```
 
-![draftStage](draftStage.png)
+<img src="draftStage.svg" width="1200" height="800" />
 
 ![pods-helm-sample](pods-helm-sample.svg)
+
+#### maven
+
+Maven `mvn clean deploy` will be started by default if `pom.xml` file exists and a sonar scan will be started using [sonar-maven-plugin](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/)...
+
+
+### sonar
+
+Sonar will be started by default on maven projects.
+
+[sonar-maven-plugin](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/). is the prefered way to run sonar. Otherwise [sonarscanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) can be used.
+
+If `sonar-project.properties` file exists a sonarscanner can be started...
+sonarscanner is the prefered way for C++/ObjectiveC and Python projects.
 
 ## Folder Structure Conventions
 
