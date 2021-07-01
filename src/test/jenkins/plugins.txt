@@ -1,5 +1,3 @@
-groovy-events-listener-plugin:1.014:latest
-configuration-as-code:latest
 blueocean:latest
 job-dsl:latest
 cloudbees-folder:latest
@@ -121,11 +119,10 @@ antisamy-markup-formatter:latest
 covcomplplot:latest
 greenballs:latest
 dropdown-viewstabbar-plugin:latest
-nested-view:latest
+nested-view:1.19
 external-monitor-job:latest
 docker-build-publish:latest
 project-stats-plugin:latest
-build-name-setter:latest
 build-timeout:latest
 prereq-buildstep:latest
 jacoco:latest
@@ -176,3 +173,26 @@ Parameterized-Remote-Trigger:latest
 jenkinslint:latest
 publish-over-ftp:latest
 kubernetes:latest
+http_request:latest
+strict-crumb-issuer:latest
+simple-theme-plugin:latest
+warnings-ng:latest
+xunit:latest
+groovy-events-listener-plugin:1.014
+#build-name-setter:latest
+#configuration-as-code:1.51
+#pipeline-graph-view:latest # Failed to create Guice container from all the plugins
+# Issue https://issues.jenkins.io/browse/JENKINS-61985
+# rm -f /mnt/jenkins/jenkins.yaml
+# rm -Rf plugins/*
+#docker-workflow:1.26 # error
+#docker-plugin:1.2.2
+#cppcheck:latest # error rm -Rf nested-view* cppcheck* docker-traceability*
+#pipeline-rest-api:latest
+#pipeline-stage-view:latest
+#disk-usage:latest # Issue upgrading
+#depgraph-view:latest
+#azure-cli:latest # Unable to create file nga/logs/nga.log java.io.IOException
+#pipeline-as-yaml:latest
+#machine-learning:latest
+#dependency-track:latest

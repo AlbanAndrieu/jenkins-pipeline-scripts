@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v3.3.0
+    rev: v4.0.1  # ok python3.6 on Ubuntu 18.04 AND python3.7 on Ubuntu 19.04 AND python3.8 on Ubuntu 20.04
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -19,6 +19,7 @@ repos:
               k8s/.*|
           )$
     -   id: check-symlinks
+    -   id: check-merge-conflict
     -   id: debug-statements
     -   id: detect-private-key
         exclude: >
@@ -33,16 +34,16 @@ repos:
     -   id: requirements-txt-fixer
     -   id: sort-simple-yaml
 -   repo: https://github.com/pre-commit/pre-commit.git
-    rev: v2.8.2
+    rev: v2.10.0
     hooks:
     -   id: validate_manifest
 -   repo: https://github.com/asottile/reorder_python_imports.git
-    rev: v2.3.6
+    rev: v2.5.0
     hooks:
     -   id: reorder-python-imports
 #        language_version: python2.7
 -   repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.0.1
+    rev: v2.1.0
     hooks:
     -   id: add-trailing-comma
 #-   repo: meta
@@ -59,20 +60,31 @@ repos:
     rev: b3680b6ebf9f7cf29b19307f246adef66756feef
     hooks:
     -   id: hindent
-#-   repo: git://github.com/detailyang/pre-commit-shell
-#    sha: 1.0.2
-#    hooks:
-#    - id: shell-lint
+-   repo: https://github.com/detailyang/pre-commit-shell
+    rev: 1.0.5
+    hooks:
+    -   id: shell-lint
+        #entry: pre_commit_hooks/shell-lint.sh -x
+        args: [-x]
+        exclude: >
+                  (?x)^(
+                      mvnw|
+                      hooks|
+                  )$
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v2.15.0
+    hooks:
+    -   id: pyupgrade
 #-   repo: git://github.com/doublify/pre-commit-clang-format
 #    sha: 994f99b6498e9c76341367ecaf76c69dfb4ea4f2
 #    hooks:
 #    -   id: clang-format
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.5.4
+    rev: v1.5.7
     hooks:
     -   id: autopep8
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+    rev: 3.9.2
     hooks:
     -   id: flake8
         args: [--max-line-length=120]
@@ -83,9 +95,8 @@ repos:
 -   repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.1
     hooks:
-#    -   id: htmlhint
-#        # optional custom config:
-#        args: [--config, .htmlhintrc]
+    -   id: htmlhint
+        args: [--config, .htmlhintrc]
     -   id: htmllint
     -   id: markdown-toc
         # optional custom config:
@@ -95,11 +106,11 @@ repos:
         # optional custom config:
         args: [--json, --verbose, --dockerfile]
 -   repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.9
+    rev: v0.1.12
     hooks:
     -   id: helmlint
 -   repo: https://github.com/norwoodj/helm-docs
-    rev: v1.3.0
+    rev: v1.5.0
     hooks:
     -   id: helm-docs
         args:

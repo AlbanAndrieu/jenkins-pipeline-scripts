@@ -8,7 +8,7 @@ set -eo pipefail
 WORKING_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}"  )" && pwd  )"
 
 export DOCKER_NAME=${DOCKER_NAME:-"jenkins-pipeline-scripts"}
-export DOCKER_TAG=${DOCKER_TAG:-"1.0.0"}
+export DOCKER_TAG=${DOCKER_TAG:-"1.0.1"}
 export DOCKER_FILE="../Dockerfile"
 
 # shellcheck source=/dev/null
@@ -36,14 +36,14 @@ echo -e ""
 echo -e "${green} This image is a trusted docker Image. ${happy_smiley} ${NC}"
 echo -e ""
 echo -e "To push it"
-echo -e "    docker login ${DOCKER_REGISTRY} --username ${DOCKER_USERNAME} --password password"
-echo -e "    docker tag ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}"
-echo -e "    docker tag ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest localhost:32000/${DOCKER_NAME}:latest"
-echo -e "    docker tag ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:local"
-echo -e "    docker push ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}"
+echo -e "    docker login ${DOCKER_REGISTRY} --username ${DOCKER_USERNAME} --password password ${NC}"
+echo -e "${green}    docker tag ${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} ${NC}"
+echo -e "    docker tag ${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} localhost:32000/${DOCKER_NAME}:latest ${NC}"
+echo -e "    docker tag ${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest ${NC}"
+echo -e "    docker push ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} ${NC}"
 echo -e ""
 echo -e "To pull it"
-echo -e "    docker pull ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG}"
+echo -e "    docker pull ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} ${NC}"
 #echo -e ""
 #echo -e "To use this docker:"
 #echo -e "    docker run -d -P ${DOCKER_ORGANISATION}/${DOCKER_NAME}"
@@ -56,9 +56,15 @@ echo -e "    docker pull ${DOCKER_REGISTRY}${DOCKER_ORGANISATION}/${DOCKER_NAME}
 #echo -e "    docker exec -it sandbox /bin/bash"
 echo -e ""
 
-echo -e "docker build -t ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest --pull -f ${WORKING_DIR}/${DOCKER_FILE} ../"
-echo -e "docker run -p 8080:8080 -t ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest --version"
-echo -e "docker run -p 8080:8080 -t ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest /home/jenkins/test.war"
+echo -e "${magenta} docker save ${DOCKER_ORGANISATION}/${DOCKER_NAME}:${DOCKER_TAG} > jenkins.tar ${NC}"
+echo -e "${magenta} microk8s ctr image import jenkins.tar ${NC}"
+echo -e "${green} microk8s ctr images ls ${NC}"
+
+echo -e "${green} k apply -f k8s/jenkins-deployment.yaml -n jenkins ${NC}"
+
+echo -e "${green} docker build -t ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest --pull -f ${WORKING_DIR}/${DOCKER_FILE} ../"
+echo -e "${magenta} docker run -p 8080:8080 -t ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest --version"
+echo -e "${magenta} docker run -p 8080:8080 -t ${DOCKER_ORGANISATION}/${DOCKER_NAME}:latest /home/jenkins/test.war"
 echo -e ""
 
 #export CST_CONFIG="docker/ubuntu16/config.yaml"
