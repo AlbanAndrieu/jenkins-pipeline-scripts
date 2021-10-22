@@ -15,7 +15,7 @@ def call(Map vars, Closure body=null) {
   vars.skipDoIt = vars.get("skipDoIt", false).toBoolean()
 
   //vars.doItFileId = vars.get("doItFileId", env.BUILD_NUMBER ?: "0").trim()
-  //vars.doItOutputFile = vars.get("doItOutputFile", "doIt-${vars.doItFileId}.log").trim()
+  //vars.doItOutputFile = vars.get("doItOutputFile", "doit-${vars.doItFileId}.log").trim()
 
   if (!vars.skipDoIt) {
     //try {
