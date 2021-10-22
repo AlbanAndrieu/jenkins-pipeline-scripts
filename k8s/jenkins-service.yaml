@@ -12,10 +12,15 @@ spec:
     app: jenkins-master
   ports:
     - name: http-port
-      port: 80
+      port: 8686
       targetPort: 8080
       #protocol: TCP
     - name: agent
       port: 50000
       targetPort: 50000
       #protocol: TCP
+  #clusterIP: 10.1.161.249
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.0.2.127

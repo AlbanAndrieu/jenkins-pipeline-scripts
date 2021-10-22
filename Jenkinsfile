@@ -9,7 +9,7 @@ String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
 String DOCKER_REGISTRY_HUB_URL=env.DOCKER_REGISTRY_HUB_URL ?: "https://${DOCKER_REGISTRY_HUB}".trim()
 String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub-docker-nabla".trim()
 
-String DOCKER_IMAGE_TAG=env.DOCKER_IMAGE_TAG ?: "latest".trim()
+String DOCKER_IMAGE_TAG=dockerImageTag(isLatest: true)
 String DOCKER_IMAGE="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
 
 String DOCKER_NAME_BUILD="jenkins-pipeline-scripts-test".trim()

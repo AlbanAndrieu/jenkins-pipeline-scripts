@@ -2,8 +2,8 @@
 import hudson.model.*
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
@@ -70,9 +70,9 @@ def call(Map vars, Closure body=null) {
   vars.MAVEN_SETTINGS_SECURITY_CONFIG = vars.get("MAVEN_SETTINGS_SECURITY_CONFIG", env.MAVEN_SETTINGS_SECURITY_CONFIG ?: "nabla-settings-security-nexus").trim()
   vars.K8S_SETTINGS_CONFIG = vars.get("K8S_SETTINGS_CONFIG", env.K8S_SETTINGS_CONFIG ?: "nabla-k8s-default").trim()
 
-  vars.HTTP_PROXY = vars.get("HTTP_PROXY", env.HTTP_PROXY ?: "http://192.168.1.57:3128").trim()
-  vars.HTTPS_PROXY = vars.get("HTTPS_PROXY", env.HTTPS_PROXY ?: "http://192.168.1.57:3128").trim()
-  vars.NO_PROXY = vars.get("NO_PROXY", env.NO_PROXY ?: "localhost,127.0.0.1,.nabla.mobi,.albandrieu.com,.azurecr.io,verdaccio").trim()
+  vars.HTTP_PROXY = vars.get("HTTP_PROXY", env.HTTP_PROXY ?: "").trim() // http://127.0.0.1:3128
+  vars.HTTPS_PROXY = vars.get("HTTPS_PROXY", env.HTTPS_PROXY ?: "").trim()
+  vars.NO_PROXY = vars.get("NO_PROXY", env.NO_PROXY ?: "localhost,127.0.0.1,.nabla.mobi,.albandrieu.com,.azurecr.io,verdaccio,albandri,albandrieu").trim()
 
   // See https://opensource.triology.de/jenkins/pipeline-syntax/globals
 

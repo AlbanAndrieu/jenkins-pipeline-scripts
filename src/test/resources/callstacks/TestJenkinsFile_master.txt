@@ -1,5 +1,5 @@
    Jenkinsfile.run()
-      Jenkinsfile.dockerTag(temp)
+      Jenkinsfile.dockerTag()
       Jenkinsfile.getDockerOpts({isDockerCompose=false, isLocalJenkinsUser=false})
       Jenkinsfile.pipeline(groovy.lang.Closure)
          Jenkinsfile.agent(groovy.lang.Closure)

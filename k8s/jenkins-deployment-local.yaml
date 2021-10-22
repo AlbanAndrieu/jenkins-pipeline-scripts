@@ -15,27 +15,42 @@ spec:
       labels:
         app: jenkins-master
     spec:
+      # fix ping scm-git-eur.misys.global.ad
+      # cat /etc/resolv.conf
+      #search misys.global.ad finastra.com
+      #nameserver 10.21.200.3
+      #options ndots:1
+      dnsPolicy: "None"
       dnsConfig:
-        #nameservers:
-        #  - 8.8.8.8
+        nameservers:
+          - 10.21.200.3
+          - 8.8.8.8
         searches:
           - albandrieu.com
-        #options:
-        #  - name: ndots
-        #    value: "1"
+          - misys.global.ad
+        options: # https://support.cloudbees.com/hc/en-us/articles/360040999471-UnknownHostException-caused-by-DNS-Resolution-issue-with-Alpine-Images
+          - name: ndots
+            value: "1"
       terminationGracePeriodSeconds: 10
       serviceAccountName: jenkins-account
       securityContext:
         fsGroup: 1000
+      #imagePullSecrets:
+      #  - name: p21d13401013001
       containers:
         - name: jenkins
-          image: nabla/jenkins:local
-          imagePullPolicy: Never
+          image: nabla/jenkins-pipeline-scripts:1.0.0
+          #image: p21d13401013001.azurecr.io/fusion-risk/jenkins-pipeline-scripts:1.0.1
+          imagePullPolicy: Always
+          #imagePullPolicy: IfNotPresent
           env:
             - name: JAVA_OPTS
-              value: -Djenkins.install.runSetupWizard=false
+              value: >-
+                -Djenkins.install.runSetupWizard=true
+                -Djavax.net.ssl.trustStore=/opt/java/openjdk/lib/security/cacerts
+                -Djavax.net.ssl.trustStorePassword=changeit
           ports:
-            - name: http-port
+            - name: liveness-port
               containerPort: 8080
             - name: jnlp-port
               containerPort: 50000
@@ -43,6 +58,7 @@ spec:
             httpGet:
               path: /login
               port: 8080
+              scheme: HTTPS
             initialDelaySeconds: 60
             timeoutSeconds: 5
             failureThreshold: 12 # ~2 minutes
@@ -50,6 +66,7 @@ spec:
             httpGet:
               path: /login
               port: 8080
+              scheme: HTTPS
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
@@ -64,6 +81,9 @@ spec:
           volumeMounts:
             - name: jenkins-home
               mountPath: /var/jenkins_home
+      nodeSelector:
+        #disktype: ssd
+        jenkins: master
       restartPolicy: Always
       volumes:
         - name: jenkins-home

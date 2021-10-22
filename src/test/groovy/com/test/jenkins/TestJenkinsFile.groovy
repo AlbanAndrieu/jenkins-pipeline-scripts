@@ -149,7 +149,13 @@ class TestJenkinsFile extends BasePipelineRegressionTest {
 		helper.registerAllowedMethod("cleanStash", [Map.class], null)
 		helper.registerAllowedMethod("cleanStash", [Map.class, Closure.class], null)
 
+	  helper.registerAllowedMethod("dockerTag", [], {c ->"test"})
 		helper.registerAllowedMethod("dockerTag", [String.class], {c ->"test"})
+		helper.registerAllowedMethod("dockerTag", [Map.class], {c ->"test"})
+
+	  helper.registerAllowedMethod("dockerImageTag", [], {c ->"latest"})
+		helper.registerAllowedMethod("dockerImageTag", [String.class], {c ->"latest"})
+		helper.registerAllowedMethod("dockerImageTag", [Map.class], {c ->"latest"})
 
 		helper.registerAllowedMethod("dockerHadoLint", [], null)
 		helper.registerAllowedMethod("dockerHadoLint", [Map.class], null)

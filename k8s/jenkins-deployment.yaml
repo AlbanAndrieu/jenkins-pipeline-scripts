@@ -19,15 +19,26 @@ spec:
       serviceAccountName: jenkins-account
       securityContext:
         fsGroup: 1000
+      #imagePullSecrets:
+      #  - name: p21d13401013001
       containers:
         - name: jenkins
           image: nabla/jenkins-pipeline-scripts:1.0.0
-          #imagePullPolicy: Always
+          imagePullPolicy: Always
+          #imagePullPolicy: IfNotPresent
           env:
             - name: JAVA_OPTS
               value: -Djenkins.install.runSetupWizard=false
           ports:
             - name: http-port
+              protocol: TCP
+              containerPort: 80
+              #targetPort: 9376
+            - name: https-port
+              protocol: TCP
+              containerPort: 443
+              #targetPort: 9377
+            - name: liveness-port
               containerPort: 8080
             - name: jnlp-port
               containerPort: 50000
@@ -35,6 +46,7 @@ spec:
             httpGet:
               path: /login
               port: 8080
+              scheme: HTTPS
             initialDelaySeconds: 240 # 4 minutes to start
             periodSeconds: 10
             timeoutSeconds: 5
@@ -53,9 +65,6 @@ spec:
       restartPolicy: Always
       volumes:
         - name: jenkins-home
-          #emptyDir: {}
-          hostPath:
-            path: /mnt/jenkins
-            type: Directory
+          emptyDir: {}
           #persistentVolumeClaim:
           #  claimName: pvc-jenkins-home

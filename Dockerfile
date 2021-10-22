@@ -14,11 +14,16 @@ RUN add-apt-repository \
 RUN apt-get update && apt-get install -y docker-ce-cli
 
 ARG JENKINS_HOME=${JENKINS_HOME:-"/var/jenkins_home"}
+#ENV http_proxy=${http_proxy:-"http://127.0.0.1:3128"}
+#ENV https_proxy=${https_proxy:-"${http_proxy}"}
+ENV no_proxy=${no_proxy:-"localhost,127.0.0.1,.albandrieu.com,.azure.io,albandri,albandrieu"}
 
-ARG CERT_NAME=${CERT_NAME:-"NABLA.crt"}
-ARG CERT_URL=${CERT_URL:-"http://albandrieu.com/download/certs/"}
-ENV JAVA_HOME /opt/java/openjdk/
+#ARG CERT_NAME=${CERT_NAME:-"NABLA.crt"}
+#ARG CERT_URL=${CERT_URL:-"http://albandrieu.com/download/certs/"}
+ARG CERT_NAME=${CERT_NAME:-"UK1VSWCERT01-CA-5.crt"}
+ARG CERT_URL=${CERT_URL:-"https://alm-artifacts.misys.global.ad/nexus/content/repositories/fusion-risk/download/certs"}
 
+ADD ${CERT_URL}/FINASTRA-FR1VSWFINCERT01-CA-1.crt /usr/local/share/ca-certificates/FINASTRA-FR1VSWFINCERT01-CA-1.crt
 ADD ${CERT_URL}/${CERT_NAME} /usr/local/share/ca-certificates/${CERT_NAME}
 
 # hadolint ignore=DL3008
@@ -30,9 +35,9 @@ ARG JAVA_HOME=${JAVA_HOME:-"/opt/java/openjdk"}
 #RUN ls -lrta ${JAVA_HOME}/lib/security/cacerts
 #RUN ln -sf /etc/ssl/certs/ca-certificates.crt ${JAVA_HOME}/lib/security/cacerts
 #RUN ln -sf /etc/ssl/certs/java/cacerts ${JAVA_HOME}/lib/security/cacerts
-
-RUN keytool -import -alias nabla -file /usr/local/share/ca-certificates/${CERT_NAME} -keystore ${JAVA_HOME}/lib/security/cacerts -storepass changeit -noprompt
-
+RUN keytool -import -alias FINASTRA-FR1VSWFINCERT01-CA-1 -file /usr/local/share/ca-certificates/FINASTRA-FR1VSWFINCERT01-CA-1.crt -keystore ${JAVA_HOME}/lib/security/cacerts -storepass changeit -noprompt
+RUN keytool -import -alias uk1vswcert01-ca-5 -file /usr/local/share/ca-certificates/UK1VSWCERT01-CA-5.crt -keystore ${JAVA_HOME}/lib/security/cacerts -storepass changeit -noprompt
+#RUN keytool -import -alias nabla -file /usr/local/share/ca-certificates/${CERT_NAME} -keystore ${JAVA_HOME}/lib/security/cacerts -storepass changeit -noprompt
 # Update Java certs
 #RUN keytool -v -noprompt \
 #    -keystore ${JAVA_HOME}/lib/security/cacerts \
@@ -44,7 +49,7 @@ RUN keytool -import -alias nabla -file /usr/local/share/ca-certificates/${CERT_N
 #    -storepass changeit
 
 # test certificate
-RUN keytool -list -keystore ${JAVA_HOME}/lib/security/cacerts -alias nabla -storepass changeit
+#RUN keytool -list -keystore ${JAVA_HOME}/lib/security/cacerts -alias nabla -storepass changeit
 
 RUN mkdir /usr/share/jenkins/ref/configs
 COPY --chown=jenkins src/test/jenkins/jenkins.yaml /usr/share/jenkins/ref/jenkins.yaml
