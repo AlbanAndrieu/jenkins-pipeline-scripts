@@ -344,7 +344,6 @@ sonarscanner is the prefered way for C++/ObjectiveC and Python projects.
     │           README.md
     │           └── templates
     │               deployment.yaml
-    │               _helpers.tpl
     │               └── tests
     │                   test-connection.yaml
     │           values.yaml
