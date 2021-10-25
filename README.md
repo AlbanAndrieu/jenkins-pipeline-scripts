@@ -36,7 +36,7 @@ Usage
 -----
 
 This repository contains helper functions and classes to be used with the Jenkins Pipeline Plugin.
-This repository is used on http://albandrieu.com:8686/jenkins/ and other Jenkins instances managed by Nabla.
+This repository is used on http://albandrieu.com/jenkins/ and other Jenkins instances managed by Nabla.
 
 Below feature have been removed on purpose
  * [tee](https://jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#-tee-%20tee%20output%20to%20file)
@@ -74,7 +74,7 @@ See also [Best Practices For Pipeline Code](https://jenkins.io/blog/2017/02/01/p
 
 Run test
 
-```
+```bash
 ./mvnw -Dtest=TestSharedLibrary test
 ```
 
@@ -84,13 +84,13 @@ Docker
 
 Build and Run
 
-```
+```bash
 $ ./scripts/docker-build.sh
 ```
 
 or
 
-```
+```bash
 $ docker build -t groovy-test .
 #You can reproduce issue `Conflicting module versions. Module [groovy-all is loaded in version 2.4.8 and you are trying to load version 2.4.12` with
 $ docker run -it groovy-test:latest
@@ -105,7 +105,7 @@ Install [microk8s](https://ubuntu.com/blog/deploying-kubernetes-locally-microk8s
 
 [Make](https://microk8s.io/docs/registry-images) docker image available to microk8s
 
-```
+```bash
 $docker save nabla/jenkins-pipeline-scripts:1.0.0 > jenkins.tar
 $microk8s ctr image import jenkins.tar
 
@@ -115,18 +115,18 @@ $microk8s ctr images ls
 
 Create jenkins namespace
 
-```
+```bash
 $k apply -f jenkins-namespace.yaml
 ```
 
 Add [deployment](https://kubernetes.io/fr/docs/concepts/workloads/controllers/deployment/)
 
-```
+```bash
 k config get-contexts
 k config use-context microk8s
 ```
 
-```
+```bash
 $ #k delete pods --all
 #k delete -f jenkins-deployment.yaml
 $k apply -f jenkins-deployment.yaml -n jenkins
@@ -139,14 +139,14 @@ $k scale --replicas=0 deployment/jenkins-master -n jenkins
 
 Copy volume data
 
-```
+```bash
 cp -r /jenkins/* /mnt/jenkins
 chown -R albandrieu:docker /mnt/jenkins
 ```
 
 Add service
 
-```
+```bash
 $k create -f jenkins-service.yaml -n jenkins
 $k get service -n jenkins
 $k logs jenkins-master-7b49df974d-kzlrg -n jenkins
@@ -160,7 +160,7 @@ Check [nfs](https://github.com/kubernetes/examples/tree/master/staging/volumes/n
 Add [PersistentVolume](https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolume)
 
 
-```
+```bash
 $k create -f jenkins-pvc.yaml -n jenkins
 $k get pvc pvc-jenkins-home -n jenkins
 $k create -f jenkins-volume.yaml -n jenkins
@@ -169,14 +169,13 @@ $k get pv jenkins-pv-volume -n jenkins
 #k describe pv  -n jenkins
 ```
 
-
-```
+```bash
 $k exec -it jenkins-master-7b49df974d-kzlrg -n jenkins -- /bin/bash
 ```
 
 [service-account-tokens](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens)
 
-```
+```bash
 $k create serviceaccount jenkins-account -n jenkins
 $k get serviceaccounts jenkins-account -o yaml  -n jenkins
 $k get secret jenkins-token-2dmg9 -o yaml  -n jenkins
@@ -184,7 +183,7 @@ $k get secret jenkins-token-2dmg9 -o yaml  -n jenkins
 
 [set-up-jenkins-in-a-kubernetes-cluster](https://medium.com/swlh/set-up-jenkins-in-a-kubernetes-cluster-96660c8d9ab)
 
-```
+```bash
 $k apply -f jenkins-resourcequota.yaml -n jenkins
 $k apply -f jenkins-role.yaml -f jenkins-serviceaccount.yaml -f jenkins-rolebinding.yaml -n jenkins
 $k apply -f jenkins-deployment.yaml -n jenkins
@@ -197,7 +196,7 @@ $k get svc -n jenkins
 
 See [dns-debugging-resolution](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/)
 
-```
+```bash
 $k get pods --namespace=kube-system -l k8s-app=kube-dns
 
 $k -n kube-system describe configmap/coredns
@@ -209,7 +208,7 @@ Add k8s jenkins-account to jenkins
 [set-up-jenkins-in-a-kubernetes-cluster](https://medium.com/swlh/quick-and-simple-how-to-setup-jenkins-distributed-master-slave-build-on-kubernetes-37f3d76aae7d)
 
 
-```
+```bash
 $kubectl get secret $(kubectl get sa jenkins-account -n jenkins -o jsonpath={.secrets[0].name}) -n jenkins -o jsonpath={.data.token} | base64 --decode
 $kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " "
 $kubectl get secret $(kubectl get sa jenkins-account -n jenkins -o jsonpath={.secrets[0].name}) -n jenkins -o jsonpath={.data.'ca\.crt'} | base64 --decode
@@ -218,7 +217,7 @@ $kubectl get secret $(kubectl get sa jenkins-account -n jenkins -o jsonpath={.se
 Add k8s proxy
 
 
-```
+```bash
 k get pod -n jenkins
 k port-forward -n jenkins jenkins-master-6868bb694-m4jhb 8080:8080
 http://localhost:8080/
@@ -237,7 +236,7 @@ See [Extending environment variables with Shared Libraries](https://devops.daten
 
   * [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
 
-```
+```bash
 $ dot -Tps draftStage.gv -o draftStage.ps
 $ dot -Tpng draftStage.gv -o draftStage.png
 $ dot -Tsvg draftStage.gv -o draftStage.svg
@@ -352,7 +351,7 @@ sonarscanner is the prefered way for C++/ObjectiveC and Python projects.
 
 ## Update documentation
 
-```
+```bash
 mvn gplus:groovydoc
 # or
 mvn site
@@ -368,13 +367,13 @@ Maven site and groovy doc will be published with jenkins build
   * [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)
   * With [github-markdown-toc](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
 
-```
+```bash
 npm install --save markdown-toc
 markdown-toc README.md
 markdown-toc CHANGELOG.md  -i
 ```
 
-```
+```bash
 pre-commit install
 git add README.md
 pre-commit run markdown-toc
