@@ -243,7 +243,7 @@ $ dot -Tpng draftStage.gv -o draftStage.png
 $ dot -Tsvg draftStage.gv -o draftStage.svg
 ```
 
-<img src="draftStage.svg" width="1200" height="800" />
+<img src="draftStage.png" width="1200" height="800" />
 
 ![pods-helm-sample](pods-helm-sample.svg)
 
