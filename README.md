@@ -12,6 +12,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1999b59401394431a1c2fea2923a919d)](https://www.codacy.com/app/uhafner/jenkins-pipeline-scripts?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlbanAndrieu/jenkins-pipeline-scripts&amp;utm_campaign=Badge_Grade)
 [![Codecov](https://img.shields.io/codecov/c/github/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://codecov.io/gh/AlbanAndrieu/jenkins-pipeline-scripts)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/pulls)
+[![Docker Pulls](https://img.shields.io/docker/pulls/nabla/jenkins-pipeline-scripts)](https://hub.docker.com/r/nabla/jenkins-pipeline-scripts)<br/>
 
 # Table of contents
 
@@ -21,6 +22,7 @@
 - [Docker](#docker)
 - [Kubernetes](#kubernetes)
 - [Graph dependency](#graph-dependency)
+    + [maven](#maven)
   * [sonar](#sonar)
 - [Folder Structure Conventions](#folder-structure-conventions)
   * [A typical top-level directory layout](#a-typical-top-level-directory-layout)
@@ -46,7 +48,7 @@ make sure you have installed the _GitHub Organization Folder_ in version 1.5 or 
 then start off with:
 
 ```groovy
-@Library('jenkins-pipeline-scripts@develop') _
+@Library('jenkins-pipeline-scripts@master') _
 ```
 
 OR (if jenkins is managing the version, the prefered way)

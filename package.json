@@ -1,0 +1,55 @@
+{
+  "name": "nabla-pipeline-scripts",
+  "description": "Pipeline sample",
+  "branchVersion": "^1.0.1",
+  "branchPattern": "1.0.*",
+  "version": "1.0.1",
+  "pre-commit": [
+    "precommit"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=11.12.0",
+    "npm": ">=6.13.6",
+    "node-gyp": ">=3.0.3",
+    "grunt": ">=1.2.0"
+  },
+  "engine-strict": true,
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "maintained node versions",
+    "not dead"
+  ],
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "plugins": [
+      "compat"
+    ],
+    "rules": {
+      "compat/compat": "warn"
+    }
+  },
+  "stylelint": {
+    "plugins": [
+      "stylelint-no-unsupported-browser-features"
+    ],
+    "rules": {
+      "plugin/no-unsupported-browser-features": true
+    },
+    "defaultSeverity": "warning"
+  },
+  "dependencies": {
+    "cli": "^1.0.1"
+  },
+  "devDependencies": {
+    "@secretlint/secretlint-rule-preset-recommend": "^4.1.3",
+    "secretlint": "^4.1.3",
+    "yo": "*"
+  },
+  "optionalDependencies": {
+    "fsevents": "2.3.2"
+  }
+}

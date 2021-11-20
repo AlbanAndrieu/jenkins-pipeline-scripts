@@ -1,3 +1,18 @@
+# comment
+
+.env
+.editorconfig
+.git
+.github
+.cache
+.mvn/
+.gradle/
+*.md
+LICENSE
+Makefile
+vendor/
+
+hooks/
 build_repository/
 workspace/
 jobs/

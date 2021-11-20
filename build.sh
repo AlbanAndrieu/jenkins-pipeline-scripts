@@ -6,6 +6,8 @@ WORKING_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}"  )" && pwd  )"
 # shellcheck source=/dev/null
 source "${WORKING_DIR}/step-0-color.sh"
 
+export REPO_TAG=${REPO_TAG:-"1.1.0"}
+
 # curl (REST API)
 # Assuming "anonymous read access" has been enabled on your Jenkins instance.
 # JENKINS_URL=[root URL of Jenkins master]
@@ -53,8 +55,8 @@ git fetch -t                  # fetch remote tags
 
 #git tag --delete v1.0.0
 #git push --delete origin v1.0.0
-echo -e "${green} git tag --delete v1.1.0 ${NC}"
-echo -e "${green} git tag v1.1.0 ${NC}"
+echo -e "${green} git tag --delete v${REPO_TAG} ${NC}"
+echo -e "${green} git tag v${REPO_TAG} ${NC}"
 echo -e "${green} git push origin --tags ${NC}"
 
 exit 0
