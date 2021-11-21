@@ -1,5 +1,5 @@
 {
-  "threshold": 0,
+  "threshold": 10,
   "reporters": ["html", "markdown"],
   "ignore": [
     "**/node_modules/**",
@@ -10,6 +10,9 @@
     "**/.github/**",
     "**/.idea/**",
     "**/report/**",
+    "**/target/**",
+    "src/test/resources/callstacks/**",
+    "src/test/jenkins/lib/**",
     "**/*.svg"
   ]
 }
