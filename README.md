@@ -7,6 +7,7 @@
 [![Minimal java version](https://img.shields.io/badge/java-1.8-yellow.svg)](https://img.shields.io/badge/java-1.8-yellow.svg)
 
 [![Jenkins Version](https://img.shields.io/badge/Jenkins-2.221-green.svg?label=min.%20Jenkins)](https://jenkins.io/download/)
+[![Build Status](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/AlbanAndrieu/jenkins-pipeline-scripts?label=changelog)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/releases)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1999b59401394431a1c2fea2923a919d)](https://www.codacy.com/app/uhafner/jenkins-pipeline-scripts?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlbanAndrieu/jenkins-pipeline-scripts&amp;utm_campaign=Badge_Grade)
@@ -22,7 +23,6 @@
 - [Docker](#docker)
 - [Kubernetes](#kubernetes)
 - [Graph dependency](#graph-dependency)
-    + [maven](#maven)
   * [sonar](#sonar)
 - [Folder Structure Conventions](#folder-structure-conventions)
   * [A typical top-level directory layout](#a-typical-top-level-directory-layout)
