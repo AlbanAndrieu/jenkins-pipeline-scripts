@@ -1,0 +1,12 @@
+---
+trustedRegistries:
+  - docker.io
+  - registry-tmp.misys.global.ad:5000
+  - p21d13401013001.azurecr.io
+ignored:
+  - DL3007
+  - DL3016
+  - DL3028
+  - SC2086
+  - SC2039
+  - DL3059
