@@ -5,7 +5,7 @@ Runs the extensions which mut be used for the checkout:
 (It is needed in case of multi repo in workspace, because one is controlled by jenkins, the other shall not)
 <ul>
 <li>isDefaultBranch tell if checkout must be controlled by Jenkins</li>
-<li>relativeTargetDir is the overriden path where to extract the repo</li>
+<li>relativeTargetDir is the overridden path where to extract the repo</li>
 </ul>
 </p>
 <!--

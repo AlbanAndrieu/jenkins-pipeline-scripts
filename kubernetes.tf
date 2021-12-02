@@ -20,7 +20,7 @@ resource "kubernetes_deployment" "java" {
       }
       spec {
         container {
-          image = "172728779084.dkr.ecr.eu-central-1.amazonaws.com/petclinic-native:latest"
+          image = "nabla/petclinic-native:latest"
           name  = "java-microservice-container"
           port {
             container_port = 8080

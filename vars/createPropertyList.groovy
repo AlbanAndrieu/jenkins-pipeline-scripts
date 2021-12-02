@@ -1,28 +1,27 @@
 #!/usr/bin/groovy
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
+  echo '[JPL] Executing `vars/createPropertyList.groovy`'
 
-    echo "[JPL] Executing `vars/createPropertyList.groovy`"
+  vars = vars ?: [:]
 
-    vars = vars ?: [:]
+  vars.daysToKeep = vars.get('daysToKeep', isReleaseBranch() ? '30' : '10').trim()
+  vars.numToKeep = vars.get('numToKeep', isReleaseBranch() ? '20' : '5').trim()
 
-    vars.daysToKeep = vars.get("daysToKeep", isReleaseBranch() ? '30' : '10').trim()
-    vars.numToKeep = vars.get("numToKeep", isReleaseBranch() ? '20' : '5').trim()
+  vars.artifactDaysToKeep = vars.get('artifactDaysToKeep', isReleaseBranch() ? '30' : '10').trim()
+  vars.artifactNumToKeep = vars.get('artifactNumToKeep', isReleaseBranch() ? '5'  : '3').trim()
 
-    vars.artifactDaysToKeep = vars.get("artifactDaysToKeep", isReleaseBranch() ? '30' : '10').trim()
-    vars.artifactNumToKeep = vars.get("artifactNumToKeep", isReleaseBranch() ? '5'  : '3').trim()
+  vars.cronString = vars.get('cronString', isReleaseBranch() ? 'H H(3-7) * * 1-5' : '').trim()
+  vars.pollSCMString = vars.get('pollSCMString', isReleaseBranch() ? 'H H(3-7) * * 1-5' : 'H/10 * * * *').trim()
 
-    vars.cronString = vars.get("cronString", isReleaseBranch() ? 'H H(3-7) * * 1-5' : '').trim()
-    vars.pollSCMString = vars.get("pollSCMString", isReleaseBranch() ? 'H H(3-7) * * 1-5' : 'H/10 * * * *').trim()
+  def triggers = isReleaseBranch() ? [snapshotDependencies(), cron(vars.cronString)] : [cron(vars.cronString)]
 
-    def triggers = isReleaseBranch() ? [snapshotDependencies(), cron(vars.cronString)] : [cron(vars.cronString)]
-
-    def propertyList = [
+  def propertyList = [
         buildDiscarder(
             logRotator(
                 daysToKeepStr:         vars.daysToKeep,
@@ -33,7 +32,7 @@ def call(Map vars, Closure body=null) {
         ), pipelineTriggers(triggers)
     ]
 
-    if (body) { body() }
+  if (body) { body() }
 
-    return propertyList
+  return propertyList
 }

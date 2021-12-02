@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
 
 def call() {
-    new Date().format("yyyyMMdd")
+  new Date().format('yyyyMMdd')
 }

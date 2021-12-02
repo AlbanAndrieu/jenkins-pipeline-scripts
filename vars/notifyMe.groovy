@@ -28,5 +28,4 @@ def call() {
           [$class: 'RequesterRecipientProvider']
       ])
     )
-
 } // notifyMe

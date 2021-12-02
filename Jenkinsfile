@@ -1,20 +1,20 @@
 #!/usr/bin/env groovy
 @Library('jenkins-pipeline-scripts@master')
 
-String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: "registry.hub.docker.com".trim()
-String DOCKER_ORGANISATION_HUB=env.DOCKER_ORGANISATION_HUB ?: "nabla".trim()
+String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: 'registry.hub.docker.com'.trim()
+String DOCKER_ORGANISATION_HUB = env.DOCKER_ORGANISATION_HUB ?: 'nabla'.trim()
 
-String DOCKER_NAME="ansible-jenkins-slave-docker".trim()
+String DOCKER_NAME = 'ansible-jenkins-slave-docker'.trim()
 
-String DOCKER_REGISTRY_HUB_URL=env.DOCKER_REGISTRY_HUB_URL ?: "https://${DOCKER_REGISTRY_HUB}".trim()
-String DOCKER_REGISTRY_HUB_CREDENTIAL=env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: "hub-docker-nabla".trim()
+String DOCKER_REGISTRY_HUB_URL = env.DOCKER_REGISTRY_HUB_URL ?: "https://${DOCKER_REGISTRY_HUB}".trim()
+String DOCKER_REGISTRY_HUB_CREDENTIAL = env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: 'hub-docker-nabla'.trim()
 
-String DOCKER_IMAGE_TAG=dockerImageTag(isLatest: true)
-String DOCKER_IMAGE="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
+String DOCKER_IMAGE_TAG = dockerImageTag(isLatest: true)
+String DOCKER_IMAGE = "${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME}:${DOCKER_IMAGE_TAG}".trim()
 
-String DOCKER_NAME_BUILD="jenkins-pipeline-scripts-test".trim()
-String DOCKER_BUILD_TAG=dockerTag().trim()
-String DOCKER_BUILD_IMG="${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME_BUILD}:${DOCKER_BUILD_TAG}".trim()
+String DOCKER_NAME_BUILD = 'jenkins-pipeline-scripts-test'.trim()
+String DOCKER_BUILD_TAG = dockerTag().trim()
+String DOCKER_BUILD_IMG = "${DOCKER_ORGANISATION_HUB}/${DOCKER_NAME_BUILD}:${DOCKER_BUILD_TAG}".trim()
 
 String DOCKER_OPTS_COMPOSE = getDockerOpts(isDockerCompose: false, isLocalJenkinsUser: false)
 
@@ -36,9 +36,9 @@ pipeline {
     booleanParam(defaultValue: false, description: 'Clean before run', name: 'CLEAN_RUN')
     booleanParam(defaultValue: false, description: 'Debug run', name: 'DEBUG_RUN')
     booleanParam(defaultValue: false, description: 'Debug mvnw', name: 'MVNW_VERBOSE')
-    booleanParam(defaultValue: false, name: "RELEASE", description: "Perform release-type build.")
-    string(defaultValue: "", name: "RELEASE_BASE", description: "Commit tag or branch that should be checked-out for release")
-    string(defaultValue: "1.0.0", name: "RELEASE_VERSION", description: "Release version for artifacts")
+    booleanParam(defaultValue: false, name: 'RELEASE', description: 'Perform release-type build.')
+    string(defaultValue: '', name: 'RELEASE_BASE', description: 'Commit tag or branch that should be checked-out for release')
+    string(defaultValue: '1.0.0', name: 'RELEASE_VERSION', description: 'Release version for artifacts')
     booleanParam(defaultValue: false, description: 'Build only to have package. no test / no docker', name: 'BUILD_ONLY')
     booleanParam(defaultValue: false, description: 'Run acceptance tests', name: 'BUILD_TEST')
     booleanParam(defaultValue: false, description: 'Build gradle', name: 'BUILD_GRADLE')
@@ -57,15 +57,14 @@ pipeline {
     stage('Setup') {
       steps {
         script {
-          setUp(description: "JPL")
+          setUp(description: 'JPL')
 
-          def myenv = load "src/test/jenkins/lib/myenv.groovy"
+          def myenv = load 'src/test/jenkins/lib/myenv.groovy'
           properties(myenv.getPropertyList())
 
           //myenv.defineEnvironment()
 
           myenv.printEnvironment()
-
         }
       }
     } // stage setup
@@ -75,21 +74,20 @@ pipeline {
       }
       steps {
         script {
-
           def branchName = env.BRANCH_NAME
           sh "echo TEST : $branchName"
 
-          withMavenWrapper(goal: "install",
+          withMavenWrapper(goal: 'install',
               //profile: "jacoco",
               skipSonar: true,
               skipPitest: true,
               skipArtifacts: true,
-              buildCmdParameters: "-Dserver=jetty9x",
+              buildCmdParameters: '-Dserver=jetty9x',
               //mavenHome: "/home/jenkins/.m2/",
               skipMavenSettings: false,
-              artifacts: "**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip")
+              artifacts: '**/target/dependency/jetty-runner.jar, **/target/test-config.jar, **/target/test.war, **/target/*.zip')
 
-          withShellCheckWrapper(pattern: "*.sh")
+          withShellCheckWrapper(pattern: '*.sh')
 
           step([
               $class: 'CoberturaPublisher',
@@ -110,7 +108,7 @@ pipeline {
           //taskScanner()
           recordIssues enabledForFailure: true,
                      aggregatingResults: true,
-                     id: "analysis-java-jps",
+                     id: 'analysis-java-jps',
                      tools: [mavenConsole(),
                              java(reportEncoding: 'UTF-8'),
                              javaDoc(),
@@ -126,8 +124,7 @@ pipeline {
 
           //jacoco buildOverBuild: false, changeBuildStatus: false, execPattern: '**/target/**-it.exec'
 
-          //perfpublisher healthy: '', metrics: '', name: '**/target/surefire-reports/**/*.xml', threshold: '', unhealthy: ''
-
+        //perfpublisher healthy: '', metrics: '', name: '**/target/surefire-reports/**/*.xml', threshold: '', unhealthy: ''
         } // script
       } // steps
     } // stage Maven
@@ -138,19 +135,18 @@ pipeline {
       }
       steps {
         script {
-
           if (env.CLEAN_RUN) {
-              sh "$WORKSPACE/clean.sh"
+            sh "$WORKSPACE/clean.sh"
           }
 
           sh "echo JAVA_HOME : $JAVA_HOME"
           //sh "echo JENKINS_USER_HOME : $JENKINS_USER_HOME"
           sh "echo HOME : $HOME"
 
-          sh "pwd && ls -lrta /jenkins/ || true"
-          sh "ls -lrta /jenkins/.gradle || true"
-          sh "mkdir -p /jenkins/.gradle || true"
-          sh "export HOME=/jenkins/home && ./gradlew build --stacktrace || true"
+          sh 'pwd && ls -lrta /jenkins/ || true'
+          sh 'ls -lrta /jenkins/.gradle || true'
+          sh 'mkdir -p /jenkins/.gradle || true'
+          sh 'export HOME=/jenkins/home && ./gradlew build --stacktrace || true'
 
           publishHTML (target: [
             allowMissing: true,
@@ -158,9 +154,8 @@ pipeline {
             keepAll: true,
             reportDir: 'build/reports/tests/test/',
             reportFiles: 'index.html',
-            reportName: "Gradle Report"
+            reportName: 'Gradle Report'
           ])
-
         } // script
       } // steps
     } // stage Maven
@@ -179,10 +174,10 @@ pipeline {
             skipSonarCheck: false,
             skipMaven: true,
             isScannerHome: false,
-            sonarExecutable: "/usr/local/sonar-runner/bin/sonar-scanner",
-            reportTaskFile: ".scannerwork/report-task.txt",
-            project: "NABLA",
-            repository: "jenkins-pipeline-scripts")
+            sonarExecutable: '/usr/local/sonar-runner/bin/sonar-scanner',
+            reportTaskFile: '.scannerwork/report-task.txt',
+            project: 'NABLA',
+            repository: 'jenkins-pipeline-scripts')
         }
       } // steps
     } // stage SonarQube analysis
@@ -193,21 +188,19 @@ pipeline {
         }
         steps {
           script {
-
-              tee("docker-build.log") {
-
-                dockerHadoLint(dockerFilePath: "./", skipDockerLintFailure: true, dockerFileId: "1")
+              tee('docker-build.log') {
+                dockerHadoLint(dockerFilePath: './', skipDockerLintFailure: true, dockerFileId: '1')
 
                 // this give the registry
-                DOCKER_BUILD_ARGS = ["--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz"].join(" ")
+                DOCKER_BUILD_ARGS = ['--build-arg JENKINS_USER_HOME=/home/jenkins --build-arg=MICROSCANNER_TOKEN=NzdhNTQ2ZGZmYmEz'].join(' ')
                 //DOCKER_BUILD_ARGS += getDockerProxyOpts()
                 if (env.CLEAN_RUN) {
-                  DOCKER_BUILD_ARGS += ["--no-cache",
-                                       "--pull",
-                                       ].join(" ")
+              DOCKER_BUILD_ARGS += ['--no-cache',
+                                       '--pull',
+                                       ].join(' ')
                 }
                 DOCKER_BUILD_ARGS += [ " --label 'version=1.0.0'",
-                                     ].join(" ")
+                                     ].join(' ')
 
                 def container = docker.build("${DOCKER_BUILD_IMG}", "${DOCKER_BUILD_ARGS} . ")
                 container.inside {
@@ -224,9 +217,7 @@ pipeline {
                 }
 
                 dockerFingerprintFrom dockerfile: './Dockerfile', image: "${DOCKER_BUILD_IMG}"
-
               } // tee
-
           } // script
         } // steps
     } // Build - Docker
@@ -238,23 +229,23 @@ pipeline {
       steps {
         script {
           try {
-            parallel "sample default maven project": {
+            parallel 'sample default maven project': {
               def e2e = build job: 'github.com/AlbanAndrieu/nabla-servers-bower-sample/master', propagate: false, wait: true
               result = e2e.result
-              if (result.equals("SUCCESS")) {
-                echo "E2E SUCCESS"
+              if (result.equals('SUCCESS')) {
+                echo 'E2E SUCCESS'
               } else {
-                 echo "E2E UNSTABLE"
+                 echo 'E2E UNSTABLE'
                  error 'FAIL E2E'
                  currentBuild.result = 'UNSTABLE'
-                 //sh "exit 1" // this fails the stage
+              //sh "exit 1" // this fails the stage
               }
             } // parallel
           } catch (exc) {
-            echo "E2E FAILURE"
+            echo 'E2E FAILURE'
             //currentBuild.result = 'FAILURE'
             //build = "FAIL" // make sure other exceptions are recorded as failure too
-            echo "WARNING : There was a problem with e2e job test " + exc.toString()
+            echo 'WARNING : There was a problem with e2e job test ' + exc
           }
         }
       } // steps
@@ -272,10 +263,9 @@ pipeline {
       node('any||flyweight') {
         withLogParser(unstableOnWarning: false)
       }
-
     } // always
-    //cleanup {
-    //  wrapCleanWs(isEmailEnabled: false)
-    //} // cleanup
+  //cleanup {
+  //  wrapCleanWs(isEmailEnabled: false)
+  //} // cleanup
   } // post
 } // pipeline

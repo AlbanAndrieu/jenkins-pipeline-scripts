@@ -1,7 +1,6 @@
 #!/usr/bin/groovy
 import hudson.model.*
 
-
 /** <p>
  * This is an overloaded method, so javadoc should be visible
  *  </p>
@@ -10,8 +9,8 @@ import hudson.model.*
  * {@inheritDoc}
  * */
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 /**
@@ -27,24 +26,23 @@ def call(Closure body=null) {
  * @return the helmChartName value
  */
 def call(Map vars, Closure body=null) {
-
-  echo "[JPL] Executing `vars/helmChartVersionFromFile.groovy`"
+  echo '[JPL] Executing `vars/helmChartVersionFromFile.groovy`'
 
   vars = vars ?: [:]
 
   helmChartName(vars)
 
-  vars.isYamlFile = vars.get("isYamlFile", true).toBoolean()
-  vars.isAppVersion = vars.get("isAppVersion", false).toBoolean()
+  vars.isYamlFile = vars.get('isYamlFile', true).toBoolean()
+  vars.isAppVersion = vars.get('isAppVersion', false).toBoolean()
 
-  vars.helmChartFileName = vars.get("helmChartFileName", "${vars.helmDir}/${vars.helmChartName}/charts/Chart.yaml").trim()
-  vars.helmChartFileName = vars.helmChartFileName.replaceAll("\\./", "")
+  vars.helmChartFileName = vars.get('helmChartFileName', "${vars.helmDir}/${vars.helmChartName}/charts/Chart.yaml").trim()
+  vars.helmChartFileName = vars.helmChartFileName.replaceAll("\\./", '')
 
-  vars.skipChartVersion = vars.get("skipChartVersion", false).toBoolean()
+  vars.skipChartVersion = vars.get('skipChartVersion', false).toBoolean()
   //vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
 
   if (isHelmTag(vars)) {
-    echo "Skipping getting version from Chart file"
+    echo 'Skipping getting version from Chart file'
     // Skipping getting version from Chart, we should use the one provided
     vars.skipChartVersion = true
   }
@@ -59,18 +57,18 @@ def call(Map vars, Closure body=null) {
           //println data.getClass()
           //println data.version.getClass()
           if (vars.isAppVersion.toBoolean()) {
-            echo "AppVersion found : " + data.appVersion.toString() + " for chart : " + vars.helmChartName
-            if (!data.appVersion?.trim() || data.appVersion.trim() == "null" || data.appVersion == null) {
-              echo "No appVersion found (Fix the chart)"
+            echo 'AppVersion found : ' + data.appVersion + ' for chart : ' + vars.helmChartName
+            if (!data.appVersion?.trim() || data.appVersion.trim() == 'null' || data.appVersion == null) {
+              echo 'No appVersion found (Fix the chart)'
               return false
             } else {
               vars.helmChartAppVersionTag = data.appVersion
               return true
             }
           } else {
-            echo "Version found : " + data.version.toString() + " for chart : " + vars.helmChartName
-            if (!data.version?.trim() || data.version.trim() == "null" || data.version == null) {
-              echo "No version found (Fix the chart)"
+            echo 'Version found : ' + data.version + ' for chart : ' + vars.helmChartName
+            if (!data.version?.trim() || data.version.trim() == 'null' || data.version == null) {
+              echo 'No version found (Fix the chart)'
               return false
             } else {
               vars.helmChartVersion = data.version
@@ -78,19 +76,18 @@ def call(Map vars, Closure body=null) {
             }
           } // isAppVersion
         } else {
-          echo "No yaml"
+          echo 'No yaml'
         }
       } else {
         echo "No fileExists(${vars.helmChartFileName})"
       }
-
     } catch (exc) {
-      echo "Warn: There was a problem with getting charts version : " + exc.toString()
+      echo 'Warn: There was a problem with getting charts version : ' + exc
     } finally {
       archiveArtifacts artifacts: "${vars.helmChartFileName}", onlyIfSuccessful: false, allowEmptyArchive: true
     }
   } else {
-    echo "Helm version retrieved from chart skipped"
+    echo 'Helm version retrieved from chart skipped'
   }
 
   //vars.helmChartAppVersionTag = vars.get("helmChartAppVersionTag", vars.helmChartVersion).trim() // Most of the time it is used as the docker image tag

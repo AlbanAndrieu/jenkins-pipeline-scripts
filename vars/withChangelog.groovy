@@ -1,36 +1,35 @@
 #!/usr/bin/env groovy
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
+  echo '[JPL] Executing `vars/withChangelog.groovy`'
 
-    echo "[JPL] Executing `vars/withChangelog.groovy`"
+  vars = vars ?: [:]
 
-    vars = vars ?: [:]
+  vars.showSummary = vars.get('showSummary', true).toBoolean()
+  vars.isPublishEnabled = vars.get('isPublishEnabled', false).toBoolean()
+  vars.isCleaningEnabled = vars.get('isCleaningEnabled', false).toBoolean()
 
-    vars.showSummary = vars.get("showSummary", true).toBoolean()
-    vars.isPublishEnabled = vars.get("isPublishEnabled", false).toBoolean()
-    vars.isCleaningEnabled = vars.get("isCleaningEnabled", false).toBoolean()
+  //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
+  //def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
+  def DEBUG_RUN = vars.get('DEBUG_RUN', env.DEBUG_RUN ?: false).toBoolean()
 
-    //def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN ?: false).toBoolean()
-    //def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN ?: false).toBoolean()
-    def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN ?: false).toBoolean()
+  if (body) { body() }
 
-    if (body) { body() }
+  if (!DEBUG_RUN && vars.isCleaningEnabled) {
+    sh 'rm CHANGELOG.html'
+  }
 
-    if (!DEBUG_RUN && vars.isCleaningEnabled) {
-        sh 'rm CHANGELOG.html'
-    }
-
-    try {
-        writeFile file: "git-changelog-settings.json", text: '''
+  try {
+    writeFile file: 'git-changelog-settings.json', text: '''
 {
  "fromRepo": ".",
  "fromCommit": "0000000000000000000000000000000000000000",
- "toRef": "refs/tags/LATEST_SUCCESSFULL",
+ "toRef": "refs/tags/LATEST_SUCCESSFUL",
 
  "ignoreCommitsIfMessageMatches": "^\\[maven-release-plugin\\].*|^\\[Gradle Release Plugin\\].*|^Merge.*",
  "readableTagName": "/([^/]+?)$",
@@ -76,7 +75,6 @@ Changelog of Git Changelog.
 <h2> {{name}} </h2>
   {{/hasIssue}}
 
-
    {{#commits}}
 <a href="https://github.com/tomasbjerre/git-changelog-lib/commit/{{hash}}">{{hash}}</a> {{authorName}} <i>{{commitTime}}</i>
 <p>
@@ -92,25 +90,25 @@ Changelog of Git Changelog.
 {{/tags}}
 '''
 
-        def changelogString = gitChangelog returnType: 'STRING',
+    def changelogString = gitChangelog returnType: 'STRING',
             from: [type: 'REF', value: 'develop'],
             to: [type: 'REF', value: 'master'],
             template: createFileTemplateContent
 
-        currentBuild.description = changelogString
+    currentBuild.description = changelogString
 
-        archiveArtifacts artifacts: 'CHANGELOG.html', excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
+    archiveArtifacts artifacts: 'CHANGELOG.html', excludes: null, fingerprint: false, onlyIfSuccessful: false, allowEmptyArchive: true
 
-        if (vars.isPublishEnabled) {
-            publishHTML (target: [
+    if (vars.isPublishEnabled) {
+      publishHTML (target: [
               allowMissing: true,
               alwaysLinkToLastBuild: false,
               keepAll: true,
               reportFiles: 'CHANGELOG.html',
-              reportName: "Changelog"
+              reportName: 'Changelog'
             ])
-        }
-    } catch (exc) {
-        echo "Warn: There was a problem with withChangelog " + exc.toString()
     }
+    } catch (exc) {
+    echo 'Warn: There was a problem with withChangelog ' + exc
+  }
 }

@@ -2,7 +2,7 @@ import java.util.zip.ZipFile
 import com.test.gradle.*
 
 plugins {
-    id "io.codearte.nexus-staging" version "0.8.0"
+    id 'io.codearte.nexus-staging' version '0.8.0'
     id 'org.gradle.test-retry' version '1.0.0'
     id 'org.jenkins-ci.jpi' version '0.38.0'
     id 'ru.vyarus.animalsniffer' version '1.5.0'
@@ -15,7 +15,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-    throw new GradleException("Build requires Java ${JavaVersion.VERSION_1_8}")
+  throw new GradleException("Build requires Java ${JavaVersion.VERSION_1_8}")
 }
 
 apply plugin: 'groovy'
@@ -26,10 +26,10 @@ apply plugin: 'jacoco'
 repositories {
     mavenCentral()
     maven {
-        url "https://maven.springframework.org/release"
+        url 'https://maven.springframework.org/release'
     }
     maven {
-        url "https://repo.jenkins-ci.org/public/"
+        url 'https://repo.jenkins-ci.org/public/'
     }
     maven {
       url 'http://repo.mycompany.com/maven2'
@@ -40,9 +40,9 @@ configurations {
   ivy
 }
 
-group = "com.test"
-archivesBaseName = "jenkins-pipeline-scripts"
-version = "1.0-SNAPSHOT"
+group = 'com.test'
+archivesBaseName = 'jenkins-pipeline-scripts'
+version = '1.0-SNAPSHOT'
 
 dependencies {
     compile    group: 'javax.servlet',         name: 'javax.servlet-api',     version: '3.1.0'
@@ -60,11 +60,11 @@ dependencies {
 
 // Get external properties from file
 if (project.hasProperty('extProps')) {
-    def props = new Properties()
-    file("$extProps").withInputStream { props.load(it) }
-    props.stringPropertyNames().forEach {
+  def props = new Properties()
+  file("$extProps").withInputStream { props.load(it) }
+  props.stringPropertyNames().forEach {
         ext."$it" = props.getProperty(it)
-    }
+  }
 }
 
 defaultTasks 'test'
@@ -118,7 +118,7 @@ test {
         html.enabled = true
     }
     testLogging {
-        events "PASSED", "FAILED", "SKIPPED"
+        events 'PASSED', 'FAILED', 'SKIPPED'
     }
     maxParallelForks = project.maxParallelForks
     retry {
@@ -137,53 +137,53 @@ jacocoTestReport {
 uploadArchives {
     repositories {
         mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            def repo = project.hasProperty('repository') ?
+      def repo = project.hasProperty('repository') ?
                             project.repository :
-                            "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            repository(url: repo) {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
+                            'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+      repository(url: repo) {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
 
-            def snapRepo = project.hasProperty('snapshotRepository') ?
+      def snapRepo = project.hasProperty('snapshotRepository') ?
                             project.snapshotRepository :
-                            "https://oss.sonatype.org/content/repositories/snapshots/"
-            snapshotRepository(url: snapRepo) {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
+                            'https://oss.sonatype.org/content/repositories/snapshots/'
+      snapshotRepository(url: snapRepo) {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
 
-            pom.project {
-                name "$project.group:$project.archivesBaseName"
-                packaging 'jar'
-                description 'Jenkins Pipeline Unit testing framework'
-                url 'https://github.com/test/JenkinsPipelineUnit'
+      pom.project {
+        name "$project.group:$project.archivesBaseName"
+        packaging 'jar'
+        description 'Jenkins Pipeline Unit testing framework'
+        url 'https://github.com/test/JenkinsPipelineUnit'
 
-                scm {
-                    url 'https://github.com/test/JenkinsPipelineUnit'
-                    connection 'scm:git:git://github.com/test/JenkinsPipelineUnit.git'
-                    developerConnection 'scm:git:git@github.com/test/JenkinsPipelineUnit.git'
-                }
+        scm {
+          url 'https://github.com/test/JenkinsPipelineUnit'
+          connection 'scm:git:git://github.com/test/JenkinsPipelineUnit.git'
+          developerConnection 'scm:git:git@github.com/test/JenkinsPipelineUnit.git'
+        }
 
-                licenses {
-                    license {
-                        name 'MIT License'
-                        url 'http://www.opensource.org/licenses/mit-license.php'
-                        distribution 'repo'
-                    }
-                }
+        licenses {
+          license {
+            name 'MIT License'
+            url 'http://www.opensource.org/licenses/mit-license.php'
+            distribution 'repo'
+          }
+        }
 
-                developers {
-                    developer {
-                        id 'aandrieu'
-                        name 'Albn Andrieu'
-                        email 'alban.andrieu@free.fr'
-                        url 'https://github.com/AlbanAndrieu'
-                        organization 'sample.com'
-                        organizationUrl 'https://github.com/sample'
-                    }
-                }
-            }
+        developers {
+          developer {
+            id 'aandrieu'
+            name 'Albn Andrieu'
+            email 'alban.andrieu@free.fr'
+            url 'https://github.com/AlbanAndrieu'
+            organization 'sample.com'
+            organizationUrl 'https://github.com/sample'
+          }
+        }
+      }
         }
     }
 }

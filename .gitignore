@@ -1,4 +1,7 @@
 
+report
+.terraform/
+
 # To avoid adding encrypted files with git add -u or -a
 
 .checkstyle

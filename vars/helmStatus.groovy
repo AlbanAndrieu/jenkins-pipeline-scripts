@@ -2,26 +2,25 @@
 import hudson.model.*
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
-
-  echo "[JPL] Executing `vars/helmStatus.groovy`"
+  echo '[JPL] Executing `vars/helmStatus.groovy`'
 
   vars = vars ?: [:]
 
-  vars.KUBECONFIG = vars.get("KUBECONFIG", env.KUBECONFIG ?: "/home/jenkins/.kube/config").trim()
+  vars.KUBECONFIG = vars.get('KUBECONFIG', env.KUBECONFIG ?: '/home/jenkins/.kube/config').trim()
 
-  vars.helmRelease = vars.get("helmRelease", vars.helmChartName ?: "test").trim()
+  vars.helmRelease = vars.get('helmRelease', vars.helmChartName ?: 'test').trim()
 
-  vars.skipStatus = vars.get("skipStatus", false).toBoolean()
-  vars.helmFileId = vars.get("helmFileId", vars.draftPack ?: "0").trim()
-  vars.kubeNamespace = vars.get("kubeNamespace", env.KUBENAMESPACE ?: "fr-standalone-devops").trim()
+  vars.skipStatus = vars.get('skipStatus', false).toBoolean()
+  vars.helmFileId = vars.get('helmFileId', vars.draftPack ?: '0').trim()
+  vars.kubeNamespace = vars.get('kubeNamespace', env.KUBENAMESPACE ?: 'fr-standalone-devops').trim()
 
-  vars.helmStatusOutputFile = vars.get("helmStatusOutputFile", "helm-status-${vars.helmFileId}.log").trim()
-  vars.skipStatusFailure = vars.get("skipStatusFailure", true).toBoolean()
+  vars.helmStatusOutputFile = vars.get('helmStatusOutputFile', "helm-status-${vars.helmFileId}.log").trim()
+  vars.skipStatusFailure = vars.get('skipStatusFailure', true).toBoolean()
 
   if (!vars.skipStatus) {
     try {
@@ -44,24 +43,23 @@ def call(Map vars, Closure body=null) {
       helm = sh (script: helmStatusCmd, returnStatus: true)
       echo "HELM STATUS RETURN CODE : ${helm}"
       if (helm == 0) {
-        echo "HELM STATUS SUCCESS"
+        echo 'HELM STATUS SUCCESS'
       } else {
         echo "WARNING : Helm status failed, check output at \'${env.BUILD_URL}/artifact/${vars.helmStatusOutputFile}\' "
         if (!vars.skipStatusFailure) {
-          echo "HELM STATUS FAILURE"
+          echo 'HELM STATUS FAILURE'
           //currentBuild.result = 'UNSTABLE'
           currentBuild.result = 'FAILURE'
           error 'There are errors in helm status'
         } else {
-          echo "HELM STATUS FAILURE skipped"
-          //error 'There are errors in helm'
+          echo 'HELM STATUS FAILURE skipped'
+        //error 'There are errors in helm'
         }
       }
-
     } catch (exc) {
-      echo "Warn: There was a problem with status helm " + exc.toString()
+      echo 'Warn: There was a problem with status helm ' + exc
     }
   } else {
-    echo "Helm status skipped"
+    echo 'Helm status skipped'
   }
 }

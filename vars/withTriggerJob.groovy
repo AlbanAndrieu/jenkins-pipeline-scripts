@@ -7,36 +7,34 @@ def call(Closure body=null) {
 }
 
 def call(Map vars, Closure body=null) {
-
-  echo "[JPL] Executing `vars/withTriggerJob.groovy`"
+  echo '[JPL] Executing `vars/withTriggerJob.groovy`'
 
   vars = vars ?: [:]
 
   getJenkinsOpts(vars)
 
   //vars.remoteJenkinsName = vars.get("remoteJenkinsName", "bm-ci-pl").trim()
-  vars.job = vars.get("job", "bower-fr-integration-test/develop").trim()
-  vars.blockBuildUntilComplete = vars.get("blockBuildUntilComplete", true).toBoolean()
-  vars.shouldNotFailBuild = vars.get("shouldNotFailBuild", false).toBoolean()
+  vars.job = vars.get('job', 'bower-fr-integration-test/develop').trim()
+  vars.blockBuildUntilComplete = vars.get('blockBuildUntilComplete', true).toBoolean()
+  vars.shouldNotFailBuild = vars.get('shouldNotFailBuild', false).toBoolean()
 
-  vars.withTriggerJob = vars.get("withTriggerJob", false).toBoolean()
-  vars.skipTriggerRemoteJobFailure = vars.get("skipTriggerRemoteJobFailure", true).toBoolean()
-  vars.triggerJobFileId = vars.get("triggerJobFileId", vars.draftPack ?: "0").trim()
-  vars.triggerJobOutputFile = vars.get("triggerJobOutputFile", "triggerJob-${vars.triggerJobFileId}.log").trim()
+  vars.withTriggerJob = vars.get('withTriggerJob', false).toBoolean()
+  vars.skipTriggerRemoteJobFailure = vars.get('skipTriggerRemoteJobFailure', true).toBoolean()
+  vars.triggerJobFileId = vars.get('triggerJobFileId', vars.draftPack ?: '0').trim()
+  vars.triggerJobOutputFile = vars.get('triggerJobOutputFile', "triggerJob-${vars.triggerJobFileId}.log").trim()
 
   if (!vars.withTriggerJob) {
-
     try {
       //tee("${vars.triggerJobOutputFile}") {
 
-        // See https://www.jenkins.io/doc/pipeline/steps/pipeline-build-step/
-        //Trigger job
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+      // See https://www.jenkins.io/doc/pipeline/steps/pipeline-build-step/
+      //Trigger job
+      catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
           def handle = build job: vars.job, propagate: !vars.shouldNotFailBuild, quietPeriod: 1, wait: vars.blockBuildUntilComplete, parameters: [string(name: 'HELM_TAG', value: String.valueOf(env.HELM_TAG))]
         } // catchError
 
-        echo "Init result: ${currentBuild.result}"
-        echo "Init currentResult: ${currentBuild.currentResult}"
+      echo "Init result: ${currentBuild.result}"
+      echo "Init currentResult: ${currentBuild.currentResult}"
 
         // See https://issues.jenkins.io/browse/JENKINS-53923
         //def triggerJobResult = handle.getResult()
@@ -64,22 +62,20 @@ def call(Map vars, Closure body=null) {
         //  }
         //}
 
-        if (body) {
-          body()
-        }
+      if (body) {
+        body()
+      }
 
-      //} // tee
-
+    //} // tee
     } catch (exc) {
-      echo "TRIGGER FAILURE"
+      echo 'TRIGGER FAILURE'
       currentBuild.result = 'FAILURE'
       //build = "FAIL" // make sure other exceptions are recorded as failure too
-      echo "WARNING : There was a problem with TriggerJob " + exc.toString()
+      echo 'WARNING : There was a problem with TriggerJob ' + exc
     } finally {
       archiveArtifacts artifacts: "${vars.triggerJobOutputFile}", onlyIfSuccessful: false, allowEmptyArchive: true
-    }
+      }
   } else {
-    echo "TriggerJob skipped"
+    echo 'TriggerJob skipped'
+    }
   }
-
-}

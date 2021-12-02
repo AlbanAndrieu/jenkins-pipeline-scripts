@@ -2,62 +2,56 @@
 import java.*
 import hudson.*
 import hudson.model.*
-import jenkins.model.Jenkins
-import com.cloudbees.groovy.cps.NonCPS
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
+  vars = vars ?: [:]
 
-    vars = vars ?: [:]
+  if (!body) {
+    echo 'No body specified'
+  }
 
-    if (!body) {
-        echo 'No body specified'
-    }
-
-    def arch = vars.get("arch", "TEST")
-    def artifacts = vars.get("artifacts", ['*_VERSION.TXT',
+  def arch = vars.get('arch', 'TEST')
+  def artifacts = vars.get('artifacts', ['*_VERSION.TXT',
                    '**/Executable/*.so',
                    '**/Executable/Test',
                    '**/MD5SUMS.md5',
                    '**/TEST-*.tar.gz'
                    ].join(', '))
 
-    def CLEAN_RUN = vars.get("CLEAN_RUN", env.CLEAN_RUN.toBoolean() ?: true)
-    def DRY_RUN = vars.get("DRY_RUN", env.DRY_RUN.toBoolean() ?: false)
-    //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
-    def SCONS_OPTS = vars.get("SCONS_OPTS", env.SCONS_OPTS ?: "")
+  def CLEAN_RUN = vars.get('CLEAN_RUN', env.CLEAN_RUN.toBoolean() ?: true)
+  def DRY_RUN = vars.get('DRY_RUN', env.DRY_RUN.toBoolean() ?: false)
+  //def DEBUG_RUN = vars.get("DEBUG_RUN", env.DEBUG_RUN.toBoolean() ?: false)
+  def SCONS_OPTS = vars.get('SCONS_OPTS', env.SCONS_OPTS ?: '')
 
-    wrapInTEST() {
-
+  wrapInTEST {
         if (!DRY_RUN) {
-            unstash 'maven-artifacts'
+      unstash 'maven-artifacts'
         }
 
         try {
+      if (CLEAN_RUN) {
+        SCONS_OPTS += '--cache-disable'
+      }
 
-            if (CLEAN_RUN) {
-                SCONS_OPTS += "--cache-disable"
-            }
+      echo "Scons OPTS have been specified: ${SCONS_OPTS}"
 
-            echo "Scons OPTS have been specified: ${SCONS_OPTS}"
+      getEnvironementData(filePath: 'step-2-0-0-build-env.sh', DEBUG_RUN: DEBUG_RUN)
 
-            getEnvironementData(filePath: "step-2-0-0-build-env.sh", DEBUG_RUN: DEBUG_RUN)
+      withShellCheckWrapper(pattern: 'step-2-2-build.sh')
 
-            withShellCheckWrapper(pattern: "step-2-2-build.sh")
-
-            if (body) { body() }
-
+      if (body) { body() }
         } catch (e) {
-            step([$class: 'ClaimPublisher'])
-            throw e
+      step([$class: 'ClaimPublisher'])
+      throw e
         }
 
         step([
-             $class: "WarningsPublisher",
+             $class: 'WarningsPublisher',
              canComputeNew: false,
              canResolveRelativePaths: false,
              canRunOnFailed: true,
@@ -84,8 +78,6 @@ def call(Map vars, Closure body=null) {
              ])
 
         stash includes: "${artifacts}", name: 'scons-artifacts-' + arch
-        stash allowEmpty: true, includes: "bw-outputs/*", name: 'bwoutputs-' + arch
-
+        stash allowEmpty: true, includes: 'bw-outputs/*', name: 'bwoutputs-' + arch
     } // wrapInTEST
-
 }

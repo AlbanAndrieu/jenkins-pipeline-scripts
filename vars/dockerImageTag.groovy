@@ -21,22 +21,21 @@ def call(Closure body=null) {
  * @return docker build tag to use
  */
 def call(Map vars, Closure body=null) {
-
-  echo "[JPL] Executing `vars/dockerImageTag.groovy`"
+  echo '[JPL] Executing `vars/dockerImageTag.groovy`'
 
   vars = vars ?: [:]
 
-  vars.dockerImageTag = vars.get("dockerImageTag", env.DOCKER_IMAGE_TAG ?: "1.2.2").trim()
+  vars.dockerImageTag = vars.get('dockerImageTag', env.DOCKER_IMAGE_TAG ?: '1.2.2').trim()
 
-  vars.isLatest = vars.get("isLatest", false).toBoolean()
+  vars.isLatest = vars.get('isLatest', false).toBoolean()
 
   if (vars.isLatest) {
-    vars.dockerImageTag = "latest"
+    vars.dockerImageTag = 'latest'
   }
 
   if (body) { body() }
 
-  echo " dockerImageTag : " + vars.dockerImageTag
+  echo ' dockerImageTag : ' + vars.dockerImageTag
 
-  return vars.dockerImageTag.toLowerCase() ?: "latest"
+  return vars.dockerImageTag.toLowerCase() ?: 'latest'
 }

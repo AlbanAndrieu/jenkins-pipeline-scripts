@@ -1,118 +1,118 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v4.0.1  # ok python3.6 on Ubuntu 18.04 AND python3.7 on Ubuntu 19.04 AND python3.8 on Ubuntu 20.04
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v4.0.1 # ok python3.6 on Ubuntu 18.04 AND python3.7 on Ubuntu 19.04 AND python3.8 on Ubuntu 20.04
     hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-added-large-files
-        args: ['--maxkb=123']
-    -   id: check-case-conflict
-    -   id: check-docstring-first
-    -   id: check-executables-have-shebangs
-    -   id: check-json
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ["--maxkb=123"]
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
         exclude: ^.vscode/
-    -   id: check-xml
-    -   id: check-yaml
+      - id: check-xml
+      - id: check-yaml
         exclude: >
           (?x)^(
               packs/.*|
               k8s/.*|
           )$
-    -   id: check-symlinks
-    -   id: check-merge-conflict
-    -   id: debug-statements
-    -   id: detect-private-key
+      - id: check-symlinks
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: detect-private-key
         exclude: >
-                  (?x)^(
-                      README.md|
-                      src/test/jenkins/jenkins.yaml
-                  )$
-    -   id: double-quote-string-fixer
-    -   id: name-tests-test
-    -   id: end-of-file-fixer
-    -   id: fix-encoding-pragma
-    -   id: requirements-txt-fixer
-    -   id: sort-simple-yaml
--   repo: https://github.com/pre-commit/pre-commit.git
+          (?x)^(
+              README.md|
+              src/test/jenkins/jenkins.yaml
+          )$
+      - id: double-quote-string-fixer
+      - id: name-tests-test
+      - id: end-of-file-fixer
+      - id: fix-encoding-pragma
+      - id: requirements-txt-fixer
+      - id: sort-simple-yaml
+  - repo: https://github.com/pre-commit/pre-commit.git
     rev: v2.10.0
     hooks:
-    -   id: validate_manifest
--   repo: https://github.com/asottile/reorder_python_imports.git
+      - id: validate_manifest
+  - repo: https://github.com/asottile/reorder_python_imports.git
     rev: v2.5.0
     hooks:
-    -   id: reorder-python-imports
-#        language_version: python2.7
--   repo: https://github.com/asottile/add-trailing-comma
+      - id: reorder-python-imports
+  #        language_version: python2.7
+  - repo: https://github.com/asottile/add-trailing-comma
     rev: v2.1.0
     hooks:
-    -   id: add-trailing-comma
-#-   repo: meta
-#    hooks:
-#    -   id: check-hooks-apply
-#    -   id: check-useless-excludes
-#-   repo: https://github.com/willthames/ansible-lint.git
-#    sha: v3.4.20
-#    hooks:
-#    -   id: ansible-lint
-#        files: \.(yaml|yml)$
-#        exclude: '.travis.yml'
--   repo: git://github.com/doublify/pre-commit-hindent
+      - id: add-trailing-comma
+  #-   repo: meta
+  #    hooks:
+  #    -   id: check-hooks-apply
+  #    -   id: check-useless-excludes
+  #-   repo: https://github.com/willthames/ansible-lint.git
+  #    sha: v3.4.20
+  #    hooks:
+  #    -   id: ansible-lint
+  #        files: \.(yaml|yml)$
+  #        exclude: '.travis.yml'
+  - repo: git://github.com/doublify/pre-commit-hindent
     rev: b3680b6ebf9f7cf29b19307f246adef66756feef
     hooks:
-    -   id: hindent
--   repo: https://github.com/detailyang/pre-commit-shell
+      - id: hindent
+  - repo: https://github.com/detailyang/pre-commit-shell
     rev: 1.0.5
     hooks:
-    -   id: shell-lint
+      - id: shell-lint
         #entry: pre_commit_hooks/shell-lint.sh -x
         args: [-x]
         exclude: >
-                  (?x)^(
-                      mvnw|
-                      hooks|
-                  )$
--   repo: https://github.com/asottile/pyupgrade
+          (?x)^(
+              mvnw|
+              hooks|
+          )$
+  - repo: https://github.com/asottile/pyupgrade
     rev: v2.15.0
     hooks:
-    -   id: pyupgrade
-#-   repo: git://github.com/doublify/pre-commit-clang-format
-#    sha: 994f99b6498e9c76341367ecaf76c69dfb4ea4f2
-#    hooks:
-#    -   id: clang-format
--   repo: https://github.com/pre-commit/mirrors-autopep8
+      - id: pyupgrade
+  #-   repo: git://github.com/doublify/pre-commit-clang-format
+  #    sha: 994f99b6498e9c76341367ecaf76c69dfb4ea4f2
+  #    hooks:
+  #    -   id: clang-format
+  - repo: https://github.com/pre-commit/mirrors-autopep8
     rev: v1.5.7
     hooks:
-    -   id: autopep8
--   repo: https://gitlab.com/pycqa/flake8
+      - id: autopep8
+  - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2
     hooks:
-    -   id: flake8
+      - id: flake8
         args: [--max-line-length=120]
--   repo: git://github.com/pre-commit/pre-commit-docker-flake8
-    rev: v0.0.3  # Fill this in with a current revision
+  - repo: git://github.com/pre-commit/pre-commit-docker-flake8
+    rev: v0.0.3 # Fill this in with a current revision
     hooks:
-    -   id: flake8-docker-not-for-production
--   repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+      - id: flake8-docker-not-for-production
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.1
     hooks:
-    -   id: htmlhint
+      - id: htmlhint
         args: [--config, .htmlhintrc]
-    -   id: htmllint
-    -   id: markdown-toc
+      - id: htmllint
+      - id: markdown-toc
         # optional custom config:
         #args: [--indent, "    ", -i]
         args: [--maxdepth, "3", -i]
-    -   id: dockerfile_lint
+      - id: dockerfile_lint
         # optional custom config:
         args: [--json, --verbose, --dockerfile]
--   repo: https://github.com/gruntwork-io/pre-commit
+  - repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.12
     hooks:
-    -   id: helmlint
--   repo: https://github.com/norwoodj/helm-docs
+      - id: helmlint
+  - repo: https://github.com/norwoodj/helm-docs
     rev: v1.5.0
     hooks:
-    -   id: helm-docs
+      - id: helm-docs
         args:
           # Make the tool search for charts only under the `packs/helm-sample` directory
           - --chart-search-root=packs/jenkins

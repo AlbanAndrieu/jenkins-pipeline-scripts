@@ -38,10 +38,10 @@ Usage
 -----
 
 This repository contains helper functions and classes to be used with the Jenkins Pipeline Plugin.
-This repository is used on http://albandrieu.com/jenkins/ and other Jenkins instances managed by Nabla.
+This repository is used on <http://albandrieu.com/jenkins/> and other Jenkins instances managed by Nabla.
 
 Below feature have been removed on purpose
- * [tee](https://jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#-tee-%20tee%20output%20to%20file)
+* [tee](https://jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#-tee-%20tee%20output%20to%20file)
 
 To use this library from your `Jenkinsfile`,
 make sure you have installed the _GitHub Organization Folder_ in version 1.5 or later,
@@ -51,7 +51,7 @@ then start off with:
 @Library('jenkins-pipeline-scripts@master') _
 ```
 
-OR (if jenkins is managing the version, the prefered way)
+OR (if jenkins is managing the version, the preferred way)
 
 ```groovy
 @Library('jenkins-pipeline-scripts') _
@@ -61,8 +61,8 @@ In jenkins
 Library
 
 * Set Load implicitly to false
-*	Allow default version to be overridden to true
-*	Include @Library changes in job recent changes
+* Allow default version to be overridden to true
+* Include @Library changes in job recent changes
 
 Behaviour
 
@@ -87,7 +87,7 @@ Docker
 Build and Run
 
 ```bash
-$ ./scripts/docker-build.sh
+./scripts/docker-build.sh
 ```
 
 or
@@ -155,7 +155,7 @@ $k logs jenkins-master-7b49df974d-kzlrg -n jenkins
 
 ```
 
-Check http://127.0.0.1:32082/
+Check <http://127.0.0.1:32082/>
 
 Check [nfs](https://github.com/kubernetes/examples/tree/master/staging/volumes/nfs)
 
@@ -227,7 +227,7 @@ http://localhost:8080/
 
 TODO : Have proper DNS service
 
-http://jenkins-master.jenkins.svc.cluster.local
+<http://jenkins-master.jenkins.svc.cluster.local>
 mon-service.mon-namespace.svc.cluster.local
 
 ========================
@@ -236,12 +236,12 @@ See [Extending environment variables with Shared Libraries](https://devops.daten
 
 ## Graph dependency
 
-  * [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
+* [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
 
 ```bash
-$ dot -Tps draftStage.gv -o draftStage.ps
-$ dot -Tpng draftStage.gv -o draftStage.png
-$ dot -Tsvg draftStage.gv -o draftStage.svg
+dot -Tps draftStage.gv -o draftStage.ps
+dot -Tpng draftStage.gv -o draftStage.png
+dot -Tsvg draftStage.gv -o draftStage.svg
 ```
 
 <img src="draftStage.png" width="1200" height="800" />
@@ -257,10 +257,10 @@ Maven `mvn clean deploy` will be started by default if `pom.xml` file exists and
 
 Sonar will be started by default on maven projects.
 
-[sonar-maven-plugin](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/). is the prefered way to run sonar. Otherwise [sonarscanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) can be used.
+[sonar-maven-plugin](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/). is the preferred way to run sonar. Otherwise [sonarscanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) can be used.
 
 If `sonar-project.properties` file exists a sonarscanner can be started...
-sonarscanner is the prefered way for C++/ObjectiveC and Python projects.
+sonarscanner is the preferred way for C++/ObjectiveC and Python projects.
 
 ## Folder Structure Conventions
 
@@ -363,11 +363,23 @@ Maven site and groovy doc will be published with jenkins build
 
 `README.md` then `CHANGELOG.md` are the default entry points.
 
+## mega-linter
+
+```bash
+npx mega-linter-runner
+```
+
+## Check secret
+
+```
+npx @secretlint/quick-start "**/*"
+```
+
 ## Update README.md
 
 
-  * [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)
-  * With [github-markdown-toc](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
+* [github-markdown-toc](https://github.com/jonschlinkert/markdown-toc)
+* With [github-markdown-toc](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
 
 ```bash
 npm install --save markdown-toc
@@ -379,4 +391,14 @@ markdown-toc CHANGELOG.md  -i
 pre-commit install
 git add README.md
 pre-commit run markdown-toc
+```
+
+### npm-groovy-lint groovy formating for Jenkinsfile
+
+Tested with nodejs 12 and 16 on ubuntu 20 and 21 (not working with nodejs 11 and 16)
+
+```
+npm install -g npm-groovy-lint@8.2.0
+npm-groovy-lint --format
+ls -lrta .groovylintrc.json
 ```

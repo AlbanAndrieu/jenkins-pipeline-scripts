@@ -196,3 +196,4 @@ groovy-events-listener-plugin:1.014
 #pipeline-as-yaml:latest
 #machine-learning:latest
 #dependency-track:latest
+yet-another-build-visualizer:latest

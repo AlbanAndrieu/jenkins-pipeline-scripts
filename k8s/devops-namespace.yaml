@@ -3,19 +3,18 @@ kind: Namespace
 metadata:
   name: nabla-jenkins
 annotations:
-   field.cattle.io/projectId: c-vnpkw:p-pbmzz
+  field.cattle.io/projectId: c-vnpkw:p-pbmzz
 ---
 kind: Namespace
 metadata:
   name: nabla-jenkins-pr
 annotations:
-   field.cattle.io/projectId: c-vnpkw:p-pbmzz
+  field.cattle.io/projectId: c-vnpkw:p-pbmzz
 ---
 kind: Namespace
 metadata:
   name: nabla-aandrieu
 ---
-
 kind: Namespace
 metadata:
   name: nabla-aandrieu-pr

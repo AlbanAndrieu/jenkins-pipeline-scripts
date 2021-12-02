@@ -3,7 +3,7 @@
 <p>
 Do a specific maven:
 <ul>
-<li>vars give all the parameters which can be overriden</li>
+<li>vars give all the parameters which can be overridden</li>
 <li>goal install allow to override default behavior</li>
 <li>profile sonar allow to override default behavior</li>
 <li>skipTests false allow to override default behavior</li>

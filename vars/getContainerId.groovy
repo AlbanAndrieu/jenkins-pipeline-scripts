@@ -1,28 +1,24 @@
 #!/usr/bin/groovy
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
+  echo '[JPL] Executing `vars/getContainerId.groovy`'
 
-    echo "[JPL] Executing `vars/getContainerId.groovy`"
+  vars = vars ?: [:]
 
-    vars = vars ?: [:]
-
-    script {
-
+  script {
         if (vars.DOCKER_TEST_CONTAINER?.trim()) {
-            // docker inspect cb714085fb0d --format='{{ .State.Status }}'
-            def containerId = sh(returnStdout: true, script: "docker ps -q -a -f 'name=${vars.DOCKER_TEST_CONTAINER}'").trim()
-            echo "Container Id: ${containerId}"
+      // docker inspect cb714085fb0d --format='{{ .State.Status }}'
+      def containerId = sh(returnStdout: true, script: "docker ps -q -a -f 'name=${vars.DOCKER_TEST_CONTAINER}'").trim()
+      echo "Container Id: ${containerId}"
 
-            if (body) { body() }
+      if (body) { body() }
 
-            return containerId
+      return containerId
         }
-
     } // script
-
 }

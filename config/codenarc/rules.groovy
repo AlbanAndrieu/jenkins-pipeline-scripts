@@ -42,8 +42,8 @@ ruleset {
     ruleset('rulesets/formatting.xml') {
         // enforce at least one space after map entry colon
         SpaceAroundMapEntryColon {
-            characterAfterColonRegex = /\s/
-            characterBeforeColonRegex = /./
+      characterAfterColonRegex = /\s/
+      characterBeforeColonRegex = /./
         }
 
         // we don't care for now
@@ -57,7 +57,7 @@ ruleset {
     ruleset('rulesets/imports.xml') {
         // we order static imports after other imports because that's the default style in IDEA
         MisorderedStaticImports {
-            comesBefore = false
+      comesBefore = false
         }
     }
 
@@ -77,7 +77,7 @@ ruleset {
 
     ruleset('rulesets/size.xml') {
         NestedBlockDepth {
-            maxNestedBlockDepth = 6
+      maxNestedBlockDepth = 6
         }
 
         // we don't care for now

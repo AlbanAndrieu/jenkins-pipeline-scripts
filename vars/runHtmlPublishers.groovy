@@ -2,6 +2,7 @@
 
 import hudson.model.*
 import com.cloudbees.groovy.cps.NonCPS
+
 // Method to run all common Jenkins HTML Publishers (Maven, Java, C++, ALMTest) in single tasks
 
 // Each Publisher task should be be described as map of {name, config}, where
@@ -22,7 +23,7 @@ import com.cloudbees.groovy.cps.NonCPS
 
 class PublisherDefaults {
 
-    static Map LogParserPublisher = [
+  static Map LogParserPublisher = [
         $class: 'LogParserPublisher',
         parsingRulesPath:
         '/jenkins/deploy-log_parsing_rules',
@@ -31,9 +32,9 @@ class PublisherDefaults {
         useProjectRule: false
     ]
 
-    // Below Publisher has been deprecated and must be removed
-    static Map AnalysisPublisher = [
-        $class: "AnalysisPublisher",
+  // Below Publisher has been deprecated and must be removed
+  static Map AnalysisPublisher = [
+        $class: 'AnalysisPublisher',
         canComputeNew: false,
         checkStyleActivated: false,
         defaultEncoding: '',
@@ -45,9 +46,9 @@ class PublisherDefaults {
         unHealthy: ''
     ]
 
-    // Below Publisher has been deprecated and must be removed
-    static Map WarningsPublisher = [
-        $class: "WarningsPublisher",
+  // Below Publisher has been deprecated and must be removed
+  static Map WarningsPublisher = [
+        $class: 'WarningsPublisher',
         canComputeNew: false,
         canResolveRelativePaths: false,
         canRunOnFailed: true,
@@ -69,62 +70,61 @@ class PublisherDefaults {
         useStableBuildAsReference: true
     ]
 
-    static Map ALMTestPublisher = [
+  static Map ALMTestPublisher = [
         allowMissing: false,
         alwaysLinkToLastBuild: false,
         keepAll: true,
-        reportDir: "./latestResult/",
+        reportDir: './latestResult/',
         reportFiles: 'index.html',
         reportName: 'AlmondeTest Report',
         reportTitles: 'ALMTEST index'
     ]
 
-    static Map RobotPublisher = [
+  static Map RobotPublisher = [
         $class: 'RobotPublisher',
-        outputPath: "./results",
-        outputFileName: "output.xml",
+        outputPath: './results',
+        outputFileName: 'output.xml',
         reportFileName: 'report.html',
         logFileName: 'log.html',
         disableArchiveOutput: false,
         passThreshold: 100.0,
         unstableThreshold: 80.0,
-        otherFiles: "*.png,*.jpg",
+        otherFiles: '*.png,*.jpg',
     ]
 
 }
 
 // Shortcut for creating default publishers (with no flags)
 def call() {
-    Map defaultPublishers = [
+  Map defaultPublishers = [
         LogParserPublisher: [:],
         AnalysisPublisher: [:]
     ]
-    call(defaultPublishers)
+  call(defaultPublishers)
 }
 
 // Shortcut for creating publishers from a list
 @NonCPS
 def call(List<String> publishers) {
-    Map defaultPublishers = [:]
-    publishers.each() { defaultPublishers[it] = [:] }
-    call(defaultPublishers)
+  Map defaultPublishers = [:]
+  publishers.each { defaultPublishers[it] = [:] }
+  call(defaultPublishers)
 }
 
 @NonCPS
 def call(Map publishers) {
+  publishers.each { publisherName, publisherConfig ->
+        echo "[JPL] Running ${publisherName} with configuration: ${publisherConfig}"
 
-    publishers.each { publisherName, publisherConfig ->
-        echo "[JPL] Running ${publisherName} with configuration: ${publisherConfig.toString()}"
-
-        if (getJenkinsOpts(isProperties: "LogParserPublisher") == false) {
-          echo "[JPL] ${publisherName} UNSUPPORTED"
+        if (getJenkinsOpts(isProperties: 'LogParserPublisher') == false) {
+      echo "[JPL] ${publisherName} UNSUPPORTED"
         }
 
         switch (publisherName) {
-            case "LogParserPublisher":
-                Map LogParserPublisherConfig = PublisherDefaults.LogParserPublisher << publisherConfig
-                step(LogParserPublisherConfig)
-                break
+            case 'LogParserPublisher':
+        Map LogParserPublisherConfig = PublisherDefaults.LogParserPublisher << publisherConfig
+        step(LogParserPublisherConfig)
+        break
             //case "AnalysisPublisher":
             //    Map AnalysisPublisherConfig = PublisherDefaults.AnalysisPublisher << publisherConfig
             //    step(AnalysisPublisherConfig)
@@ -133,18 +133,18 @@ def call(Map publishers) {
             //    Map WarningsPublisherConfig = PublisherDefaults.WarningsPublisher << publisherConfig
             //    step(WarningsPublisherConfig)
             //    break
-            case "ALMTestPublisher":
-                Map ALMTestPublisherConfig = PublisherDefaults.ALMTestPublisher << publisherConfig
-                publishHTML(ALMTestPublisherConfig)
-                break
-            case "RobotPublisher":
-                Map RobotPublisherConfig = PublisherDefaults.RobotPublisher << publisherConfig
-                step(RobotPublisherConfig)
-                break
+            case 'ALMTestPublisher':
+        Map ALMTestPublisherConfig = PublisherDefaults.ALMTestPublisher << publisherConfig
+        publishHTML(ALMTestPublisherConfig)
+        break
+            case 'RobotPublisher':
+        Map RobotPublisherConfig = PublisherDefaults.RobotPublisher << publisherConfig
+        step(RobotPublisherConfig)
+        break
             default:
-                echo "[JPL] Unknown results Publisher"
-                break
+                echo '[JPL] Unknown results Publisher'
+        break
         }
-    }
-    echo "[JPL] Finished running HTML Publishers"
+  }
+  echo '[JPL] Finished running HTML Publishers'
 }

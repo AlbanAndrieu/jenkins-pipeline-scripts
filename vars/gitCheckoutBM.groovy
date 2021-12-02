@@ -2,41 +2,31 @@
 import java.*
 import hudson.*
 import hudson.model.*
-import jenkins.model.Jenkins
-import com.cloudbees.groovy.cps.NonCPS
 
 def call(Closure body=null) {
-    this.vars = [:]
-    call(vars, body)
+  this.vars = [:]
+  call(vars, body)
 }
 
 def call(Map vars, Closure body=null) {
+  vars = vars ?: [:]
 
-    vars = vars ?: [:]
+  if (!body) {
+    echo 'No body specified'
+  }
 
-    if (!body) {
-        echo 'No body specified'
-    }
+  def relativeTargetDir = vars.get('relativeTargetDir', 'bm')
+  def isDefaultBranch = vars.get('isDefaultBranch', true).toBoolean()
 
-    def relativeTargetDir = vars.get("relativeTargetDir", "bm")
-    def isDefaultBranch = vars.get("isDefaultBranch", true).toBoolean()
-
-    script {
-
+  script {
         gitCheckoutBMRepo(vars) {
+      dir ('bm') {
+        getGitData(vars)
 
-            dir ("bm") {
-
-                getGitData(vars)
-
-                if (body) { body() }
-
+        if (body) { body() }
             } // dir
-
         }
 
         gitCheckoutTESTRepo(vars)
-
     } // script
-
 }

@@ -97,8 +97,7 @@
     <maven.fabric8.docker.plugin.version>0.26.1</maven.fabric8.docker.plugin.version>
     <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
     <maven.jenkinsfile.plugin.version>1.0.0</maven.jenkinsfile.plugin.version>
-    <maven.jenkins.pipeline.unit.plugin.version>1.8</maven.jenkins.pipeline.unit.plugin.version>
-    <!--<maven.jenkins.pipeline.unit.plugin.version>1.6</maven.jenkins.pipeline.unit.plugin.version>-->
+    <maven.jenkins.pipeline.unit.plugin.version>1.10</maven.jenkins.pipeline.unit.plugin.version>
     <maven.gmavenplus.plugin.version>1.5</maven.gmavenplus.plugin.version>
     <maven.jgitflow.plugin.version>1.0-m5.1</maven.jgitflow.plugin.version>
     <jdk.version>1.8.0</jdk.version>
@@ -106,21 +105,11 @@
     <java.level>8</java.level>
     <javaagent></javaagent>
     <jacoco.version>0.8.2</jacoco.version>
-    <!--<jacoco.version>0.7.7.201606060606</jacoco.version> Incompatible version 1007 in Sonar-->
-    <!--<jacoco.version>0.7.6-SNAPSHOT</jacoco.version>-->
     <maven.jacoco.plugin.version>${jacoco.version}</maven.jacoco.plugin.version>
     <jacoco.agent.version>${jacoco.version}</jacoco.agent.version>
     <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=destfile=${sonar.jacoco.itReportPath}</jacoco.agent>-->
     <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=output=tcpserver</jacoco.agent>-->
     <jacoco.agent></jacoco.agent>
-    <!--
-        <cobertura.maven.plugin.version>2.7</cobertura.maven.plugin.version>
-        <maven.codenarc.plugin.version>0.22-1</maven.codenarc.plugin.version>
-
-        <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
-        <sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>
-        <cobertura.format>xml</cobertura.format>
-        -->
     <asm.ow2.version>5.0.3</asm.ow2.version>
     <jmockit.version>1.19</jmockit.version>
     <junit.version>4.13</junit.version>
@@ -141,7 +130,7 @@
     <guava.version>18.0</guava.version>
     <doxia.core.version>1.8</doxia.core.version>
     <doxia.version>1.8.1</doxia.version>
-    <commons.io.version>2.6</commons.io.version>
+    <commons.io.version>2.11.0</commons.io.version>
     <commons.lang3.version>3.7</commons.lang3.version>
     <commons.math3.version>3.2</commons.math3.version>
     <org.assertj.version>3.4.1</org.assertj.version>
@@ -460,12 +449,12 @@
             <centralAnalyzerEnabled>false</centralAnalyzerEnabled>
             <nexusAnalyzerEnabled>false</nexusAnalyzerEnabled>
             <!--
-                        <nexusUrl>https://albandrieu.com/nexus/</nexusUrl>
-                        <cveUrl12Modified>http://albandrieu.com/download/nist/nvdcve-Modified.xml.gz</cveUrl12Modified>
-                        <cveUrl20Modified>http://albandrieu.com/download/nist/nvdcve-2.0-Modified.xml.gz</cveUrl20Modified>
-                        <cveUrl12Base>http://albandrieu.com/download/nist/nvdcve-%d.xml</cveUrl12Base>
-                        <cveUrl20Base>http://albandrieu.com/download/nist/nvdcve-2.0-%d.xml</cveUrl20Base>
-                        -->
+            <nexusUrl>https://albandrieu.com/nexus/</nexusUrl>
+            <cveUrl12Modified>http://albandrieu.com/download/nist/nvdcve-Modified.xml.gz</cveUrl12Modified>
+            <cveUrl20Modified>http://albandrieu.com/download/nist/nvdcve-2.0-Modified.xml.gz</cveUrl20Modified>
+            <cveUrl12Base>http://albandrieu.com/download/nist/nvdcve-%d.xml</cveUrl12Base>
+            <cveUrl20Base>http://albandrieu.com/download/nist/nvdcve-2.0-%d.xml</cveUrl20Base>
+            -->
           </configuration>
         </plugin>
         <plugin>
@@ -545,6 +534,7 @@
             <configuration>
               <sources>
                 <source>src/main/groovy</source>
+                <source>src/main/java</source>
                 <source>src/main/resources</source>
               </sources>
             </configuration>
@@ -558,6 +548,7 @@
             <configuration>
               <sources>
                 <source>src/test/groovy</source>
+                <source>src/test/java</source>
                 <source>src/test/resources/callstacks</source>
                 <!-- TODO
                                 <source>src/test/resources/libs/jenkins-pipeline-scripts@feature/src</source>

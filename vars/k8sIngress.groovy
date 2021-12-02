@@ -7,8 +7,7 @@ def call(Closure body=null) {
 }
 
 def call(Map vars, Closure body=null) {
-
-  echo "[JPL] Executing `vars/k8sIngress.groovy`"
+  echo '[JPL] Executing `vars/k8sIngress.groovy`'
 
   vars = vars ?: [:]
 
@@ -18,15 +17,15 @@ def call(Map vars, Closure body=null) {
 
   //vars.HELM_NAMESPACE = helmNamespace(vars)
 
-  vars.HELM_NAMESPACE_INGRESS = vars.get("HELM_NAMESPACE_INGRESS", env.HELM_NAMESPACE_INGRESS ?: "ingress-nginx").trim()
+  vars.HELM_NAMESPACE_INGRESS = vars.get('HELM_NAMESPACE_INGRESS', env.HELM_NAMESPACE_INGRESS ?: 'ingress-nginx').trim()
 
   //vars.k8IngressSelector = vars.get("k8sIngressSelector", 'app.kubernetes.io/component=controller').trim()
   //vars.k8IngressSelector = vars.get("k8sIngressSelector", 'app=default-http-backend').trim()
-  vars.k8IngressSelector = vars.get("k8sIngressSelector", 'app=ingress-nginx').trim()
+  vars.k8IngressSelector = vars.get('k8sIngressSelector', 'app=ingress-nginx').trim()
 
-  vars.skipKubeIngress = vars.get("skipKubeIngress", false).toBoolean()
-  vars.kubeIngressId = vars.get("kubeIngressId", vars.draftPack ?: "0").trim()
-  vars.kubeIngressOutputFile = vars.get("kubeIngressOutputFile", "k8s-namespace-${vars.kubeIngressId}.json").trim()
+  vars.skipKubeIngress = vars.get('skipKubeIngress', false).toBoolean()
+  vars.kubeIngressId = vars.get('kubeIngressId', vars.draftPack ?: '0').trim()
+  vars.kubeIngressOutputFile = vars.get('kubeIngressOutputFile', "k8s-namespace-${vars.kubeIngressId}.json").trim()
   //vars.kubeIngressYmlOutputFile = vars.get("kubeIngressYmlOutputFile", "k8s-config-${vars.kubeIngressId}.yml").trim()
   //vars.kubeClusterInfoOutputFile = vars.get("kubeClusterInfoOutputFile", "k8s-cluster-info-${vars.kubeIngressId}.json").trim()
 
@@ -34,7 +33,7 @@ def call(Map vars, Closure body=null) {
     try {
     //tee("${vars.kubeIngressOutputFile}") {
 
-      String k8sIngressCmd = "kubectl "
+      String k8sIngressCmd = 'kubectl '
 
       //k8sIngressCmd += " ${vars.helmDir}/${vars.helmChartName}/charts "
       if (vars.KUBECONFIG?.trim()) {
@@ -45,9 +44,8 @@ def call(Map vars, Closure body=null) {
       }
 
       if (!vars.HELM_NAMESPACE_INGRESS?.trim()) {
-        echo "Namespace ingress is mandatory"
+        echo 'Namespace ingress is mandatory'
       } else {
-
         //if (vars.HELM_NAMESPACE?.trim()) {
         //  k8sIngressCmd += " --namespace ${vars.HELM_NAMESPACE} "
         //}
@@ -70,14 +68,14 @@ def call(Map vars, Closure body=null) {
 
     //} // tee
     } catch (exc) {
-      echo "Warn: There was a problem with k8sIngress : " + exc.toString()
-      //println hudson.console.ModelHyperlinkNote.encodeTo(env.BUILD_URL + "/artifact/${vars.kubeIngressYmlOutputFile}", "${vars.kubeIngressYmlOutputFile}")
-      //println hudson.console.ModelHyperlinkNote.encodeTo(env.BUILD_URL + "/artifact/${vars.kubeClusterInfoOutputFile}", "${vars.kubeClusterInfoOutputFile}")
+      echo 'Warn: There was a problem with k8sIngress : ' + exc
+    //println hudson.console.ModelHyperlinkNote.encodeTo(env.BUILD_URL + "/artifact/${vars.kubeIngressYmlOutputFile}", "${vars.kubeIngressYmlOutputFile}")
+    //println hudson.console.ModelHyperlinkNote.encodeTo(env.BUILD_URL + "/artifact/${vars.kubeClusterInfoOutputFile}", "${vars.kubeClusterInfoOutputFile}")
     //} finally {
     //  cleanEmptyFile(vars)
     //  archiveArtifacts artifacts: "k8s-*.yml, **/k8s-*.log, ${vars.KUBECONFIG}, ${vars.kubeIngressOutputFile}, ${vars.kubeClusterInfoOutputFile}", onlyIfSuccessful: false, allowEmptyArchive: true
     }
   } else {
-    echo "KubeIngress skipped"
+    echo 'KubeIngress skipped'
   }
 }

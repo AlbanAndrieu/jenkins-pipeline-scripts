@@ -6,7 +6,7 @@ public void dockerTemplate(body) {
         containers: [containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)],
         volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]) {
     body.call()
-  }
+        }
 }
 
 public void mavenTemplate(body) {
@@ -15,7 +15,7 @@ public void mavenTemplate(body) {
         volumes: [secretVolume(secretName: 'maven-settings', mountPath: '/root/.m2'),
                   persistentVolumeClaim(claimName: 'maven-local-repo', mountPath: '/root/.m2nrepo')]) {
     body.call()
-  }
+                  }
 }
 
 return this

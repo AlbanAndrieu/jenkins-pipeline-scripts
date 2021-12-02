@@ -40,6 +40,6 @@ Usage
 -----
 
 `
-#!/usr/bin/env groovy
+# !/usr/bin/env groovy
 @Library(value='jenkins-pipeline-scripts', changelog=false) _
 `

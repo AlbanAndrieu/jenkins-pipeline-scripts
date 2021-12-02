@@ -7,28 +7,27 @@ import org.apache.commons.math3.primes.Primes
 
 class Utils implements Serializable {
 
-	def script
+  def script
 
-	Utils() {
+  Utils() {
+  }
 
-	}
+  Utils(script) {
+    this.script = script
+  }
 
-	Utils(script) {
-		this.script = script
-	}
+  void parallelize(int count) {
+    if (!Primes.isPrime(count)) {
+      echo "${count} was not prime"
+    }
+  // …
+  }
 
-	void parallelize(int count) {
-		if (!Primes.isPrime(count)) {
-			echo "${count} was not prime"
-		}
-		// …
-	}
-
-	/**
-	 * @return GIT config for devteam-tools
-	 */
-	def gitTools() {
-	    return [branch: 'master']
-	}
+    /**
+     * @return GIT config for devteam-tools
+     */
+  def gitTools() {
+    return [branch: 'master']
+  }
 
 }
