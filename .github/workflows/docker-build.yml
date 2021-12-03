@@ -1,7 +1,6 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# This workflow will build a Java project with Docker
 
-name: Main Workflow
+name: Docker Workflow
 
 on:
   push:
@@ -9,14 +8,14 @@ on:
     paths-ignore:
       - "**.md"
   pull_request:
-    #branches: [ master ]
+    branches: [ master ]
     types: [opened, synchronize, reopened]
     paths-ignore:
       - "**.md"
 
 jobs:
   build:
-    name: Build Maven and Docker
+    name: Build Docker
     #runs-on: ubuntu-18.04
     runs-on: ubuntu-latest
 
@@ -33,9 +32,6 @@ jobs:
           distribution: "adopt"
           cache: maven
 
-      - name: Build with Maven Wrapper
-        run: ./mvnw -B package
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -49,8 +45,9 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          push: false
-          tags: nabla/jenkins-pipeline-scripts:latest,nabla/jenkins-pipeline-scripts:${{ github.sha }}
+          push: true
+          #tags: nabla/jenkins-pipeline-scripts:latest,nabla/jenkins-pipeline-scripts:${{ github.sha }}
+          tags: nabla/jenkins-pipeline-scripts:latest
 
 #      - name: Run Trivy vulnerability scanner
 #        uses: aquasecurity/trivy-action@master
