@@ -132,7 +132,7 @@
     <doxia.version>1.8.1</doxia.version>
     <commons.io.version>2.11.0</commons.io.version>
     <commons.lang3.version>3.7</commons.lang3.version>
-    <commons.math3.version>3.2</commons.math3.version>
+    <commons.math3.version>3.6.1</commons.math3.version>
     <org.assertj.version>3.4.1</org.assertj.version>
     <jenkins.version>2.249</jenkins.version>
     <jenkins.core.version>${jenkins.version}</jenkins.core.version>
