@@ -105,7 +105,7 @@
     <java.level>8</java.level>
     <javaagent></javaagent>
     <jacoco.version>0.8.2</jacoco.version>
-    <maven.jacoco.plugin.version>${jacoco.version}</maven.jacoco.plugin.version>
+    <maven.jacoco.plugin.version>0.8.7</maven.jacoco.plugin.version>
     <jacoco.agent.version>${jacoco.version}</jacoco.agent.version>
     <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=destfile=${sonar.jacoco.itReportPath}</jacoco.agent>-->
     <!--<jacoco.agent>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.agent.version}/org.jacoco.agent-${jacoco.agent.version}-runtime.jar=output=tcpserver</jacoco.agent>-->
