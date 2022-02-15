@@ -50,6 +50,8 @@ echo -e "${green} ./mvnw clean install -Dpipeline.stack.write=true ${NC}"
 #./gradlew wrapper --gradle-version=5.2.1 --distribution-type=bin
 #./gradlew build
 
+datree test ./k8s/*.yaml --only-k8s-files || true
+
 git tag -l | xargs git tag -d # remove all local tags
 git fetch -t                  # fetch remote tags
 
