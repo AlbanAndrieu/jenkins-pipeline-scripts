@@ -10,7 +10,6 @@
 [![Build Status](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/AlbanAndrieu/jenkins-pipeline-scripts?label=changelog)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/releases)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1999b59401394431a1c2fea2923a919d)](https://www.codacy.com/app/uhafner/jenkins-pipeline-scripts?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlbanAndrieu/jenkins-pipeline-scripts&amp;utm_campaign=Badge_Grade)
 [![Codecov](https://img.shields.io/codecov/c/github/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://codecov.io/gh/AlbanAndrieu/jenkins-pipeline-scripts)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/pulls)
 [![Docker Pulls](https://img.shields.io/docker/pulls/nabla/jenkins-pipeline-scripts)](https://hub.docker.com/r/nabla/jenkins-pipeline-scripts)<br/>
@@ -27,7 +26,10 @@
 - [Folder Structure Conventions](#folder-structure-conventions)
   * [A typical top-level directory layout](#a-typical-top-level-directory-layout)
 - [Update documentation](#update-documentation)
+- [mega-linter](#mega-linter)
+- [Check secret](#check-secret)
 - [Update README.md](#update-readmemd)
+  * [npm-groovy-lint groovy formating for Jenkinsfile](#npm-groovy-lint-groovy-formating-for-jenkinsfile)
 
 <!-- tocstop -->
 

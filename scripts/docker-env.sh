@@ -17,9 +17,8 @@ if [ -n "${DOCKER_BUILD_ARGS}" ]; then
 else
   # shellcheck disable=SC2154
   echo -e "${red} ${double_arrow} Undefined build parameter ${head_skull} : DOCKER_BUILD_ARGS, use the default one ${NC}"
-  export DOCKER_BUILD_ARGS="--pull --no-cache --squash"
-  #export DOCKER_BUILD_ARGS="--pull --no-cache --build-arg ANSIBLE_VAULT_PASS=${ANSIBLE_VAULT_PASS} "
-  #export DOCKER_BUILD_ARGS="--build-arg --no-cache"
+  export DOCKER_BUILD_ARGS="--pull --no-cache "
+  #export DOCKER_BUILD_ARGS="--pull --no-cache --build-arg ANSIBLE_VAULT_PASS=${ANSIBLE_VAULT_PASS} --squash"
   echo -e "${magenta} DOCKER_BUILD_ARGS : ${DOCKER_BUILD_ARGS} ${NC}"
 fi
 

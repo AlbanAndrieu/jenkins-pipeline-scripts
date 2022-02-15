@@ -1,7 +1,7 @@
 #!/usr/bin/groovy
-import hudson.model.*
 import static com.test.jenkins.sonar.Sonar.sonarRestCall
-import static com.test.jenkins.sonar.Sonar.getSonarReportProperties
+
+import hudson.model.*
 
 def call(Closure body=null) {
   this.vars = [:]
@@ -109,41 +109,36 @@ Dashboard URL: ${dashboardUrl}
 Issue count: ${results}"""
 
         // Fail the build if any CRITICAL or BLOCKER issues and is not in the release branch
-        if (!isReleaseBranch() && (results["CRITICAL"] > vars.criticalThreshold || results["BLOCKER"] > vars.blockerThreshold )) {
+        if (!isReleaseBranch() && (results['CRITICAL'] > vars.criticalThreshold || results['BLOCKER'] > vars.blockerThreshold )) {
           if (!vars.skipFailure) {
-            echo "SONAR CHECK UNSTABLE Pipeline aborted because the number of CRITICAL and BLOCKER and MAJOR issues is more than 0"
+            echo 'SONAR CHECK UNSTABLE Pipeline aborted because the number of CRITICAL and BLOCKER and MAJOR issues is more than 0'
             currentBuild.result = 'UNSTABLE'
           } else {
-            echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
-            //error 'There are errors in sonar check'
+            echo 'SONAR CHECK UNSTABLE on QUALITY GATE skipped'
+          //error 'There are errors in sonar check'
           }
-
         }
 
         // Fail the build if not release branch and quality gate status is not OK
         if (!isReleaseBranch() && null != qg && qg.status != 'OK') {
-          echo "Quality gate status NOT met on short-lived branch"
+          echo 'Quality gate status NOT met on short-lived branch'
           if (!vars.skipFailure) {
-            echo "SONAR CHECK UNSTABLE on QUALITY GATE"
+            echo 'SONAR CHECK UNSTABLE on QUALITY GATE'
             currentBuild.result = 'UNSTABLE'
-            //error "Pipeline aborted because of quality gate status on short-lived branch"
+          //error "Pipeline aborted because of quality gate status on short-lived branch"
           } else {
-            echo "SONAR CHECK UNSTABLE on QUALITY GATE skipped"
-            //error 'There are errors in sonar check'
+            echo 'SONAR CHECK UNSTABLE on QUALITY GATE skipped'
+          //error 'There are errors in sonar check'
           }
         }
-
       } // withSonarQubeEnv
-
     } catch (exc) {
-      echo "WARNING : There was a problem retrieving sonar scan results : " + exc.toString()
+      echo 'WARNING : There was a problem retrieving sonar scan results : ' + exc.toString()
     }
 
     //} // tee
 
     archiveArtifacts artifacts: "${vars.sonarCheckOutputFile}, ${vars.sonarCheckResultFile}, ${vars.reportTaskFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
     println hudson.console.ModelHyperlinkNote.encodeTo(env.BUILD_URL + "artifact/${vars.sonarCheckResultFile}", "${vars.sonarCheckResultFile}")
-
   } // script
-
 }

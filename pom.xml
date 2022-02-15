@@ -114,6 +114,7 @@
     <jmockit.version>1.19</jmockit.version>
     <junit.version>4.13</junit.version>
     <hamcrest.version>2.1</hamcrest.version>
+    <groovy.all.version>2.5.15</groovy.all.version> <!-- will use groovy 2.4.6 -->
     <groovy.version>2.4.12</groovy.version>
     <!--<groovy.version>2.5.13</groovy.version>-->
     <!--<groovy.version>3.0.6</groovy.version>-->
@@ -122,8 +123,7 @@
     <groovy.cps.version>1.31</groovy.cps.version>
     <!-- jenkins 2.249.1 -->
     <slf4j.version>1.7.26</slf4j.version>
-    <log4j.version>1.2.17</log4j.version>
-    <log4j.core.version>2.13.2</log4j.core.version>
+    <log4j.core.version>2.17.1</log4j.core.version>
     <logback.version>1.0.13</logback.version>
     <jsr305.version>2.0.1</jsr305.version>
     <jmockit.version>1.19</jmockit.version>
@@ -158,15 +158,17 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>${groovy.version}</version>
+        <version>${groovy.all.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!--
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy</artifactId>
         <version>${groovy.version}</version>
       </dependency>
+      -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
@@ -216,13 +218,6 @@
             </exclusions>
             -->
     </dependency>
-    <!--
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <version>${groovy.version}</version>
-        </dependency>
-        -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-test</artifactId>
@@ -625,14 +620,6 @@
             </goals>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
-            <!--<scope>runtime</scope>-->
-          </dependency>
-        </dependencies>
         <configuration>
           <invokeDynamic>true</invokeDynamic>
           <sources>
@@ -887,14 +874,6 @@
             </exclusion>
           </exclusions>
         </dependency>
-        <!--
-                <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${log4j.version}</version>
-                    <scope>runtime</scope>
-                </dependency>
-                -->
         <dependency>
           <groupId>org.apache.logging.log4j</groupId>
           <artifactId>log4j-core</artifactId>

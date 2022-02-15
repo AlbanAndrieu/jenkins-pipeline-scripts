@@ -1,95 +1,95 @@
 credentials:
   system:
     domainCredentials:
-    - credentials:
-      - usernamePassword:
-          description: "Stash jenkins user"
-          id: "stash-jenkins"
-          password: "{AQAAABAAAAAQmOEbN9vS4GT7WB4XtSY+OruB/yqizmjkxjOriQ50Jos=}"
-          scope: GLOBAL
-          username: "mgr.jenkins"
-      - usernamePassword:
-          description: "jenkins-ssh slave"
-          id: "jenkins-ssh"
-          password: "{AQAAABAAAAAQfX7GZPVIFGHtp1BDiOtqt4V4XVV7mO8UQlEkzb5Q9BY=}"
-          scope: GLOBAL
-          username: "jenkins"
-      - usernamePassword:
-          description: "Ansible Vault"
-          id: "jenkins-ansible-vault"
-          password: "{AQAAABAAAABAHUmduSLQfSNRlUWJA3XIM/T4duh5Oo/NEBMcDdPXbL6datOORihxxfHWt5CoFclcsfo8ZkFa12SPL/jpV6jUXjrcnTQKQtfRwJnSvgn8wpk=}"
-          scope: GLOBAL
-          username: "jenkins"
-      - usernamePassword:
-          description: "jenkins@unix slaves (NEW, it should replace previous one which\
-            \ had ID number instead of string)"
-          id: "jenkins_unix_slaves"
-          password: "{AQAAABAAAABAwq4rkyRto39zZoaBkmjGCC91LXlZ8qBTGPKnb9dCBX76o1lZ5ssSoX4qetkxeZC+OJUp6fVa32F2qqAvABV52Ic8g0XB02fVm4DzbTcAIHk=}"
-          scope: GLOBAL
-          username: "jenkins"
-      - usernamePassword:
-          description: "jenkins_unix_slaves_master_slave (Jenkins)"
-          id: "jenkins_unix_slaves_master_slave"
-          password: "{AQAAABAAAABAtAZECGKX+D7fTOKFr1lOrbxoGFzIhDUgKuWLZMMXEohsyNUZ+X2sNo6+Cpi9PRUEPcD6LseWTYocn+HxnBFXMzw4gFdRruTZ6ntIiZ8orLY=}"
-          scope: GLOBAL
-          username: "Jenkins"
-      - string:
-          description: "Migrated SonarQube authentication token"
-          id: "sonar-token"
-          scope: GLOBAL
-          secret: "{AQAAABAAAABw2Zi5u/E0AhSJqjr8VRyPRHJz6DGf6Moni/sORZwXfQV2cwcoEychsXf/7MKlxY4QrQqCnBTb9ogCIIhSLf2u5iypRHF04y7zoDCVfXeYlmO1n3Kl1vlLbdghEaEcRldWCX1W6jZMKjmtatG3Lf1J9Yiiu/DQp80akwE0350P5Cg=}"
-      - usernamePassword:
-          description: "hub-docker-nabla"
-          id: "hub-docker-nabla"
-          password: "{AQAAABAAAAAQTw7F8q2Xc1eqM/m+kHc5y6X6tCJi1QZQADuL62MvGec=}"
-          scope: GLOBAL
-          username: "nabla"
-      - usernamePassword:
-          description: "Main jenkins user credentials"
-          id: "ad.jenkins-bm"
-          password: "{AQAAABAAAAAQyg0QdAufs9k2jjLZP1WxEHTcjN09nuBwgIPIowJWAjY=}"
-          scope: GLOBAL
-          username: "nabla.jenkins"
+      - credentials:
+          - usernamePassword:
+              description: "Stash jenkins user"
+              id: "jenkins-stash"
+              password: "{AQAAABAAAAAQmOEbN9vS4GT7WB4XtSY+OruB/yqizmjkxjOriQ50Jos=}"
+              scope: GLOBAL
+              username: "jenkins"
+          - usernamePassword:
+              description: "jenkins-ssh slave"
+              id: "jenkins-ssh"
+              password: "{AQAAABAAAAAQfX7GZPVIFGHtp1BDiOtqt4V4XVV7mO8UQlEkzb5Q9BY=}"
+              scope: GLOBAL
+              username: "jenkins"
+          - usernamePassword:
+              description: "Ansible Vault"
+              id: "jenkins-ansible-vault"
+              password: "{AQAAABAAAABAHUmduSLQfSNRlUWJA3XIM/T4duh5Oo/NEBMcDdPXbL6datOORihxxfHWt5CoFclcsfo8ZkFa12SPL/jpV6jUXjrcnTQKQtfRwJnSvgn8wpk=}"
+              scope: GLOBAL
+              username: "jenkins"
+          - usernamePassword:
+              description:
+                "jenkins@unix slaves"
+              id: "jenkins_unix_slaves"
+              password: "{AQAAABAAAABAwq4rkyRto39zZoaBkmjGCC91LXlZ8qBTGPKnb9dCBX76o1lZ5ssSoX4qetkxeZC+OJUp6fVa32F2qqAvABV52Ic8g0XB02fVm4DzbTcAIHk=}"
+              scope: GLOBAL
+              username: "jenkins"
+          - usernamePassword:
+              description: "jenkins_unix_slaves_master_slave (Jenkins)"
+              id: "jenkins_unix_slaves_master_slave"
+              password: "{AQAAABAAAABAtAZECGKX+D7fTOKFr1lOrbxoGFzIhDUgKuWLZMMXEohsyNUZ+X2sNo6+Cpi9PRUEPcD6LseWTYocn+HxnBFXMzw4gFdRruTZ6ntIiZ8orLY=}"
+              scope: GLOBAL
+              username: "Jenkins"
+          - string:
+              description: "Migrated SonarQube authentication token"
+              id: "sonar-token"
+              scope: GLOBAL
+              secret: "{AQAAABAAAABw2Zi5u/E0AhSJqjr8VRyPRHJz6DGf6Moni/sORZwXfQV2cwcoEychsXf/7MKlxY4QrQqCnBTb9ogCIIhSLf2u5iypRHF04y7zoDCVfXeYlmO1n3Kl1vlLbdghEaEcRldWCX1W6jZMKjmtatG3Lf1J9Yiiu/DQp80akwE0350P5Cg=}"
+          - usernamePassword:
+              description: "hub-docker-nabla"
+              id: "hub-docker-nabla"
+              password: "{AQAAABAAAAAQTw7F8q2Xc1eqM/m+kHc5y6X6tCJi1QZQADuL62MvGec=}"
+              scope: GLOBAL
+              username: "nabla"
+          - usernamePassword:
+              description: "Main jenkins user credentials"
+              id: "main-jenkins"
+              password: "{AQAAABAAAAAQyg0QdAufs9k2jjLZP1WxEHTcjN09nuBwgIPIowJWAjY=}"
+              scope: GLOBAL
+              username: "nabla.jenkins"
 jenkins:
   agentProtocols:
-  - "JNLP4-connect"
-  - "Ping"
+    - "JNLP4-connect"
+    - "Ping"
   authorizationStrategy: "loggedInUsersCanDoAnything"
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: false
   disableRememberMe: false
   globalNodeProperties:
-  - envVars:
-      env:
-      - key: "COMPOSE_HTTP_TIMEOUT"
-        value: "200"
-      - key: "CUSTOM_BUILD_ID"
-        value: "0"
-      - key: "DOCKER_CLIENT_TIMEOUT"
-        value: "600"
-      - key: "DOCKER_REGISTRY"
-        value: "nabla-registry.albandrieu.com"
-      - key: "DOCKER_REGISTRY_ACR"
-        value: "nabla.azurecr.io"
-      - key: "DOCKER_REGISTRY_ACR_CREDENTIAL"
-        value: "nabla.azurecr.io"
-      - key: "DOCKER_REGISTRY_CREDENTIAL"
-        value: "devops.jenkins"
-      - key: "DOCKER_REGISTRY_TMP"
-        value: "nabla-registry-tmp.albandrieu.com"
-      - key: "DOCKER_REGISTRY_TMP_CREDENTIAL"
-        value: "devops.jenkins"
-      - key: "SONAR_USER_HOME"
-        value: ".sonar"
+    - envVars:
+        env:
+          - key: "COMPOSE_HTTP_TIMEOUT"
+            value: "200"
+          - key: "CUSTOM_BUILD_ID"
+            value: "0"
+          - key: "DOCKER_CLIENT_TIMEOUT"
+            value: "600"
+          - key: "DOCKER_REGISTRY"
+            value: "nabla-registry.albandrieu.com"
+          - key: "DOCKER_REGISTRY_ACR"
+            value: "nabla.azurecr.io"
+          - key: "DOCKER_REGISTRY_ACR_CREDENTIAL"
+            value: "nabla.azurecr.io"
+          - key: "DOCKER_REGISTRY_CREDENTIAL"
+            value: "devops.jenkins"
+          - key: "DOCKER_REGISTRY_TMP"
+            value: "nabla-registry-tmp.albandrieu.com"
+          - key: "DOCKER_REGISTRY_TMP_CREDENTIAL"
+            value: "devops.jenkins"
+          - key: "SONAR_USER_HOME"
+            value: ".sonar"
   labelAtoms:
-  - name: "ansible"
-  - name: "any"
-  - name: "docker-compose"
-  - name: "java"
-  - name: "master"
-  - name: "molecule"
-  - name: "ubuntu"
+    - name: "ansible"
+    - name: "any"
+    - name: "docker-compose"
+    - name: "java"
+    - name: "master"
+    - name: "molecule"
+    - name: "ubuntu"
   labelString: "any"
   markupFormatter:
     rawHtml:
@@ -97,14 +97,14 @@ jenkins:
   mode: EXCLUSIVE
   myViewsTabBar: "standard"
   nodeProperties:
-  - envVars:
-      env:
-      - key: "ARCH"
-        value: "darwin"
-      - key: "JAVA_HOME"
-        value: "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home"
-      - key: "PATH"
-        value: "/opt/local/bin:/usr/local/opt/gnu-getopt/bin:/usr/local/opt/llvm/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    - envVars:
+        env:
+          - key: "ARCH"
+            value: "darwin"
+          - key: "JAVA_HOME"
+            value: "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home"
+          - key: "PATH"
+            value: "/opt/local/bin:/usr/local/opt/gnu-getopt/bin:/usr/local/opt/llvm/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
   numExecutors: 1
   primaryView:
     all:
@@ -119,26 +119,26 @@ jenkins:
       allowsSignup: false
       enableCaptcha: false
       users:
-      - id: "admin"
-        name: "Alban Andrieu"
-        properties:
-        - favoriting:
-            autofavoriteEnabled: true
-        - preferredProvider:
-            providerId: "default"
-        - userConfiguration:
-            displayForReadOnlyPermission: true
-        - mailer:
-            emailAddress: "alban.andrieu@free.fr"
+        - id: "admin"
+          name: "Alban Andrieu"
+          properties:
+            - favoriting:
+                autofavoriteEnabled: true
+            - preferredProvider:
+                providerId: "default"
+            - userConfiguration:
+                displayForReadOnlyPermission: true
+            - mailer:
+                emailAddress: "alban.andrieu@free.fr"
   slaveAgentPort: 0
   systemMessage: "Jenkins UAT"
   updateCenter:
     sites:
-    - id: "default"
-      url: "http://updates.jenkins-ci.org/stable/update-center.json"
+      - id: "default"
+        url: "http://updates.jenkins-ci.org/stable/update-center.json"
   views:
-  - all:
-      name: "all"
+    - all:
+        name: "all"
   viewsTabBar: "standard"
 security:
   apiToken:
@@ -155,170 +155,170 @@ security:
     port: 222
   scriptApproval:
     approvedSignatures:
-    - "field jenkins.model.Jenkins servletContext"
-    - "method groovy.json.JsonSlurper parse java.io.Reader"
-    - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
-    - "method groovy.lang.GString getBytes"
-    - "method groovy.lang.GroovyObject getProperty java.lang.String"
-    - "method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object"
-    - "method hudson.model.Actionable getActions"
-    - "method hudson.model.Cause getShortDescription"
-    - "method hudson.model.Cause$UserIdCause getUserId"
-    - "method hudson.model.Computer getNode"
-    - "method hudson.model.Executor getOwner"
-    - "method hudson.model.Executor interrupt hudson.model.Result jenkins.model.CauseOfInterruption[]"
-    - "method hudson.model.ItemGroup getItem java.lang.String"
-    - "method hudson.model.Job getBuilds"
-    - "method hudson.model.Label getNodes"
-    - "method hudson.model.Node getNodeName"
-    - "method hudson.model.Run getCause java.lang.Class"
-    - "method hudson.model.Run getExecutor"
-    - "method hudson.model.Run getLogFile"
-    - "method hudson.model.Run getNumber"
-    - "method hudson.model.Saveable save"
-    - "method hudson.plugins.git.GitSCM getBranches"
-    - "method hudson.plugins.git.GitSCM getUserRemoteConfigs"
-    - "method hudson.plugins.git.GitSCM isDoGenerateSubmoduleConfigurations"
-    - "method hudson.plugins.git.GitSCMBackwardCompatibility getExtensions"
-    - "method hudson.plugins.git.UserRemoteConfig getUrl"
-    - "method hudson.slaves.EnvironmentVariablesNodeProperty getEnvVars"
-    - "method hudson.util.PersistedList getAll java.lang.Class"
-    - "method java.io.BufferedReader readLine"
-    - "method java.lang.Class isArray"
-    - "method java.lang.String concat java.lang.String"
-    - "method java.lang.Throwable getStackTrace"
-    - "method java.net.HttpURLConnection getErrorStream"
-    - "method java.net.HttpURLConnection getResponseCode"
-    - "method java.net.HttpURLConnection setRequestMethod java.lang.String"
-    - "method java.net.URL openConnection"
-    - "method java.net.URLConnection connect"
-    - "method java.net.URLConnection getInputStream"
-    - "method java.net.URLConnection getURL"
-    - "method java.net.URLConnection setRequestProperty java.lang.String java.lang.String"
-    - "method javax.servlet.ServletContext getContextPath"
-    - "method jenkins.model.Jenkins getGlobalNodeProperties"
-    - "method jenkins.model.Jenkins getLabel java.lang.String"
-    - "method jenkins.model.Jenkins getRootUrl"
-    - "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses"
-    - "method org.jenkinsci.plugins.workflow.support.actions.EnvironmentAction getEnvironment"
-    - "method org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper getRawBuild"
-    - "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
-    - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
-      \ createSummary java.lang.String"
-    - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
-      \ getBuild"
-    - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
-      \ removeSummaries"
-    - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
-      \ setBuildNumber int"
-    - "new groovy.json.JsonSlurperClassic"
-    - "new java.io.BufferedReader java.io.Reader"
-    - "new java.io.File java.lang.String"
-    - "new java.io.InputStreamReader java.io.InputStream"
-    - "new java.lang.StringBuffer"
-    - "new jenkins.model.CauseOfInterruption$UserInterruption java.lang.String"
-    - "staticField java.net.HttpURLConnection HTTP_BAD_REQUEST"
-    - "staticMethod hudson.console.ModelHyperlinkNote encodeTo java.lang.String java.lang.String"
-    - "staticMethod hudson.model.Hudson getInstance"
-    - "staticMethod java.lang.String valueOf char[]"
-    - "staticMethod java.lang.Thread currentThread"
-    - "staticMethod jenkins.model.Jenkins getInstance"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods eachLine java.io.File\
-      \ groovy.lang.Closure"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getAt java.lang.Object\
-      \ java.lang.String"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getProperties\
-      \ java.lang.Object"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getText java.net.URL"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods invokeMethod\
-      \ java.lang.Object java.lang.String java.lang.Object"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods println java.lang.Object\
-      \ java.lang.Object"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods toBoolean java.lang.Boolean"
-    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods write java.io.File\
-      \ java.lang.String"
-    - "staticMethod org.codehaus.groovy.runtime.EncodingGroovyMethods encodeBase64\
-      \ byte[]"
+      - "field jenkins.model.Jenkins servletContext"
+      - "method groovy.json.JsonSlurper parse java.io.Reader"
+      - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+      - "method groovy.lang.GString getBytes"
+      - "method groovy.lang.GroovyObject getProperty java.lang.String"
+      - "method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object"
+      - "method hudson.model.Actionable getActions"
+      - "method hudson.model.Cause getShortDescription"
+      - "method hudson.model.Cause$UserIdCause getUserId"
+      - "method hudson.model.Computer getNode"
+      - "method hudson.model.Executor getOwner"
+      - "method hudson.model.Executor interrupt hudson.model.Result jenkins.model.CauseOfInterruption[]"
+      - "method hudson.model.ItemGroup getItem java.lang.String"
+      - "method hudson.model.Job getBuilds"
+      - "method hudson.model.Label getNodes"
+      - "method hudson.model.Node getNodeName"
+      - "method hudson.model.Run getCause java.lang.Class"
+      - "method hudson.model.Run getExecutor"
+      - "method hudson.model.Run getLogFile"
+      - "method hudson.model.Run getNumber"
+      - "method hudson.model.Saveable save"
+      - "method hudson.plugins.git.GitSCM getBranches"
+      - "method hudson.plugins.git.GitSCM getUserRemoteConfigs"
+      - "method hudson.plugins.git.GitSCM isDoGenerateSubmoduleConfigurations"
+      - "method hudson.plugins.git.GitSCMBackwardCompatibility getExtensions"
+      - "method hudson.plugins.git.UserRemoteConfig getUrl"
+      - "method hudson.slaves.EnvironmentVariablesNodeProperty getEnvVars"
+      - "method hudson.util.PersistedList getAll java.lang.Class"
+      - "method java.io.BufferedReader readLine"
+      - "method java.lang.Class isArray"
+      - "method java.lang.String concat java.lang.String"
+      - "method java.lang.Throwable getStackTrace"
+      - "method java.net.HttpURLConnection getErrorStream"
+      - "method java.net.HttpURLConnection getResponseCode"
+      - "method java.net.HttpURLConnection setRequestMethod java.lang.String"
+      - "method java.net.URL openConnection"
+      - "method java.net.URLConnection connect"
+      - "method java.net.URLConnection getInputStream"
+      - "method java.net.URLConnection getURL"
+      - "method java.net.URLConnection setRequestProperty java.lang.String java.lang.String"
+      - "method javax.servlet.ServletContext getContextPath"
+      - "method jenkins.model.Jenkins getGlobalNodeProperties"
+      - "method jenkins.model.Jenkins getLabel java.lang.String"
+      - "method jenkins.model.Jenkins getRootUrl"
+      - "method org.jenkinsci.plugins.workflow.steps.FlowInterruptedException getCauses"
+      - "method org.jenkinsci.plugins.workflow.support.actions.EnvironmentAction getEnvironment"
+      - "method org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper getRawBuild"
+      - "method org.jenkinsci.plugins.workflow.support.steps.input.Rejection getUser"
+      - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
+        \ createSummary java.lang.String"
+      - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
+        \ getBuild"
+      - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
+        \ removeSummaries"
+      - "method org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder$BadgeManager\
+        \ setBuildNumber int"
+      - "new groovy.json.JsonSlurperClassic"
+      - "new java.io.BufferedReader java.io.Reader"
+      - "new java.io.File java.lang.String"
+      - "new java.io.InputStreamReader java.io.InputStream"
+      - "new java.lang.StringBuffer"
+      - "new jenkins.model.CauseOfInterruption$UserInterruption java.lang.String"
+      - "staticField java.net.HttpURLConnection HTTP_BAD_REQUEST"
+      - "staticMethod hudson.console.ModelHyperlinkNote encodeTo java.lang.String java.lang.String"
+      - "staticMethod hudson.model.Hudson getInstance"
+      - "staticMethod java.lang.String valueOf char[]"
+      - "staticMethod java.lang.Thread currentThread"
+      - "staticMethod jenkins.model.Jenkins getInstance"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods eachLine java.io.File\
+        \ groovy.lang.Closure"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getAt java.lang.Object\
+        \ java.lang.String"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getProperties\
+        \ java.lang.Object"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getText java.net.URL"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods invokeMethod\
+        \ java.lang.Object java.lang.String java.lang.Object"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods println java.lang.Object\
+        \ java.lang.Object"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods toBoolean java.lang.Boolean"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods write java.io.File\
+        \ java.lang.String"
+      - "staticMethod org.codehaus.groovy.runtime.EncodingGroovyMethods encodeBase64\
+        \ byte[]"
 unclassified:
   ansiColorBuildWrapper:
     colorMaps:
-    - black: "#000000"
-      blackB: "#4C4C4C"
-      blue: "#1E90FF"
-      blueB: "#4682B4"
-      cyan: "#00CDCD"
-      cyanB: "#00FFFF"
-      green: "#00CD00"
-      greenB: "#00FF00"
-      magenta: "#CD00CD"
-      magentaB: "#FF00FF"
-      name: "xterm"
-      red: "#CD0000"
-      redB: "#FF0000"
-      white: "#E5E5E5"
-      whiteB: "#FFFFFF"
-      yellow: "#CDCD00"
-      yellowB: "#FFFF00"
-    - black: "#000000"
-      blackB: "#555555"
-      blue: "#0000AA"
-      blueB: "#5555FF"
-      cyan: "#00AAAA"
-      cyanB: "#55FFFF"
-      defaultBackground: 0
-      defaultForeground: 7
-      green: "#00AA00"
-      greenB: "#55FF55"
-      magenta: "#AA00AA"
-      magentaB: "#FF55FF"
-      name: "vga"
-      red: "#AA0000"
-      redB: "#FF5555"
-      white: "#AAAAAA"
-      whiteB: "#FFFFFF"
-      yellow: "#AA5500"
-      yellowB: "#FFFF55"
-    - black: "black"
-      blackB: "black"
-      blue: "blue"
-      blueB: "blue"
-      cyan: "cyan"
-      cyanB: "cyan"
-      green: "green"
-      greenB: "green"
-      magenta: "magenta"
-      magentaB: "magenta"
-      name: "css"
-      red: "red"
-      redB: "red"
-      white: "white"
-      whiteB: "white"
-      yellow: "yellow"
-      yellowB: "yellow"
-    - black: "#2E3436"
-      blackB: "#2E3436"
-      blue: "#3465A4"
-      blueB: "#3465A4"
-      cyan: "#06989A"
-      cyanB: "#06989A"
-      defaultBackground: 0
-      defaultForeground: 7
-      green: "#4E9A06"
-      greenB: "#4E9A06"
-      magenta: "#75507B"
-      magentaB: "#75507B"
-      name: "gnome-terminal"
-      red: "#CC0000"
-      redB: "#CC0000"
-      white: "#D3D7CF"
-      whiteB: "#D3D7CF"
-      yellow: "#C4A000"
-      yellowB: "#C4A000"
+      - black: "#000000"
+        blackB: "#4C4C4C"
+        blue: "#1E90FF"
+        blueB: "#4682B4"
+        cyan: "#00CDCD"
+        cyanB: "#00FFFF"
+        green: "#00CD00"
+        greenB: "#00FF00"
+        magenta: "#CD00CD"
+        magentaB: "#FF00FF"
+        name: "xterm"
+        red: "#CD0000"
+        redB: "#FF0000"
+        white: "#E5E5E5"
+        whiteB: "#FFFFFF"
+        yellow: "#CDCD00"
+        yellowB: "#FFFF00"
+      - black: "#000000"
+        blackB: "#555555"
+        blue: "#0000AA"
+        blueB: "#5555FF"
+        cyan: "#00AAAA"
+        cyanB: "#55FFFF"
+        defaultBackground: 0
+        defaultForeground: 7
+        green: "#00AA00"
+        greenB: "#55FF55"
+        magenta: "#AA00AA"
+        magentaB: "#FF55FF"
+        name: "vga"
+        red: "#AA0000"
+        redB: "#FF5555"
+        white: "#AAAAAA"
+        whiteB: "#FFFFFF"
+        yellow: "#AA5500"
+        yellowB: "#FFFF55"
+      - black: "black"
+        blackB: "black"
+        blue: "blue"
+        blueB: "blue"
+        cyan: "cyan"
+        cyanB: "cyan"
+        green: "green"
+        greenB: "green"
+        magenta: "magenta"
+        magentaB: "magenta"
+        name: "css"
+        red: "red"
+        redB: "red"
+        white: "white"
+        whiteB: "white"
+        yellow: "yellow"
+        yellowB: "yellow"
+      - black: "#2E3436"
+        blackB: "#2E3436"
+        blue: "#3465A4"
+        blueB: "#3465A4"
+        cyan: "#06989A"
+        cyanB: "#06989A"
+        defaultBackground: 0
+        defaultForeground: 7
+        green: "#4E9A06"
+        greenB: "#4E9A06"
+        magenta: "#75507B"
+        magentaB: "#75507B"
+        name: "gnome-terminal"
+        red: "#CC0000"
+        redB: "#CC0000"
+        white: "#D3D7CF"
+        whiteB: "#D3D7CF"
+        yellow: "#C4A000"
+        yellowB: "#C4A000"
   badgePlugin:
     disableFormatHTML: false
   buildDiscarders:
     configuredBuildDiscarders:
-    - "jobBuildDiscarder"
+      - "jobBuildDiscarder"
   buildFailureAnalyzer:
     doNotAnalyzeAbortedJob: false
     gerritTriggerEnabled: true
@@ -327,7 +327,8 @@ unclassified:
     knowledgeBase: "localFile"
     maxLogSize: 0
     noCausesEnabled: true
-    noCausesMessage: "No problems were identified. If you know why this problem occurred,\
+    noCausesMessage:
+      "No problems were identified. If you know why this problem occurred,\
       \ please add a suitable Cause for it."
     nrOfScanThreads: 3
     slackFailureCategories: "ALL"
@@ -352,7 +353,8 @@ unclassified:
     asyncHtmlRemoval: false
     credentialsId: "nabla.jenkins.checkmarx"
     enableCertificateValidation: true
-    excludeFolders: ".repository, target, .node_cache, .node_tmp, .grunt, .bower,\
+    excludeFolders:
+      ".repository, target, .node_cache, .node_tmp, .grunt, .bower,\
       \ bower_components, node_modules, node, lib, libs, docs, help, test,  Sample,\
       \ vendors, dist, build"
     filterPattern: |-
@@ -382,8 +384,8 @@ unclassified:
     username: "nabla.jenkins"
   defaultFolderConfiguration:
     healthMetrics:
-    - worstChildHealthMetric:
-        recursive: true
+      - worstChildHealthMetric:
+          recursive: true
   dependencyTrackPublisher:
     dependencyTrackAutoCreateProjects: false
     dependencyTrackConnectionTimeout: 0
@@ -411,29 +413,29 @@ unclassified:
     actualiseOnFactory: false
   globalConfigFiles:
     configs:
-    - custom:
-        comment: "JPL bowerrc configuration - Used only with isLocalJenkinsUser: true"
-        content: |-
-          {
-            "directory": "bower_components",
-            "proxy": "http://192.168.1.57:3128",
-            "https-proxy": "http://192.168.1.57:3128",
-            "no-proxy": "localhost,127.0.0.1,.albandrieu.com",
-            "analytics": false,
-            "timeout": 120000,
-            "registry": "http://192.168.1.57:5678",
-            "register": "http://192.168.1.57:5678",
-            "publish": "http://192.168.1.57:5678",
-            "storage": {
-              "packages" : ".bower/packages",
-              "registry" : ".bower/registry"
-            },
-            "tmp": ".bower/tmp",
-            "allow_root": true
-          }
-        id: "nabla-bowerrc-default"
-        name: "nabla-bowerrc-default"
-        providerId: "org.jenkinsci.plugins.configfiles.custom.CustomConfig"
+      - custom:
+          comment: "JPL bowerrc configuration - Used only with isLocalJenkinsUser: true"
+          content: |-
+            {
+              "directory": "bower_components",
+              "proxy": "http://192.168.1.57:3128",
+              "https-proxy": "http://192.168.1.57:3128",
+              "no-proxy": "localhost,127.0.0.1,.albandrieu.com",
+              "analytics": false,
+              "timeout": 120000,
+              "registry": "http://192.168.1.57:5678",
+              "register": "http://192.168.1.57:5678",
+              "publish": "http://192.168.1.57:5678",
+              "storage": {
+                "packages" : ".bower/packages",
+                "registry" : ".bower/registry"
+              },
+              "tmp": ".bower/tmp",
+              "allow_root": true
+            }
+          id: "nabla-bowerrc-default"
+          name: "nabla-bowerrc-default"
+          providerId: "org.jenkinsci.plugins.configfiles.custom.CustomConfig"
   globalConfigurationImpl:
     allResults: true
     enabled: true
@@ -443,7 +445,8 @@ unclassified:
     durabilityHint: PERFORMANCE_OPTIMIZED
   globalEventsPlugin:
     disableSynchronization: false
-    onEventGroovyCode: "import groovy.json.*\nimport hudson.model.Hudson.*\nimport\
+    onEventGroovyCode:
+      "import groovy.json.*\nimport hudson.model.Hudson.*\nimport\
       \ jenkins.model.*\nimport java.lang.management.RuntimeMXBean\nimport java.lang.management.ManagementFactory\n\
       import hudson.model.*\nimport jenkins.metrics.impl.TimeInQueueAction\n\n//@Grab('org.jenkins-ci.plugins.workflow:workflow-job:2.37')\n\
       import org.jenkinsci.plugins.workflow.job.WorkflowRun\nimport org.jenkinsci.plugins.workflow.flow.FlowExecution;\n\
@@ -614,29 +617,29 @@ unclassified:
       \    return docs\n}\n"
   globalLibraries:
     libraries:
-    - defaultVersion: "develop"
-      name: "jenkins-pipeline-scripts"
-      retriever:
-        modernSCM:
-          scm:
-            git:
-              credentialsId: "devops.jenkins-ssh"
-              id: "f574f66c-ef3c-46e6-97ec-d992710beefc"
-              remote: "ssh://git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git"
+      - defaultVersion: "develop"
+        name: "jenkins-pipeline-scripts"
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                credentialsId: "devops.jenkins-ssh"
+                id: "f574f66c-ef3c-46e6-97ec-d992710beefc"
+                remote: "ssh://git@github.com:AlbanAndrieu/jenkins-pipeline-scripts.git"
   groovy:
     installations:
-    - name: "groovy-2.4.4"
-      properties:
-      - installSource:
-          installers:
-          - groovyInstaller:
-              id: "2.4.4"
-    - name: "groovy-2.4.12"
-      properties:
-      - installSource:
-          installers:
-          - groovyInstaller:
-              id: "3.0.8"
+      - name: "groovy-2.4.4"
+        properties:
+          - installSource:
+              installers:
+                - groovyInstaller:
+                    id: "2.4.4"
+      - name: "groovy-2.4.12"
+        properties:
+          - installSource:
+              installers:
+                - groovyInstaller:
+                    id: "3.0.8"
   ivyBuildTrigger:
     extendedVersionMatching: false
   jenkinsLintGlobalConfiguration:
@@ -672,15 +675,15 @@ unclassified:
     windowsSlaveLaunchCheckerEnabled: true
   jiraGlobalConfiguration:
     sites:
-    - alternativeUrl: "http://jira.albandrieu.com/"
-      credentialsId: "devops.jenkins"
-      readTimeout: 10
-      timeout: 30
-      url: "http://jira.albandrieu.com/"
+      - alternativeUrl: "http://jira.albandrieu.com/"
+        credentialsId: "devops.jenkins"
+        readTimeout: 10
+        timeout: 30
+        url: "http://jira.albandrieu.com/"
   jobImportGlobalConfig:
     sites:
-    - name: "other-jenkins"
-      url: "https://other-jenkins.albandrieu.com/jenkins"
+      - name: "other-jenkins"
+        url: "https://other-jenkins.albandrieu.com/jenkins"
   junitTestResultStorage:
     storage: "file"
   location:
@@ -688,12 +691,12 @@ unclassified:
     url: "https://albandrieu:8686/jenkins/"
   lockableResourcesManager:
     declaredResources:
-    - name: "lock_CPP_master-slave"
+      - name: "lock_CPP_master-slave"
   logParser:
     legacyFormatting: false
     parsingRulesGlobal:
-    - name: "deploy log parsing"
-      path: "/jenkins/deploy-log_parsing_rules"
+      - name: "deploy log parsing"
+        path: "/jenkins/deploy-log_parsing_rules"
   mailer:
     charset: "UTF-8"
     defaultSuffix: "@free.fr"
@@ -733,11 +736,11 @@ unclassified:
     useAuthenticatedEndpoint: false
   remoteBuildConfiguration:
     remoteSites:
-    - address: "https://other-ci.albandrieu.com/jenkins"
-      auth2:
-        CredentialsAuth:
-          credentials: "devops.jenkins"
-      displayName: "other-ci"
+      - address: "https://other-ci.albandrieu.com/jenkins"
+        auth2:
+          CredentialsAuth:
+            credentials: "devops.jenkins"
+        displayName: "other-ci"
   robotConfig:
     buildsToShowInResultsColumn: 15
     robotResultsColumnEnabled: true
@@ -755,94 +758,94 @@ unclassified:
 tool:
   ant:
     installations:
-    - name: "ant-latest"
-      properties:
-      - installSource:
-          installers:
-          - antFromApache:
-              id: "1.10.1"
+      - name: "ant-latest"
+        properties:
+          - installSource:
+              installers:
+                - antFromApache:
+                    id: "1.10.1"
   customTool:
     installations:
-    - name: "ZAPROXY"
-      properties:
-      - installSource:
-          installers:
-          - zip:
-              subdir: "ZAP_2.5.0"
-              url: "https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Core.tar.gz"
-    - name: "ZAPROXY_2.8.0"
-      properties:
-      - installSource:
-          installers:
-          - zip:
-              label: "zaproxy"
-              subdir: "ZAP_2.8.0"
-              url: "http://fr1cslfrbm0059/download/zap/ZAP_2.8.0_Core.zip"
-    - name: "ZAPROXY_2.10.0"
-      properties:
-      - installSource:
-          installers:
-          - zip:
-              label: "zaproxy"
-              subdir: "ZAP_2.10.0"
-              url: "https://github.com/zaproxy/zaproxy/releases/download/v2.10.0/ZAP_2.10.0_Crossplatform.zip"
+      - name: "ZAPROXY"
+        properties:
+          - installSource:
+              installers:
+                - zip:
+                    subdir: "ZAP_2.5.0"
+                    url: "https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Core.tar.gz"
+      - name: "ZAPROXY_2.8.0"
+        properties:
+          - installSource:
+              installers:
+                - zip:
+                    label: "zaproxy"
+                    subdir: "ZAP_2.8.0"
+                    url: "http://fr1cslfrbm0059/download/zap/ZAP_2.8.0_Core.zip"
+      - name: "ZAPROXY_2.10.0"
+        properties:
+          - installSource:
+              installers:
+                - zip:
+                    label: "zaproxy"
+                    subdir: "ZAP_2.10.0"
+                    url: "https://github.com/zaproxy/zaproxy/releases/download/v2.10.0/ZAP_2.10.0_Crossplatform.zip"
   git:
     installations:
-    - home: "/usr/bin/git"
-      name: "git-latest"
+      - home: "/usr/bin/git"
+        name: "git-latest"
   groovy:
     installations:
-    - name: "groovy-2.4.4"
-      properties:
-      - installSource:
-          installers:
-          - groovyInstaller:
-              id: "2.4.4"
-    - name: "groovy-2.4.12"
-      properties:
-      - installSource:
-          installers:
-          - groovyInstaller:
-              id: "3.0.8"
+      - name: "groovy-2.4.4"
+        properties:
+          - installSource:
+              installers:
+                - groovyInstaller:
+                    id: "2.4.4"
+      - name: "groovy-2.4.12"
+        properties:
+          - installSource:
+              installers:
+                - groovyInstaller:
+                    id: "3.0.8"
   jdk:
     installations:
-    - name: "java-latest"
-      properties:
-      - installSource:
-          installers:
-          - jdkInstaller:
-              acceptLicense: true
-              id: "jdk-8u131-oth-JPR"
-    - name: "java-7-latest"
-      properties:
-      - installSource:
-          installers:
-          - jdkInstaller:
-              acceptLicense: true
-              id: "jdk-7u80-oth-JPR"
-    - name: "jdk8"
-      properties:
-      - installSource:
-          installers:
-          - jdkInstaller:
-              acceptLicense: true
-              id: "jdk-8u131-oth-JPR"
-    - name: "openjdk8"
-    - name: "jdk-18"
-      properties:
-      - installSource:
-          installers:
-          - jdkInstaller:
-              acceptLicense: true
-              id: "jdk-8u131-oth-JPR"
+      - name: "java-latest"
+        properties:
+          - installSource:
+              installers:
+                - jdkInstaller:
+                    acceptLicense: true
+                    id: "jdk-8u131-oth-JPR"
+      - name: "java-7-latest"
+        properties:
+          - installSource:
+              installers:
+                - jdkInstaller:
+                    acceptLicense: true
+                    id: "jdk-7u80-oth-JPR"
+      - name: "jdk8"
+        properties:
+          - installSource:
+              installers:
+                - jdkInstaller:
+                    acceptLicense: true
+                    id: "jdk-8u131-oth-JPR"
+      - name: "openjdk8"
+      - name: "jdk-18"
+        properties:
+          - installSource:
+              installers:
+                - jdkInstaller:
+                    acceptLicense: true
+                    id: "jdk-8u131-oth-JPR"
   maven:
     installations:
-    - name: "maven-3.5.0"
-      properties:
-      - installSource:
-          installers:
-          - maven:
-              id: "3.5.0"
+      - name: "maven-3.5.0"
+        properties:
+          - installSource:
+              installers:
+                - maven:
+                    id: "3.5.0"
   mavenGlobalConfig:
     globalSettingsProvider:
       mvn:
@@ -852,7 +855,7 @@ tool:
         settingsConfigId: "nabla-maven-local-default"
   pipelineMaven:
     publisherOptions:
-    - "pipelineGraphPublisher"
+      - "pipelineGraphPublisher"
     triggerDownstreamUponResultAborted: false
     triggerDownstreamUponResultFailure: false
     triggerDownstreamUponResultNotBuilt: false
@@ -860,23 +863,23 @@ tool:
     triggerDownstreamUponResultUnstable: false
   sConsInstallation:
     installations:
-    - home: "/usr/local/bin/scons"
-      name: "scons-latest"
+      - home: "/usr/local/bin/scons"
+        name: "scons-latest"
   sonarRunnerInstallation:
     installations:
-    - name: "Sonar-Runner-2.8"
-      properties:
-      - installSource:
-          installers:
-          - sonarRunnerInstaller:
-              id: "4.6.1.2450"
-    - name: "Sonar-Scanner-4.6"
-      properties:
-      - installSource:
-          installers:
-          - sonarRunnerInstaller:
-              id: "4.6.1.2450"
+      - name: "Sonar-Runner-2.8"
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "4.6.1.2450"
+      - name: "Sonar-Scanner-4.6"
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "4.6.1.2450"
   xvfbInstallation:
     installations:
-    - home: "/usr/bin/"
-      name: "mgr"
+      - home: "/usr/bin/"
+        name: "mgr"

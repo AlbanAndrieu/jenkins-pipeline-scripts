@@ -8,7 +8,7 @@ on:
     paths-ignore:
       - "**.md"
   pull_request:
-    branches: [ master ]
+    branches: [master]
     types: [opened, synchronize, reopened]
     paths-ignore:
       - "**.md"
@@ -48,7 +48,6 @@ jobs:
           push: true
           #tags: nabla/jenkins-pipeline-scripts:latest,nabla/jenkins-pipeline-scripts:${{ github.sha }}
           tags: nabla/jenkins-pipeline-scripts:latest
-
 #      - name: Run Trivy vulnerability scanner
 #        uses: aquasecurity/trivy-action@master
 #        with:

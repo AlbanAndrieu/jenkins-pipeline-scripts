@@ -51,7 +51,6 @@ jobs:
         with:
           push: false
           tags: nabla/jenkins-pipeline-scripts:latest,nabla/jenkins-pipeline-scripts:${{ github.sha }}
-
 #      - name: Run Trivy vulnerability scanner
 #        uses: aquasecurity/trivy-action@master
 #        with:
