@@ -50,7 +50,6 @@ aqua-security-scanner:latest
 whitesource:latest
 matrix-combinations-parameter:latest
 jobtype-column:latest
-batch-task:latest
 configurationslicing:latest
 parameterized-trigger:latest
 sounds:latest
@@ -70,7 +69,6 @@ skip-certificate-check:latest
 maven-info:latest
 node-iterator-api:latest
 ssh:latest
-publish-over-ssh:latest
 ssh-slaves:latest
 ssh-credentials:latest
 stashNotifier:latest
@@ -197,3 +195,5 @@ groovy-events-listener-plugin:1.014
 #machine-learning:latest
 #dependency-track:latest
 yet-another-build-visualizer:latest
+#batch-task:latest
+#publish-over-ssh:latest
