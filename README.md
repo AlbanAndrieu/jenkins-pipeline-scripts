@@ -8,6 +8,11 @@
 
 [![Jenkins Version](https://img.shields.io/badge/Jenkins-2.221-green.svg?label=min.%20Jenkins)](https://jenkins.io/download/)
 [![Build Status](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml)
+
+[![Main Workflow](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/maven-build.yml)
+[![Docker Workflow](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/docker-build.yml/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/docker-build.yml)
+[![Trivy](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/trivy.yml/badge.svg)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/actions/workflows/trivy.yml)
+
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/AlbanAndrieu/jenkins-pipeline-scripts?label=changelog)](https://github.com/AlbanAndrieu/jenkins-pipeline-scripts/releases)
 
 [![Codecov](https://img.shields.io/codecov/c/github/AlbanAndrieu/jenkins-pipeline-scripts.svg)](https://codecov.io/gh/AlbanAndrieu/jenkins-pipeline-scripts)
