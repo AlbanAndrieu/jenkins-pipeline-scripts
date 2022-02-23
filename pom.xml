@@ -102,6 +102,7 @@
     <maven.jgitflow.plugin.version>1.0-m5.1</maven.jgitflow.plugin.version>
     <jdk.version>1.8.0</jdk.version>
     <jdk.level>1.8</jdk.level>
+    <jdk.target>1.8</jdk.target>
     <java.level>8</java.level>
     <javaagent></javaagent>
     <jacoco.version>0.8.2</jacoco.version>
@@ -134,7 +135,7 @@
     <commons.lang3.version>3.7</commons.lang3.version>
     <commons.math3.version>3.2</commons.math3.version>
     <org.assertj.version>3.4.1</org.assertj.version>
-    <jenkins.version>2.249</jenkins.version>
+    <jenkins.version>2.335</jenkins.version>
     <jenkins.core.version>${jenkins.version}</jenkins.core.version>
     <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
     <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
@@ -510,7 +511,7 @@
         </dependencies>
         <configuration>
           <source>${jdk.level}</source>
-          <target>${jdk.level}</target>
+          <target>${jdk.target}</target>
           <compilerId>groovy-eclipse-compiler</compilerId>
           <verbose>true</verbose>
         </configuration>

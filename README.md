@@ -239,6 +239,7 @@ See [Extending environment variables with Shared Libraries](https://devops.daten
 ## Graph dependency
 
 * [graphviz](https://www.graphviz.org/pdf/dotguide.pdf)
+* [webgraphviz](http://webgraphviz.com/)
 
 ```bash
 dot -Tps draftStage.gv -o draftStage.ps
@@ -247,6 +248,12 @@ dot -Tsvg draftStage.gv -o draftStage.svg
 ```
 
 <img src="draftStage.png" width="1200" height="800" />
+
+```bash
+terraform graph | grep -v -e 'meta' -e 'close' -e 's3' -e 'vpc' -e 'expand' | dot -Tpng > terraform.png
+```
+
+<img src="terraform.png" width="1200" height="800" />
 
 ![pods-helm-sample](pods-helm-sample.svg)
 

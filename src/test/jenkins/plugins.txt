@@ -132,9 +132,9 @@ description-setter:latest
 build-environment:latest
 git-client:latest
 authentication-tokens:latest
-monitoring:latest
+#monitoring:latest
 text-finder:latest
-extended-choice-parameter:latest
+#extended-choice-parameter:latest
 built-on-column:latest
 run-condition:latest
 lastfailureversioncolumn:latest
@@ -155,7 +155,7 @@ matrix-auth:latest
 testInProgress:latest
 copy-data-to-workspace-plugin:latest
 mailer:latest
-next-build-number:latest
+#next-build-number:latest
 qc:latest
 multiple-scms:latest
 job-import-plugin:latest
