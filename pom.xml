@@ -136,7 +136,7 @@
     <commons.math3.version>3.2</commons.math3.version>
     <org.assertj.version>3.4.1</org.assertj.version>
     <jenkins.version>2.335</jenkins.version>
-    <jenkins.core.version>${jenkins.version}</jenkins.core.version>
+    <jenkins.core.version>2.336</jenkins.core.version>
     <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
     <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
     <!-- See http://localhost:8686/pluginManager/plugin/workflow-cps/thirdPartyLicenses -->
