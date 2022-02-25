@@ -117,9 +117,9 @@ repos:
           # Make the tool search for charts only under the `packs/helm-sample` directory
           - --chart-search-root=packs/jenkins
         files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
-  - repo: https://github.com/datreeio/datree
-    rev: HEAD
-    hooks:
-      - id: datree-docker
-        args: ['test', './k8s/*.yaml', '--only-k8s-files']
-        verbose: true
+#  - repo: https://github.com/datreeio/datree
+#    rev: HEAD
+#    hooks:
+#      - id: datree-docker
+#        args: ['test', './k8s/*.yaml', '--only-k8s-files']
+#        verbose: true

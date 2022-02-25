@@ -5,6 +5,7 @@ name: Docker Workflow
 on:
   push:
     branches: [master]
+    branches-ignore: "dependabot/**"
     paths-ignore:
       - "**.md"
   pull_request:
