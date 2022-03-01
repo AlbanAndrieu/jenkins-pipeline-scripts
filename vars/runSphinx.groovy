@@ -56,7 +56,7 @@ def call(Map vars, Closure body=null) {
             //        }
             //    }
             //} // isReleaseBranch
-            }  {
+            } else {
               echo "WARNING : Sphinx failed, check output at \'${env.BUILD_URL}artifact/${vars.sphinxOutputFile}\' "
               if (!vars.skipSphinxFailure) {
                 echo 'SPHINX UNSTABLE'
