@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 @Library('jenkins-pipeline-scripts@master')
 
-String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: 'registry.hub.docker.com'.trim()
+String DOCKER_REGISTRY_HUB=env.DOCKER_REGISTRY_HUB ?: "index.docker.io/v1".toLowerCase().trim()
 String DOCKER_ORGANISATION_HUB = env.DOCKER_ORGANISATION_HUB ?: 'nabla'.trim()
 
 String DOCKER_NAME = 'ansible-jenkins-slave-docker'.trim()
@@ -253,14 +253,15 @@ pipeline {
   } // stages
   post {
     always {
-      recordIssues enabledForFailure: true,
-        tools: [taskScanner(),
-                tagList()
-        ]
 
       //archiveArtifacts allowEmptyArchive: true, artifacts: '*.log. *.json', excludes: null, fingerprint: false, onlyIfSuccessful: false
 
       node('any||flyweight') {
+				recordIssues enabledForFailure: true,
+					tools: [taskScanner(),
+									tagList()
+					]
+
         withLogParser(unstableOnWarning: false)
       }
     } // always

@@ -7,6 +7,7 @@ def call(Closure body=null) {
 }
 
 def call(Map vars, Closure body=null) {
+
   echo '[JPL] Executing `vars/getJenkinsOpts.groovy`'
 
   vars = vars ?: [:]
@@ -84,7 +85,7 @@ def call(Map vars, Closure body=null) {
   vars.isVirtualHost = vars.get('isVirtualHost', false).toBoolean()
   vars.isRoot = vars.get('isRoot', false).toBoolean()
   //vars.isCredentialsMapping = vars.get("isCredentialsMapping", true).toBoolean()
-  vars.isNetworkMapping = vars.get('isNetworkMapping', false).toBoolean()
+  vars.isNetworkMapping = vars.get('isNetworkMapping', true).toBoolean()
   vars.isUserNamespace = vars.get('isUserNamespace', false).toBoolean()
   vars.isPidMapping = vars.get('isPidMapping', false).toBoolean()
   vars.isDnsSearchMapping = vars.get('isDnsSearchMapping', true).toBoolean()

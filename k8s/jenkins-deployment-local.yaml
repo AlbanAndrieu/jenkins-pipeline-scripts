@@ -23,11 +23,10 @@ spec:
       dnsPolicy: "None"
       dnsConfig:
         nameservers:
-          - 10.21.200.3
           - 8.8.8.8
+          - 8.8.4.4
         searches:
           - albandrieu.com
-          - misys.global.ad
         options: # https://support.cloudbees.com/hc/en-us/articles/360040999471-UnknownHostException-caused-by-DNS-Resolution-issue-with-Alpine-Images
           - name: ndots
             value: "1"
@@ -39,8 +38,7 @@ spec:
       #  - name: p21d13401013001
       containers:
         - name: jenkins
-          image: nabla/jenkins-pipeline-scripts:1.0.0
-          #image: p21d13401013001.azurecr.io/fusion-risk/jenkins-pipeline-scripts:1.0.1
+          image: nabla/jenkins-pipeline-scripts:1.0.2
           imagePullPolicy: Always
           #imagePullPolicy: IfNotPresent
           env:
@@ -77,7 +75,7 @@ spec:
               memory: 2Gi
             requests:
               cpu: 0.5
-              memory: 1.3Gi
+              memory: 1Gi
           volumeMounts:
             - name: jenkins-home
               mountPath: /var/jenkins_home

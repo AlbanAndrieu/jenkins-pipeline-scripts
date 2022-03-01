@@ -7,6 +7,7 @@ def call(Closure body=null) {
 }
 
 def call(Map vars, Closure body=null) {
+
   echo '[JPL] Executing `vars/getDockerOpts.groovy`'
 
   vars = vars ?: [:]
@@ -30,7 +31,7 @@ def call(Map vars, Closure body=null) {
     DOCKER_OPTS_BASIC += ' --net=host'
   }
   if (vars.isUserNamespace == true) {
-    DOCKER_OPTS_BASIC += ' --userns=host'
+    DOCKER_OPTS_BASIC += ' --userns=host --add-host albandrieu.com:82.66.4.247 '
   }
   if (vars.isPidMapping == true) {
     DOCKER_OPTS_BASIC += ' --pid=host'

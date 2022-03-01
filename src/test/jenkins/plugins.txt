@@ -184,6 +184,7 @@ groovy-events-listener-plugin:1.014
 # rm -f /mnt/jenkins/jenkins.yaml
 # rm -Rf plugins/*
 #docker-workflow:1.26 # error
+docker-workflow:1.28
 #docker-plugin:1.2.2
 #cppcheck:latest # error rm -Rf nested-view* cppcheck* docker-traceability*
 #pipeline-rest-api:latest
@@ -197,3 +198,4 @@ groovy-events-listener-plugin:1.014
 yet-another-build-visualizer:latest
 #batch-task:latest
 #publish-over-ssh:latest
+amazon-ecr

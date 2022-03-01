@@ -115,7 +115,7 @@ Install [microk8s](https://ubuntu.com/blog/deploying-kubernetes-locally-microk8s
 [Make](https://microk8s.io/docs/registry-images) docker image available to microk8s
 
 ```bash
-$docker save nabla/jenkins-pipeline-scripts:1.0.0 > jenkins.tar
+$docker save nabla/jenkins-pipeline-scripts:1.0.2 > jenkins.tar
 $microk8s ctr image import jenkins.tar
 
 $microk8s ctr images ls
@@ -138,7 +138,7 @@ k config use-context microk8s
 ```bash
 $ #k delete pods --all
 #k delete -f jenkins-deployment.yaml
-$k apply -f jenkins-deployment.yaml -n jenkins
+$k apply -f jenkins-deployment-local.yaml -n jenkins
 
 $k get deployments jenkins-master -n jenkins --watch
 $k describe pod -n jenkins | grep jenkins
