@@ -27,17 +27,17 @@ def call(Map vars, Closure body=null) {
         vars.RELEASE_VERSION = (readFile("${vars.pomFile}") =~ '<version>(.+)-SNAPSHOT</version>')[0][1]
       }
       echo "NEW RELEASE_VERSION : ${vars.RELEASE_VERSION}"
-        } // if RELEASE_VERSION
-    } catch (exc) {
+    } // if RELEASE_VERSION
+  } catch (exc) {
     echo 'Warning: There were errors in getReleasedVersion : readFile. ' + exc
     try {
       if (vars.pomFile != null && vars.pomFile.trim() != '') {
         vars.RELEASE_VERSION = readMavenPom(file: vars.pomFile).getVersion()
       }
-        } catch (excc) {
+    } catch (excc) {
       echo 'Warning: There were errors in getReleasedVersion : readMavenPom. ' + excc
     }
-    } // catch
+  } // catch
 
   echo "echo RELEASE_VERSION : ${vars.RELEASE_VERSION}"
 

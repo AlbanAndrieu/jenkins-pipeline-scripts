@@ -40,11 +40,11 @@ def call(Map vars, Closure body=null) {
   vars.DOCKER_REGISTRY_TMP_URL = vars.get('DOCKER_REGISTRY_TMP_URL', env.DOCKER_REGISTRY_TMP_URL ?: "https://${vars.DOCKER_REGISTRY_TMP}").trim()
   vars.DOCKER_REGISTRY_TMP_CREDENTIAL = vars.get('DOCKER_REGISTRY_TMP_CREDENTIAL', env.DOCKER_REGISTRY_TMP_CREDENTIAL ?: 'jenkins').trim()
 
-  vars.DOCKER_REGISTRY = vars.get('DOCKER_REGISTRY', env.DOCKER_REGISTRY ?: 'registry.hub.docker.com').toLowerCase().trim()
+  vars.DOCKER_REGISTRY = vars.get('DOCKER_REGISTRY', env.DOCKER_REGISTRY ?: 'index.docker.io/v1').toLowerCase().trim() // index.docker.io/v1 registry.hub.docker.com
   vars.DOCKER_REGISTRY_URL = vars.get('DOCKER_REGISTRY_URL', env.DOCKER_REGISTRY_URL ?: "https://${vars.DOCKER_REGISTRY}").trim()
   vars.DOCKER_REGISTRY_CREDENTIAL = vars.get('DOCKER_REGISTRY_CREDENTIAL', env.DOCKER_REGISTRY_CREDENTIAL ?: 'hub-docker-nabla').trim()
 
-  vars.DOCKER_REGISTRY_HUB = vars.get('DOCKER_REGISTRY_HUB', env.DOCKER_REGISTRY_HUB ?: '').toLowerCase().trim()
+  vars.DOCKER_REGISTRY_HUB = vars.get('DOCKER_REGISTRY_HUB', env.DOCKER_REGISTRY_HUB ?: 'index.docker.io/v1').toLowerCase().trim() // index.docker.io/v1
   vars.DOCKER_REGISTRY_HUB_URL = vars.get('DOCKER_REGISTRY_HUB_URL', env.DOCKER_REGISTRY_HUB_URL ?: "https://${vars.DOCKER_REGISTRY_HUB}").trim()
   vars.DOCKER_REGISTRY_HUB_CREDENTIAL = vars.get('DOCKER_REGISTRY_HUB_CREDENTIAL', env.DOCKER_REGISTRY_HUB_CREDENTIAL ?: 'hub-docker-nabla').trim()
 

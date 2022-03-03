@@ -113,7 +113,7 @@ pipeline {
                              java(reportEncoding: 'UTF-8'),
                              javaDoc(),
                              spotBugs(),
-                             checkStyle(),
+                             //checkStyle(),
                              cpd(pattern: '**/target/cpd.xml'),
                              pmdParser(pattern: '**/target/pmd.xml')
                      ],

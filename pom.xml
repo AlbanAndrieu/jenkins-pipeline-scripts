@@ -135,7 +135,7 @@
     <commons.lang3.version>3.7</commons.lang3.version>
     <commons.math3.version>3.2</commons.math3.version>
     <org.assertj.version>3.4.1</org.assertj.version>
-    <jenkins.version>2.335</jenkins.version>
+    <jenkins.version>2.334</jenkins.version>
     <jenkins.core.version>${jenkins.version}</jenkins.core.version>
     <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
     <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
@@ -345,6 +345,12 @@
       <id>jenkins-releases</id>
       <name>Jenkins Releases Repository</name>
       <url>https://repo.jenkins-ci.org/releases/</url>
+    </repository>
+    <!-- below is for org/connectbot/jbcrypt/jbcrypt/1.0.0/jbcrypt-1.0.0.jar -->
+    <repository>
+      <id>jenkins-public</id>
+      <name>Jenkins Public</name>
+      <url>http://repo.jenkins-ci.org/public/</url>
     </repository>
   </repositories>
   <pluginRepositories>
