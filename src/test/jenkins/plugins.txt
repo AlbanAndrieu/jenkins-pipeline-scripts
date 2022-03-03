@@ -199,3 +199,5 @@ yet-another-build-visualizer:latest
 #batch-task:latest
 #publish-over-ssh:latest
 amazon-ecr
+ansible
+embeddable-build-status

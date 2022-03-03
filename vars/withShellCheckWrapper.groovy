@@ -19,51 +19,55 @@ def call(Map vars, Closure body=null) {
   vars.shellCheckFileId = vars.get('shellCheckFileId', '0').trim()
 
   vars.skipShellCheckFailure = vars.get('skipShellCheckFailure', true).toBoolean()
-  vars.skipShellCheck = vars.get('skipShellCheck', false).toBoolean()
-  vars.shellCheckOutputFile = vars.get('shellCheckOutputFile', "shellcheck-checkstyle-${vars.shellCheckFileId}.xml").trim()
+  vars.skipShellCheck = vars.get('skipShellCheck', true).toBoolean()
+  vars.shellCheckOutputFile = vars.get('shellCheckOutputFile', "shellcheck-${vars.shellCheckFileId}.json").trim()
 
   vars.isSuccessReturnCode = vars.get('isSuccessReturnCode', 0)
   vars.isFailReturnCode = vars.get('isFailReturnCode', 255)
   vars.isUnstableReturnCode = vars.get('isUnstableReturnCode', 1)
 
+  vars.isFingerprintEnabled = vars.get('isFingerprintEnabled', false).toBoolean()
+
   if (!vars.skipShellCheck) {
     tee("${vars.shellOutputFile}") {
       if (isUnix()) {
         shellCheckExitCode = sh(
-                  script: """#!/bin/bash -l
-                  export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\"
-                  shellcheck ${vars.shellCheckCmdParameters} -f checkstyle ${vars.pattern} 2>&1 > ${vars.shellCheckOutputFile}""",
-                returnStdout: true,
-                returnStatus: true
-            )
+					script: """#!/bin/bash -l
+					export SHELLCHECK_OPTS=\"${SHELLCHECK_OPTS}\"
+					shellcheck ${vars.shellCheckCmdParameters} -f json ${vars.pattern} 2>&1 > ${vars.shellCheckOutputFile}""",
+					returnStdout: true,
+					returnStatus: true
+				)
 
         echo "SHELLCHECK RETURN CODE : ${shellCheckExitCode}"
         if (shellCheckExitCode == vars.isSuccessReturnCode) {
           echo 'SHELLCHECK SUCCESS'
-            } else if (!vars.skipShellCheckFailure) {
+        } else if (!vars.skipShellCheckFailure) {
           if (shellCheckExitCode == vars.isFailReturnCode) {
             echo 'SHELLCHECK FAILURE'
             currentBuild.result = 'FAILURE'
             error 'There are errors in shellCheck'
-                } else if (shellCheckExitCode <= vars.isUnstableReturnCode) {
+          } else if (shellCheckExitCode <= vars.isUnstableReturnCode) {
             echo 'SHELLCHECK UNSTABLE'
             currentBuild.result = 'UNSTABLE'
-                } else {
+          } else {
             echo 'SHELLCHECK FAILURE'
             //currentBuild.result = 'FAILURE'
             error 'There are other errors'
           }
-            } else {
+        } else {
           echo 'SHELLCHECK FAILURE skipped'
         //error 'There are errors in shellCheck'
         }
-          } // isUnix
-        } // tee
+			} // isUnix
+		} // tee
 
-    checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: "${vars.shellCheckOutputFile}", shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+    // deprecated plugin https://plugins.jenkins.io/checkstyle/
+		//checkstyle canComputeNew: false, defaultEncoding: '', healthy: '50', pattern: "${vars.shellCheckOutputFile}", shouldDetectModules: true, thresholdLimit: 'normal', unHealthy: '100'
+	  archiveArtifacts artifacts: "${vars.shellCheckOutputFile}", excludes: null, fingerprint: vars.isFingerprintEnabled, onlyIfSuccessful: false, allowEmptyArchive: true
 
-    return shellCheckExitCode
-    } else {
+		return shellCheckExitCode
+	} else {
     echo 'ShellCheck skipped'
   }
 }
