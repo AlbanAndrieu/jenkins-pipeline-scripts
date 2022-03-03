@@ -132,10 +132,10 @@
     <doxia.core.version>1.8</doxia.core.version>
     <doxia.version>1.8.1</doxia.version>
     <commons.io.version>2.11.0</commons.io.version>
-    <commons.lang3.version>3.7</commons.lang3.version>
+    <commons.lang3.version>3.8.1</commons.lang3.version>
     <commons.math3.version>3.2</commons.math3.version>
     <org.assertj.version>3.4.1</org.assertj.version>
-    <jenkins.version>2.334</jenkins.version>
+    <jenkins.version>2.337</jenkins.version>
     <jenkins.core.version>${jenkins.version}</jenkins.core.version>
     <jenkins.workflow.scm.step.plugin.version>2.7</jenkins.workflow.scm.step.plugin.version>
     <jenkins.workflow.step.api.version>2.20</jenkins.workflow.step.api.version>
