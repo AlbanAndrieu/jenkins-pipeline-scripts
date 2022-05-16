@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.337-jdk11 as RUNTIME
+FROM jenkins/jenkins:2.347-jdk11 as RUNTIME
 
 # Install dependencies
 USER root
