@@ -16,6 +16,7 @@ on:
 
 jobs:
   build:
+    if: github.actor != 'dependabot[bot]' && github.actor!= 'dependabot-preview[bot]'   # ignore the pull request which comes from user dependabot.
     name: Build Docker
     #runs-on: ubuntu-18.04
     runs-on: ubuntu-latest

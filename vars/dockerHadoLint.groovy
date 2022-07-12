@@ -33,25 +33,25 @@ def call(Map vars, Closure body=null) {
       try {
         if (body) { body() }
 
-                //docker history --no-trunc fusion-risk/ansible-jenkins-slave:latest > docker-history.log
-                //dive fusion-risk/ansible-jenkins-slave:latest
+                //docker history --no-trunc nabla/ansible-jenkins-slave:latest > docker-history.log
+                //dive nabla/ansible-jenkins-slave:latest
 
         // TODO Remove it when tee will be back
         vars.dockerLintCmd += " 2>&1 > ${vars.dockerLintOutputFile} "
 
         docker = sh (script: vars.dockerLintCmd, returnStatus: true)
-        echo "DOCKER HADOLINT RETURN CODE : ${docker}"
+        echo "DOCKER HANABLA RETURN CODE : ${docker}"
         if (docker == 0) {
-          echo 'DOCKER HADOLINT SUCCESS'
+          echo 'DOCKER HANABLA SUCCESS'
                 //sh "hadolint Dockerfile -f checkstyle > target/checkstyle-hadolint.xml \"${vars.dockerFilePath}/${vars.dockerFileName}\""
                 } else {
           echo "WARNING : Docker HadoLint failed, check output at \'${env.BUILD_URL}artifact/${vars.dockerLintOutputFile}\' "
           if (!vars.skipDockerLintFailure) {
-            echo 'DOCKER HADOLINT UNSTABLE'
+            echo 'DOCKER HANABLA UNSTABLE'
             currentBuild.result = 'UNSTABLE'
             error 'There are errors in docker HadoLint'
                   } else {
-            echo 'DOCKER HADOLINT UNSTABLE skipped'
+            echo 'DOCKER HANABLA UNSTABLE skipped'
           //error 'There are errors in docker'
           }
         }

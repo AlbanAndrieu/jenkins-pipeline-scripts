@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    name: Build Maven and Docker
+    name: Build Maven
     #runs-on: ubuntu-18.04
     runs-on: ubuntu-latest
 

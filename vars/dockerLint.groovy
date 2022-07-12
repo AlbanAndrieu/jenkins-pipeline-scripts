@@ -32,8 +32,8 @@ def call(Map vars, Closure body=null) {
       try {
         if (body) { body() }
 
-        //docker history --no-trunc fusion-risk/ansible-jenkins-slave:latest > docker-history.log
-        //dive fusion-risk/ansible-jenkins-slave:latest
+        //docker history --no-trunc nabla/ansible-jenkins-slave:latest > docker-history.log
+        //dive nabla/ansible-jenkins-slave:latest
 
         sh "find ${vars.dockerFilePath} -name \"Dockerfile*\" || true"
         sh 'pwd'

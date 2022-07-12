@@ -17,7 +17,7 @@ def pushAndRemoveDockerImage(def container, def image, def tag, def remove=true)
       container.push('latest')
     }
     // No need to explicitly removed "latest", it will be overwritten by any subsequent build
-    // of the same job. Removing "latest" during build risks race condition with parallel builds
+    // of the same job. Removing "latest" during build nablas race condition with parallel builds
     // For that reason, cleaning is implemented as nightly cron job for docker VM's
     if (remove) {
       sh "docker rmi ${image}:${tag}"

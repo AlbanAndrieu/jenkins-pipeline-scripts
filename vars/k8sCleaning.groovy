@@ -32,7 +32,7 @@ def call(Map vars, Closure body=null) {
       echo "Cleaning for jenkins : "
       kubectl get pods -o name --selector=jenkins=albandri-slave --all-namespaces | xargs -I {} kubectl delete {}
       kubectl get pods -o name --selector=jenkins=almonde-slave --all-namespaces | xargs -I {} kubectl delete {}
-      kubectl get pods -o name --selector=jenkins=risk-slave --all-namespaces | xargs -I {} kubectl delete {}
+      kubectl get pods -o name --selector=jenkins=nabla-slave --all-namespaces | xargs -I {} kubectl delete {}
       '''
     } catch (exc) {
       echo 'Warn: There was a problem with cleaning k8s ' + exc

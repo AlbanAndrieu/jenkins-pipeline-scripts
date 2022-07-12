@@ -58,7 +58,7 @@ def call(def dockerImageName, def pomFile = 'pom.xml', def releaseVersion = '') 
     } else {
       vars.fileName += '.TXT'
     }
-    // See https://risk-jenkins.misys.global.ad/jenkins/pipeline-syntax/globals#env
+    // See https://nabla-jenkins.nabla.albandrieu.com/jenkins/pipeline-syntax/globals#env
     vars.jobUrl = vars.get('JOB_URL', env.JOB_URL ?: 'TODO').trim()
 
     //vars.dockerTag = vars.get("dockerTag", dockerTag ?: (env.DOCKER_TAG ?: "temp")).trim()
