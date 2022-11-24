@@ -119,7 +119,7 @@
     <groovy.version>2.4.12</groovy.version>
     <!--<groovy.version>2.5.13</groovy.version>-->
     <!--<groovy.version>3.0.6</groovy.version>-->
-    <ivy.version>2.4.0</ivy.version>
+    <ivy.version>2.5.1</ivy.version>
     <!--<groovy.cps.version>1.28</groovy.cps.version> jenkins 2.221 -->
     <groovy.cps.version>1.31</groovy.cps.version>
     <!-- jenkins 2.249.1 -->
