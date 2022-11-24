@@ -113,7 +113,7 @@
     <jacoco.agent></jacoco.agent>
     <asm.ow2.version>5.0.3</asm.ow2.version>
     <jmockit.version>1.19</jmockit.version>
-    <junit.version>4.13</junit.version>
+    <junit.version>4.13.2</junit.version>
     <hamcrest.version>2.1</hamcrest.version>
     <groovy.all.version>2.5.15</groovy.all.version> <!-- will use groovy 2.4.6 -->
     <groovy.version>2.4.12</groovy.version>
