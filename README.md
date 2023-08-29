@@ -1,3 +1,4 @@
+<!-- markdown-link-check-disable-next-line -->
 ## [![Nabla](http://albandrieu.com/nabla/index/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu) jenkins-pipeline-scripts
 
 [![License: APACHE](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
@@ -21,6 +22,8 @@
 
 # Table of contents
 
+// spell-checker:disable
+
 <!-- toc -->
 
 - [Usage](#usage)
@@ -38,11 +41,23 @@
 
 <!-- tocstop -->
 
+// spell-checker:enable
+
 *NOTE: This repository is being deprecated internally at Nabla and hence
 will receive few updates going forward.*
 
-Usage
------
+## Initialize
+
+```bash
+direnv allow
+pyenv install 3.10.4
+pyenv local 3.10.4
+python -m pipenv install --dev --ignore-pipfile
+direnv allow
+pre-commit install
+```
+
+## Usage
 
 This repository contains helper functions and classes to be used with the Jenkins Pipeline Plugin.
 This repository is used on <http://albandrieu.com/jenkins/> and other Jenkins instances managed by Nabla.
@@ -88,8 +103,7 @@ Run test
 ```
 
 
-Docker
------------
+## Docker
 
 Build and Run
 

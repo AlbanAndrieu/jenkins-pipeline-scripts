@@ -72,7 +72,7 @@ ssh:latest
 ssh-slaves:latest
 ssh-credentials:latest
 stashNotifier:latest
-sitemonitor:latest
+#sitemonitor:latest
 build-metrics:latest
 distfork:latest
 promoted-builds:latest
