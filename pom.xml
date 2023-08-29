@@ -143,6 +143,7 @@
     <jenkins.workflow.cps.version>2.83</jenkins.workflow.cps.version>
     <jenkins.symbol.version>1.18</jenkins.symbol.version>
     <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
+    <sonar.organization>albanandrieu-github</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.login>818224bf27cc74d98389c3d5c567e58ea7e058eb</sonar.login>
     <sonar.links.ci>${env.BUILD_URL}</sonar.links.ci>
