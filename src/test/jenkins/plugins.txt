@@ -29,7 +29,7 @@ downstream-buildview:latest
 clamav:latest
 deploy:latest
 naginator:latest
-build-publisher:latest
+# build-publisher:latest
 xvfb:latest
 windows-slaves:latest
 m2release:latest
@@ -47,7 +47,7 @@ fail-the-build-plugin:latest
 workflow-step-api:latest
 checkmarx:latest
 aqua-security-scanner:latest
-whitesource:latest
+# whitesource:latest
 matrix-combinations-parameter:latest
 jobtype-column:latest
 configurationslicing:latest

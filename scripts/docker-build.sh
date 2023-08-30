@@ -8,7 +8,7 @@ set -eo pipefail
 WORKING_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export DOCKER_NAME=${DOCKER_NAME:-"jenkins-pipeline-scripts"}
-export DOCKER_TAG=${DOCKER_TAG:-"1.0.2"}
+export DOCKER_TAG=${DOCKER_TAG:-"1.0.3"}
 export DOCKER_FILE="../Dockerfile"
 
 # shellcheck source=/dev/null

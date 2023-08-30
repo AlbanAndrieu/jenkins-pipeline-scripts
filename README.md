@@ -26,6 +26,7 @@
 
 <!-- toc -->
 
+- [Initialize](#initialize)
 - [Usage](#usage)
 - [Docker](#docker)
 - [Kubernetes](#kubernetes)
@@ -129,7 +130,7 @@ Install [microk8s](https://ubuntu.com/blog/deploying-kubernetes-locally-microk8s
 [Make](https://microk8s.io/docs/registry-images) docker image available to microk8s
 
 ```bash
-$docker save nabla/jenkins-pipeline-scripts:1.0.2 > jenkins.tar
+$docker save nabla/jenkins-pipeline-scripts:1.0.3 > jenkins.tar
 $microk8s ctr image import jenkins.tar
 
 $microk8s ctr images ls
