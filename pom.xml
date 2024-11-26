@@ -130,7 +130,7 @@
     <jmockit.version>1.19</jmockit.version>
     <guava.version>18.0</guava.version>
     <doxia.core.version>1.8</doxia.core.version>
-    <doxia.version>1.8.1</doxia.version>
+    <doxia.version>1.11.1</doxia.version>
     <commons.io.version>2.11.0</commons.io.version>
     <commons.lang3.version>3.7</commons.lang3.version>
     <commons.math3.version>3.2</commons.math3.version>
