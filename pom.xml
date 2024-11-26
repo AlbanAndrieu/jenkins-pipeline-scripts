@@ -74,7 +74,7 @@
     <maven.tomcat7.plugin.version>2.2</maven.tomcat7.plugin.version>
     <maven.pitest.plugin.version>1.2.4</maven.pitest.plugin.version>
     <maven.sonar.plugin.version>3.9.0.2155</maven.sonar.plugin.version>
-    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+    <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
     <maven.pitest.plugin.version>1.4.3</maven.pitest.plugin.version>
     <groovy.eclipse.compiler.version>3.4.0-01</groovy.eclipse.compiler.version>
     <groovy.eclipse.batch.version>2.5.7-01</groovy.eclipse.batch.version>
